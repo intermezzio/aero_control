@@ -1,0 +1,7 @@
+<!-- Sample launch file for running talker and listener -->
+<launch>
+
+	<node name="talker" pkg="aero_control-staffonly" type="talker.py"/>
+    <!--- TODO: create listener node --->
+
+</launch>
