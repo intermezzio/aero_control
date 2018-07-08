@@ -12,13 +12,11 @@ A python script to practice receiving ROS messages
 class Listener():
     ''' Subscribes to ROS messages
     '''
-    def __init__(self, chat_frequency=1.0):
+    def __init__(self):
 
         # publishing objects
         self.chatter_sub = rospy.Subscriber("/chatter", String, self.chatter_callback)
 
-        # rate of publishing
-        self.chat_frequency = rospy.Rate(chat_frequency)
 
     def chatter_callback(self, msg):
         ''' Function to be run everytime a message is received on chatter topic
