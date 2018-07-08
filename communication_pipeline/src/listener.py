@@ -14,7 +14,7 @@ class Listener():
     '''
     def __init__(self):
 
-        # publishing objects
+        # subscription objects
         self.chatter_sub = rospy.Subscriber("/chatter", String, self.chatter_callback)
 
 
