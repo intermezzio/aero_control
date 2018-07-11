@@ -1,4 +1,4 @@
-### Please answer the following questions and push your answers to your team's documents repository
+### Please answer the following questions and push your answers to your team's remote repository
 
 For true/false question, if the statement is false, provide a description of why it is false.
 
