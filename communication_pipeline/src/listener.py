@@ -22,7 +22,7 @@ class Listener():
         ''' Function to be run everytime a message is received on chatter topic
         '''
 	msg =  "this is a listern"
-	return msg
+	print(msg)
 
         '''TODO-START: FILL IN CODE HERE 
         * print out the message received to the terminal
