@@ -29,7 +29,9 @@ class Talker():
             '''TODO-START: FILL IN CODE HERE 
             * create a string message that contains "Hello World" and the iteration number i
             '''
-            raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
+            chat_msg = "Hello World" + str(i)
+	    print(chat_msg)
+            #raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
             '''TODO-END '''
             self.chatter_pub.publish(chat_msg)
             self.chat_frequency.sleep()

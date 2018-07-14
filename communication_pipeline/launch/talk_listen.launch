@@ -2,6 +2,7 @@
 <launch>
 
 	<node name="talker" pkg="aero_control" type="talker.py"/>
-    <!--- TODO: create listener node --->
+
+    <node name="listener" pkg="aero_control" type="listener.py" output="screen"/>
 
 </launch>
