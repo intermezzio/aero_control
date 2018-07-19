@@ -17,7 +17,7 @@ class Listener():
     '''
     def __init__(self):
         # TODO-START: subscribe to our custom chatter topic, using chatter_callback as the callback
-        raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
+        self.chatter_sub = rospy.Subscriber("/chatter", String, self.chatter_callback)
         # TODO-END
 
     def chatter_callback(self, msg):
