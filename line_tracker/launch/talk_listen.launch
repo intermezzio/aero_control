@@ -1,8 +1,0 @@
-<!-- Sample launch file for running talker and listener -->
-<launch>
-
-	<node name="talker" pkg="line_tracker" type="talker.py"/>
-
-	<node name="listener" pkg="line_tracker" type="listener.py" output="screen"/>
-
-</launch>
