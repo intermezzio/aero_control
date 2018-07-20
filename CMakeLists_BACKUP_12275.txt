@@ -8,8 +8,13 @@ project(aero_control)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+<<<<<<< HEAD
+  roscpp
+  rospy
+=======
   rospy
   roscpp
+>>>>>>> 77543efb4ff62a326b3b162aad36bc72473ddff6
   std_msgs
   message_generation
 )
@@ -49,8 +54,13 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate messages in the 'msg' folder
 add_message_files(
+<<<<<<< HEAD
+   FILES
+   Line.msg
+=======
     FILES
     Line.msg
+>>>>>>> 77543efb4ff62a326b3b162aad36bc72473ddff6
  )
 
 ## Generate services in the 'srv' folder
@@ -69,9 +79,15 @@ add_message_files(
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
+<<<<<<< HEAD
+   DEPENDENCIES
+   std_msgs
+ )
+=======
   DEPENDENCIES
   std_msgs
 )
+>>>>>>> 77543efb4ff62a326b3b162aad36bc72473ddff6
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -105,9 +121,14 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES aero_control
+<<<<<<< HEAD
+#  CATKIN_DEPENDS rospy std_msgs message_runtime
+#  DEPENDS system_lib
+=======
 #  CATKIN_DEPENDS rospy std_msgs
 #  DEPENDS system_lib
 CATKIN_DEPENDS message_runtime
+>>>>>>> 77543efb4ff62a326b3b162aad36bc72473ddff6
 )
 
 ###########
@@ -121,6 +142,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 77543efb4ff62a326b3b162aad36bc72473ddff6
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/aero_control.cpp
