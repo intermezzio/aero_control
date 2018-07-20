@@ -15,11 +15,17 @@ class Talker():
     ''' Generates and publishes ROS messages
     '''
     def __init__(self, chat_frequency=1.0):
+        pub = rospy.Publisher('custom_chatter', Person)
+        rospy.init_node('custom_talker', anonymous=True)
 
-        
-        raise Exception("CODE INCOMPLETE! Delete this exception and complete the following lines")
-        self.chatter_pub = # TODO subscribe to our custom chatter topic, using chatter_callback as the callback
+        msg = Line() # Object
 
+        while not rospy.is_shutdown():
+            rospy.loginfo(msg)
+            pub.publish(msg)
+            r.sleep()
+
+        self.chatter_pub = rospy.Publisher("/custom_chatter", String, queue_size=1)
         # rate of publishing
         self.chat_frequency = rospy.Rate(chat_frequency)
 
@@ -32,7 +38,7 @@ class Talker():
             # TODO-START: create and publish a custom message [values can be anything]
             raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
             # TODO-END
-            
+
             self.chat_frequency.sleep()
 
 if __name__ == '__main__':
