@@ -8,11 +8,19 @@ project(aero_control)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+<<<<<<< HEAD
+   roscpp
+   rospy
+   std_msgs
+   message_generation
+  )
+=======
   rospy
   roscpp
   std_msgs
   message_generation
 )
+>>>>>>> 15b7f4ec14d88d95407466343fe0a5048a29df98
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)

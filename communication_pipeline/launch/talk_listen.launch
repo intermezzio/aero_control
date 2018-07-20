@@ -1,8 +1,14 @@
 <!-- Sample launch file for running talker and listener -->
 <launch>
 
+<<<<<<< HEAD
+	<node name="talker" pkg="aero_control" type="talker.py"/>
+
+    <node name="listener" pkg="aero_control" type="listener.py" output="screen"/>
+=======
 	<node name="talker" pkg="aero_control" type="talker.py" output="screen"/>
     <!--- TODO: create listener node --->
 	<node name="listener" pkg="aero_control" type="listener.py" output="screen"/>
+>>>>>>> 77543efb4ff62a326b3b162aad36bc72473ddff6
 
 </launch>

@@ -33,6 +33,10 @@ class VelocityCommander():
             * create a velocity command along the x-axis that oscillates with amplitude 0.1 m/s and period 2 seconds
             * All other velocity command components should be zero
             '''
+            # .linear.x= a*sin(np.pi*t)
+            vel_cmd.linear.x = a*sin(np.pi*t)
+            vel_cmd.linear.y = 0
+            vel_cmd.linear.z = 0
             raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
             '''TODO-END '''
             self.velocity_command_pub.publish(vel_cmd)

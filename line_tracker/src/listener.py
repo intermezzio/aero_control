@@ -3,8 +3,9 @@
 from __future__ import division, print_function
 
 import rospy
+from aero_control.msg import Line
 # TODO-START: Import our custom message
-raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
+# raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
 # TODO-END
 
 
@@ -17,14 +18,21 @@ class Listener():
     '''
     def __init__(self):
         # TODO-START: subscribe to our custom chatter topic, using chatter_callback as the callback
-        raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
+<<<<<<< HEAD
+        self.chatter_sub = rospy.Subscriber("custom_chatter", Line, self.chatter_callback)
+        # raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
+=======
+        self.chatter_sub = rospy.Subscriber("/chatter", String, self.chatter_callback)
+>>>>>>> 77543efb4ff62a326b3b162aad36bc72473ddff6
         # TODO-END
 
     def chatter_callback(self, msg):
         ''' Function to be run everytime a message is received on chatter topic
         '''
         # TODO-START: print the x, y, vx, and vy values in msg
-        raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
+        # msg = x,y,vx,vy
+        print(msg)
+        # raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
         # TODO-END
 
 if __name__ == '__main__':
