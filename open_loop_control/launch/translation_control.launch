@@ -23,6 +23,6 @@
   </include>
 
   <!-- Launch detector node -->
-  <node pkg="aero_control_staffonly" name="translation_controller" type="translation_control.py"/>
+  <node pkg="aero_control" name="translation_controller" type="translation_control.py"/>
 
 </launch>
