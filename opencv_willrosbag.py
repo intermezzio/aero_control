@@ -1,43 +1,81 @@
-import cv2
+# import cv2
 from cv_bridge import CvBridge, CvBridgeError
-import rospy
-from sensor_msgs.msg import Image
+# import rospy
+# from sensor_msgs.msg import Image
+# import numpy as np
+# from scipy.stats import linregress
+# from matplotlib.lines import Line2D
 
 
-_DEBUG = True
-class ImageToCV:
-    def __init__(self):
-        rospy.Subscriber("/aero_downward_camera/image", Image, self.image_cb)
-        self.image_pub = rospy.Publisher("/image_to_cv/processed", Image, queue_size=1)
-        self.bridge = CvBridge()
+# _DEBUG = True
+# class ImageToCV:
+#     def __init__(self):
+#         rospy.Subscriber("/aero_downward_camera/image", Image, self.image_cb)
+#         self.image_pub = rospy.Publisher("/image_to_cv/processed", Image, queue_size=1)
+#         self.bridge = CvBridge()
 
-    def image_cb(self, msg):
-        try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, "8UC1")
+#     def image_cb(self, msg):
+#         try:
+#             cv_image = self.bridge.imgmsg_to_cv2(msg, "8UC1")
 
-        except CvBridgeError as e:
-            print(e)
+#         except CvBridgeError as e:
+#             print(e)
 
-        # cv2.imshow(cv_image) # shows the image, might be VERY slow (optional)
-        self.process(cv_image)
+#         # cv2.imshow(cv_image) # shows the image, might be VERY slow (optional)
+#         self.process(cv_image)
 
-    def process(self, img):
-        # cv2 processing goes here <--------------------
+        
+#     def process(self, img):
+#         # cv2 processing goes here <--------------------
 
-        if _DEBUG:
-            try:
-                self.image_pub.publish(self.bridge.cv2_to_imgmsg(img, "8UC1"))
+#         white_thresh = 255
+#         black_thresh = 255
 
-            except CvBridgeError as e:
-                print(e)
+#         k_dim = 4
+#         kernel = np.ones((k_dim,k_dim),np.uint8)
 
-if __name__ == "__main__":
-    rospy.init_node("image_to_cv")
-    a = ImageToCV()
-    print("this is running")
+#         d = np.copy(img) #preserves raw images, but requires more time and processing power    
+#         d = cv2.inRange(d,black_thresh,white_thresh)
+#         d = cv2.dilate(d,kernel)
 
-    # rospy.on_shutdown(cv2.destroyAllWindows())
+#         aw = np.argwhere(d)
+#         m,b,_,_,_ = linregress(aw[:,1], aw[:,0])
 
-    rospy.spin()
+#         def find_inliers(m,b,shape):
+#             for x1 in range(shape[0]):
+#                 y1 = m * x1 + b
+#                 if y1 < 0 or y1 > shape[1]:
+#                     continue ##jump back to the beginning of the for loop
+#                 break
+                
+#             for x2 in range(shape[0])[::-1]:
+#                 y2 = m * x2 + b
+#                 if y2 < 0 or y1 > shape[1]:
+#                     continue
+#                 break
+#             return(x1,y1,x2,y2)
+
+#         x1,y1,x2,y2 = find_inliers(m,b,d.shape)
+
+#         regression = Line2D([x1,x2],[y1,y2], color="red",linewidth=10)
+#         a.imshow(d,cmap="gray")
+#         a.add_line(regression)
+
+#         if _DEBUG:
+#             try:
+#                 self.image_pub.publish(self.bridge.cv2_to_imgmsg(d, "8UC1"))
+
+#             except CvBridgeError as e:
+#                 print(e)
+
+
+# if __name__ == "__main__":
+#     rospy.init_node("image_to_cv")
+#     a = ImageToCV()
+#     print("this is running")
+
+#     # rospy.on_shutdown(cv2.destroyAllWindows())
+
+#     rospy.spin()
 
 
