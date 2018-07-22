@@ -5,6 +5,8 @@ from sensor_msgs.msg import Image
 import numpy as np
 from scipy.stats import linregress
 from matplotlib.lines import Line2D
+import matplotlib.pyplot as plt
+
 
 
 _DEBUG = True
@@ -31,39 +33,42 @@ class ImageToCV:
         white_thresh = 255
         black_thresh = 255
 
-        k_dim = 4
+        k_dim = 2
         kernel = np.ones((k_dim,k_dim),np.uint8)
 
         d = np.copy(img) #preserves raw images, but requires more time and processing power    
         d = cv2.inRange(d,black_thresh,white_thresh)
         d = cv2.dilate(d,kernel)
 
-        aw = np.argwhere(d)
-        m,b,_,_,_ = linregress(aw[:,1], aw[:,0])
+        white_thresh = 255
+        black_thresh = 255
 
-        def find_inliers(m,b,shape):
-            for x1 in range(shape[0]):
-                y1 = m * x1 + b
-                if y1 < 0 or y1 > shape[1]:
-                    continue ##jump back to the beginning of the for loop
-                break
-                
-            for x2 in range(shape[0])[::-1]:
-                y2 = m * x2 + b
-                if y2 < 0 or y1 > shape[1]:
-                    continue
-                break
-            return(x1,y1,x2,y2)
+        k_dim = 4
+        kernel = np.ones((k_dim,k_dim),np.uint8)
 
-        x1,y1,x2,y2 = find_inliers(m,b,d.shape)
+        d = np.copy(d) #preserves raw images, but requires more time and processing power    
+        d = cv2.inRange(d,black_thresh,white_thresh)
+        d = cv2.dilate(d,kernel)
+        d = cv2.resize(d, (0,0), fx=10, fy=10)
 
-        regression = Line2D([x1,x2],[y1,y2], color="red",linewidth=10)
-        a.imshow(d,cmap="gray")
-        a.add_line(regression)
+        ret,thresh = cv2.threshold(d,0,255,0)
+        im2,contours,hierarchy = cv2.findContours(thresh, 1, 2)#adds the pixels in the threshold to the list of possible contours
+        cntrs = contours[0] #takes a random pixel, in this case the first
+        
+        rows,cols = d.shape[:2]
+        [vx,vy,x,y] = cv2.fitLine(cntrs, cv2.DIST_L2,0,0.01,0.01)
+        lefty = int((-x*vy/vx) + y)
+        righty = int(((cols-x)*vy/vx)+y)
+        regression = cv2.line(d,(cols-1,righty),(0,lefty),(255,255,255),2)
+
+
+        # cv2.imshow('image', regression)
 
         if _DEBUG:
             try:
                 self.image_pub.publish(self.bridge.cv2_to_imgmsg(d, "8UC1"))
+                # self.image_pub.publish(self.bridge.cv2_to_imgmsg(regression, "8UC1"))
+
 
             except CvBridgeError as e:
                 print(e)
