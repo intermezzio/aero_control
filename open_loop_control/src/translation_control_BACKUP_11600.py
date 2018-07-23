@@ -15,9 +15,17 @@ from geometry_msgs.msg import Twist, PoseStamped
 
 
 # Maneuver inputs (placed at top for ease of modification)
-
+<<<<<<< HEAD
 
 MANEUVER_VELOCITY_SETPOINT = np.array([0.3, 0.0, 0.0])
+
+=======
+<<<<<<< HEAD
+MANEUVER_VELOCITY_SETPOINT = np.array([0, .5, 0])
+=======
+MANEUVER_VELOCITY_SETPOINT = np.array([0.3, 0.0, 0.0])
+>>>>>>> 783af2c8056ca71afef33ddb59b86e9febeb0f1f
+>>>>>>> 4fa022bd684e8dfc8551e46105b4199e619a989c
 MANEUVER_REFERENCE_FRAME = 'bu'
 MANEUVER_DURATION = 2.0
 
@@ -220,6 +228,8 @@ class TranslationController:
         # Create velocity setpoint
         # Note difference: vsp_bu_lenu__lenu is an array, vel_setpoint_bu_lenu__lenu is a Twist message
         # They encode the same velocity information in different package 
+<<<<<<< HEAD
+=======
 	
     	# if timedelta == MANEUVER_DURATION:
     	
@@ -227,7 +237,7 @@ class TranslationController:
      #        	self.vel_setpoint_bu_lenu_lenu.linear.y = 0
      #       		self.vel_setpoint_bu_lenu_lenu.linear.z = 0
 
-
+>>>>>>> 4fa022bd684e8dfc8551e46105b4199e619a989c
 
 
 
@@ -245,6 +255,10 @@ class TranslationController:
         self.vel_setpoint_bu_lenu__lenu.linear.y = velsp_bu_lenu__lenu[1]
         self.vel_setpoint_bu_lenu__lenu.linear.z = velsp_bu_lenu__lenu[2]
         '''TODO-END '''
+<<<<<<< HEAD
+
+=======
+>>>>>>> 4fa022bd684e8dfc8551e46105b4199e619a989c
 
         # Publish command velocites for timedelta seconds
         while not rospy.is_shutdown() and datetime.datetime.now() - start_time < timedelta and self.current_state.mode == 'OFFBOARD':
@@ -354,18 +368,18 @@ if __name__ == '__main__':
 
     controller = TranslationController(MANEUVER_VELOCITY_SETPOINT, MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
 
-
+<<<<<<< HEAD
     # In order to ter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
     #######################################
       
     #######################################
-
+=======
 
     # In order to enter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
 
-
+>>>>>>> 4fa022bd684e8dfc8551e46105b4199e619a989c
     rospy.spin()
 
     controller.stop_streaming_offboard_points()

@@ -15,9 +15,11 @@ from geometry_msgs.msg import Twist, PoseStamped
 
 
 # Maneuver inputs (placed at top for ease of modification)
-
-
+<<<<<<< Temporary merge branch 1
+MANEUVER_VELOCITY_SETPOINT = np.array([0, .5, 0])
+=======
 MANEUVER_VELOCITY_SETPOINT = np.array([0.3, 0.0, 0.0])
+>>>>>>> Temporary merge branch 2
 MANEUVER_REFERENCE_FRAME = 'bu'
 MANEUVER_DURATION = 2.0
 
@@ -221,12 +223,15 @@ class TranslationController:
         # Note difference: vsp_bu_lenu__lenu is an array, vel_setpoint_bu_lenu__lenu is a Twist message
         # They encode the same velocity information in different package 
 	
-    	# if timedelta == MANEUVER_DURATION:
-    	
-     #        	self.vel_setpoint_bu_lenu_lenu.linear.x = 0
-     #        	self.vel_setpoint_bu_lenu_lenu.linear.y = 0
-     #       		self.vel_setpoint_bu_lenu_lenu.linear.z = 0
-
+	vsp_bu_lenu__lenu = st.coord_transform(maneuver_velocity_setpoint, fin, 'lenu') 
+	self.vel_setpoint_bu_lenu_lenu.linear.x = vsp_bu_lenu__lenu[0]
+	self.vel_setpoint_bu_lenu_lenu.linear.y = vsp_bu_lenu__lenu[1]
+	self.vel_setpoint_bu_lenu_lenu.linear.z = vsp_bu_lenu__lenu[2]
+	if timedelta == MANEUVER_DURATION:
+	
+        	self.vel_setpoint_bu_lenu_lenu.linear.x = 0
+        	self.vel_setpoint_bu_lenu_lenu.linear.y = 0
+       		self.vel_setpoint_bu_lenu_lenu.linear.z = 0
 
 
 
@@ -237,7 +242,9 @@ class TranslationController:
         Encode this in the linear portion of the Twist message and assign to the member variable
         self.vel_setpoint_bu_lenu__lenu     
         '''
-
+<<<<<<< Temporary merge branch 1
+       
+=======
         # raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
         velsp_bu_lenu__lenu = get_lenu_velocity(self.q_bu_lenu, velsp__fin, fin, self.static_transforms)
         self.vel_setpoint_bu_lenu__lenu = Twist()
@@ -245,6 +252,7 @@ class TranslationController:
         self.vel_setpoint_bu_lenu__lenu.linear.y = velsp_bu_lenu__lenu[1]
         self.vel_setpoint_bu_lenu__lenu.linear.z = velsp_bu_lenu__lenu[2]
         '''TODO-END '''
+>>>>>>> Temporary merge branch 2
 
         # Publish command velocites for timedelta seconds
         while not rospy.is_shutdown() and datetime.datetime.now() - start_time < timedelta and self.current_state.mode == 'OFFBOARD':
@@ -354,18 +362,14 @@ if __name__ == '__main__':
 
     controller = TranslationController(MANEUVER_VELOCITY_SETPOINT, MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
 
-
+<<<<<<< Temporary merge branch 1
     # In order to ter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
     #######################################
       
     #######################################
-
-
-    # In order to enter offboard mode, the drone must already be receiving commands
-    # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
-
-
+=======
+>>>>>>> Temporary merge branch 2
     rospy.spin()
 
     controller.stop_streaming_offboard_points()

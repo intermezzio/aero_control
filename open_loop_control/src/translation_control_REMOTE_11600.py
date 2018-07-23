@@ -15,9 +15,11 @@ from geometry_msgs.msg import Twist, PoseStamped
 
 
 # Maneuver inputs (placed at top for ease of modification)
-
-
+<<<<<<< HEAD
+MANEUVER_VELOCITY_SETPOINT = np.array([0, .5, 0])
+=======
 MANEUVER_VELOCITY_SETPOINT = np.array([0.3, 0.0, 0.0])
+>>>>>>> 783af2c8056ca71afef33ddb59b86e9febeb0f1f
 MANEUVER_REFERENCE_FRAME = 'bu'
 MANEUVER_DURATION = 2.0
 
@@ -230,7 +232,6 @@ class TranslationController:
 
 
 
-
 	'''TODO-START: FILL IN CODE HERE 
         Use the provided functions to calculate the desired velocity of the body-up frame with respect to the 
         local ENU frame, expressed in local ENU coordinates (i.e. vsp_bu_lenu__lenu).
@@ -355,16 +356,8 @@ if __name__ == '__main__':
     controller = TranslationController(MANEUVER_VELOCITY_SETPOINT, MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
 
 
-    # In order to ter offboard mode, the drone must already be receiving commands
-    # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
-    #######################################
-      
-    #######################################
-
-
     # In order to enter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
-
 
     rospy.spin()
 
