@@ -41,10 +41,18 @@
   <build_depend>message_generation</build_depend>
   <!-- Use build_export_depend for packages you need in order to build against this package: -->
 
+  <build_export_depend>message_generation</build_export_depend>
+
   <!-- <build_export_depend>message_generation</build_export_depend> -->
   <!-- Use buildtool_depend for build tool packages: -->
   <!--   <buildtool_depend>catkin</buildtool_depend> -->
   <!-- Use exec_depend for packages you need at runtime: -->
+
+  <!--   <build_export_depend>message_generation</build_export_depend> -->
+  <!-- Use buildtool_depend for build tool packages: -->
+  <!--   <buildtool_depend>catkin</buildtool_depend> -->
+  <!-- Use exec_depend for packages you need at runtime: -->
+
   <exec_depend>message_runtime</exec_depend> 
 
   <!--   <build_export_depend>message_generation</build_export_depend> -->
@@ -53,6 +61,7 @@
   <!--   <buildtool_depend>catkin</buildtool_depend> -->
   <!-- Use exec_depend for packages you need at runtime: -->
   <exec_depend>message_runtime</exec_depend>
+
 
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
