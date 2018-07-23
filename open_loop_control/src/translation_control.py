@@ -213,10 +213,10 @@ class TranslationController:
         # Note difference: vsp_bu_lenu__lenu is an array, vel_setpoint_bu_lenu__lenu is a Twist message
         # They encode the same velocity information in different package 
 	
-	vsp_bu_lenu__lenu = st.coord_transform(maneuver_velocity_setpoint, fin, 'lenu') 
-	self.vel_setpoint_bu_lenu_lenu.linear.x = vsp_bu_lenu__lenu[0]
-	self.vel_setpoint_bu_lenu_lenu.linear.y = vsp_bu_lenu__lenu[1]
-	self.vel_setpoint_bu_lenu_lenu.linear.z = vsp_bu_lenu__lenu[2]
+	vsp_bu_lenu__lenu = get_lenu_velocity(self.q_bu_lenu,velsp__fin, fin, self.static_transforms) 
+	self.vel_setpoint_bu_lenu__lenu.linear.x = vsp_bu_lenu__lenu[0]
+	self.vel_setpoint_bu_lenu__lenu.linear.y = vsp_bu_lenu__lenu[1]
+	self.vel_setpoint_bu_lenu__lenu.linear.z = vsp_bu_lenu__lenu[2]
 	if timedelta == MANEUVER_DURATION:
 	
         	self.vel_setpoint_bu_lenu_lenu.linear.x = 0
