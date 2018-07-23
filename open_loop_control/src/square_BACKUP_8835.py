@@ -24,7 +24,7 @@ duration.append(2)        	#
 ###############################
 
     # Iterate through maneuvers
-for i in range(len(velsp__fin)):
+for i in range(len(steps)):
     controller.execute_maneuver(velsp__fin[i], fin, duration[i])
 
 
