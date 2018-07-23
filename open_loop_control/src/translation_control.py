@@ -17,7 +17,7 @@ from geometry_msgs.msg import Twist, PoseStamped
 # Maneuver inputs (placed at top for ease of modification)
 
 
-MANEUVER_VELOCITY_SETPOINT = np.array([0.3, 0.0, 0.0])
+MANEUVER_VELOCITY_SETPOINT = np.array([0.5, 0.0, 0.0])
 MANEUVER_REFERENCE_FRAME = 'bu'
 MANEUVER_DURATION = 2.0
 

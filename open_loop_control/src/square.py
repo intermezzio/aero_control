@@ -2,6 +2,7 @@ import translation_control as tc
 
 if __name__ == '__main__':
     controller = tc.TranslationController(tc.MANEUVER_VELOCITY_SETPOINT, tc.MANEUVER_REFERENCE_FRAME, tc.MANEUVER_DURATION)
+    
 fin = 'bu'               	#
 velsp__fin = []
 duration = []
@@ -30,3 +31,4 @@ rospy.spin()
 
 controller.stop_streaming_offboard_points()
 print('DONE!')
+
