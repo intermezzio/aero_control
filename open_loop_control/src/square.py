@@ -25,10 +25,10 @@ if __name__ == '__main__':
 	###############################
 
 	    # Iterate through maneuvers
-    for i in range(len(steps)):
-        execute_maneuver(velsp__fin[i], fin, duration[i])
+	for i in range(len(steps)):
+	    execute_maneuver(velsp__fin[i], fin, duration[i])
+	rospy.loginfo(velsp__fin[i])
+	rospy.spin()
 
-    rospy.spin()
-
-    controller.stop_streaming_offboard_points()
-    print('DONE!')
+	controller.stop_streaming_offboard_points()
+	print('DONE!')

@@ -366,6 +366,30 @@ if __name__ == '__main__':
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
 
 
+        #Square ######################
+    fin = 'bu'                  #
+    velsp__fin = []
+    duration = []
+
+    velsp__fin.append([0,1, 0])  #
+    duration.append(2)          #
+                                #
+    velsp__fin.append([0,0,1])   #
+    duration.append(2)          #
+                                #
+    velsp__fin.append([0,0,1])   #
+    duration.append(2)          #
+
+    velsp__fin.append([0,-1,0])
+    duration.append(2)
+
+    velsp__fin.append([0,0,-1])   #
+    duration.append(2)          #
+    ###############################
+
+        # Iterate through maneuvers
+    for i in range(len(velsp__fin)):
+        controller.execute_maneuver(velsp__fin[i], fin, duration[i])
     rospy.spin()
 
     controller.stop_streaming_offboard_points()
