@@ -15,7 +15,9 @@ from geometry_msgs.msg import Twist, PoseStamped
 
 
 # Maneuver inputs (placed at top for ease of modification)
-MANEUVER_VELOCITY_SETPOINT = np.array([0, .5, 0])
+
+MANEUVER_VELOCITY_SETPOINT = np.array([0.3, 0.0, 0.0])
+
 MANEUVER_REFERENCE_FRAME = 'bu'
 MANEUVER_DURATION = 2.0
 
@@ -47,7 +49,10 @@ class StaticTransforms():
     # lned = local North-East-Down world frame ("local" implies that it may not be aligned with north and east, but z is down)
     
     # local ENU and local NED
-    R_lenu2lned = tft.rotation_matrix(np.pi, (1,0,0))
+    R_lenu2lned = np.array([[0.0, 1.0, 0.0, 0.0],
+                            [1.0, 0.0, 0.0, 0.0],
+                            [0.0, 0.0, -1.0, 0.0],
+                            [0.0, 0.0, 0.0, 0.0]])
 
     # body-up and body-down
     R_bu2bd = tft.rotation_matrix(np.pi, (1,0,0))
@@ -67,7 +72,10 @@ class StaticTransforms():
     R_bd2dc = R_dc2bd.T
     R_bd2fc = R_fc2bd.T
     
-    # Find concatenated rotation matrices from downward-camera to forward-camera
+    # Find chained rotation matrices from downward-camera to forward-camera
+    # NOTE: 'concatenate_matrices' is actually doing a matrix multiplication, 'concatenate' is a 
+    # bad name for this function, but we didn't make it up. See here:
+    # https://github.com/davheld/tf/blob/master/src/tf/transformations.py
     R_dc2fc = tft.concatenate_matrices(R_bd2fc, R_dc2bd)
     R_fc2dc = R_dc2fc.T
     R_dc2bu = tft.concatenate_matrices(R_bd2bu, R_dc2bd)
@@ -111,7 +119,7 @@ class StaticTransforms():
         v__fout = np.array(v4__fout[0:3])
         return v__fout
 
-def get_lenu_velocity(q_bu_lenu, v__fin, fin='bu', static_transforms=None):
+def get_lenu_velocity(q_bu_lenu, v__fin, fin, static_transforms=None):
         '''tranforms a vector represented in fin frame to vector in lenu frame
         Args:
         - v__fin: 3D vector represented in input frame coordinates
@@ -212,17 +220,6 @@ class TranslationController:
         # Create velocity setpoint
         # Note difference: vsp_bu_lenu__lenu is an array, vel_setpoint_bu_lenu__lenu is a Twist message
         # They encode the same velocity information in different package 
-	
-	vsp_bu_lenu__lenu = get_lenu_velocity(self.q_bu_lenu,velsp__fin, fin, self.static_transforms) 
-	self.vel_setpoint_bu_lenu__lenu.linear.x = vsp_bu_lenu__lenu[0]
-	self.vel_setpoint_bu_lenu__lenu.linear.y = vsp_bu_lenu__lenu[1]
-	self.vel_setpoint_bu_lenu__lenu.linear.z = vsp_bu_lenu__lenu[2]
-	if timedelta == MANEUVER_DURATION:
-	
-        	self.vel_setpoint_bu_lenu_lenu.linear.x = 0
-        	self.vel_setpoint_bu_lenu_lenu.linear.y = 0
-       		self.vel_setpoint_bu_lenu_lenu.linear.z = 0
-
 
 
 
@@ -232,7 +229,15 @@ class TranslationController:
         Encode this in the linear portion of the Twist message and assign to the member variable
         self.vel_setpoint_bu_lenu__lenu     
         '''
-       
+
+        # raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
+        velsp_bu_lenu__lenu = get_lenu_velocity(self.q_bu_lenu, velsp__fin, fin, self.static_transforms)
+        self.vel_setpoint_bu_lenu__lenu = Twist()
+        self.vel_setpoint_bu_lenu__lenu.linear.x = velsp_bu_lenu__lenu[0]
+        self.vel_setpoint_bu_lenu__lenu.linear.y = velsp_bu_lenu__lenu[1]
+        self.vel_setpoint_bu_lenu__lenu.linear.z = velsp_bu_lenu__lenu[2]
+        '''TODO-END '''
+
 
         # Publish command velocites for timedelta seconds
         while not rospy.is_shutdown() and datetime.datetime.now() - start_time < timedelta and self.current_state.mode == 'OFFBOARD':
@@ -271,9 +276,11 @@ class TranslationController:
                                             velsp_limited.linear.y,
                                             velsp_limited.linear.z])
                     if speed > Constants.MAX_SPEED:
-                        velsp_limited.linear.x *= MAX_SPEED/speed
-                        velsp_limited.linear.y *= MAX_SPEED/speed
-                        velsp_limited.linear.z *= MAX_SPEED/speed
+                        rospy.logwarn("Velocity setpoint too high! Limiting speed to {} m/s".format(Constants.MAX_SPEED))
+                        velsp_limited.linear.x *= Constants.MAX_SPEED/speed
+                        velsp_limited.linear.y *= Constants.MAX_SPEED/speed
+                        velsp_limited.linear.z *= Constants.MAX_SPEED/speed
+
 
                     # Publish limited setpoint
                     self.vel_setpoint_pub.publish(velsp_limited)
