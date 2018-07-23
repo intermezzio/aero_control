@@ -15,11 +15,7 @@ from geometry_msgs.msg import Twist, PoseStamped
 
 
 # Maneuver inputs (placed at top for ease of modification)
-<<<<<<< HEAD
-MANEUVER_VELOCITY_SETPOINT = np.array([0, .5, 0])
-=======
 MANEUVER_VELOCITY_SETPOINT = np.array([0.3, 0.0, 0.0])
->>>>>>> 783af2c8056ca71afef33ddb59b86e9febeb0f1f
 MANEUVER_REFERENCE_FRAME = 'bu'
 MANEUVER_DURATION = 2.0
 
@@ -199,8 +195,7 @@ class TranslationController:
         self.maneuver_velocity_setpoint = maneuver_velocity_setpoint
         self.maneuver_reference_frame = maneuver_reference_frame
         self.maneuver_duration = maneuver_duration
-  
-    
+
     def execute_maneuver(self, velsp__fin, fin, duration):
         ''' move at given velocity, described in a given frame, for a given duration
         Args:
@@ -221,24 +216,13 @@ class TranslationController:
 
         # Create velocity setpoint
         # Note difference: vsp_bu_lenu__lenu is an array, vel_setpoint_bu_lenu__lenu is a Twist message
-        # They encode the same velocity information in different package 
-	
-    	# if timedelta == MANEUVER_DURATION:
-    	
-     #        	self.vel_setpoint_bu_lenu_lenu.linear.x = 0
-     #        	self.vel_setpoint_bu_lenu_lenu.linear.y = 0
-     #       		self.vel_setpoint_bu_lenu_lenu.linear.z = 0
-
-
-
-
-	'''TODO-START: FILL IN CODE HERE 
+        #   They encode the same velocity information in different packages
+        '''TODO-START: FILL IN CODE HERE 
         Use the provided functions to calculate the desired velocity of the body-up frame with respect to the 
         local ENU frame, expressed in local ENU coordinates (i.e. vsp_bu_lenu__lenu).
         Encode this in the linear portion of the Twist message and assign to the member variable
         self.vel_setpoint_bu_lenu__lenu     
         '''
-
         # raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
         velsp_bu_lenu__lenu = get_lenu_velocity(self.q_bu_lenu, velsp__fin, fin, self.static_transforms)
         self.vel_setpoint_bu_lenu__lenu = Twist()
@@ -257,8 +241,6 @@ class TranslationController:
 
         # at end of maneuver, set setpoint back to zero
         self.vel_setpoint_bu_lenu__lenu = Twist()
-    
-    
 
     def hover(self):
         ''' change setpoint to zero velocity. streaming_offboard_points automatically sends info
@@ -354,10 +336,6 @@ class TranslationController:
 if __name__ == '__main__':
 
     controller = TranslationController(MANEUVER_VELOCITY_SETPOINT, MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
-
-
-    # In order to enter offboard mode, the drone must already be receiving commands
-    # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
 
     rospy.spin()
 
