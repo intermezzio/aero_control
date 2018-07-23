@@ -5,6 +5,9 @@ if __name__ == '__main__':
 
 	    #Square ######################
 	fin = 'bu'               	#
+    velsp__fin = []
+    duration = []
+
 	velsp__fin.append([0,1, 0])  #
 	duration.append(2)       	#
 	                         	#
