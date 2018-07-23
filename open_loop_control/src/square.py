@@ -4,7 +4,7 @@ if __name__ == '__main__':
     controller = TranslationController(MANEUVER_VELOCITY_SETPOINT, MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
 
 	    #Square ######################
-	fin = 'bu'               	#
+    fin = 'bu'               	#
     velsp__fin = []
     duration = []
 
