@@ -20,9 +20,14 @@ from geometry_msgs.msg import Twist, PoseStamped
 
 	# Maneuver inputs (placed at top for ease of modification)
 
-	#########################################################################################################################
-	# CONSTANTS (DON'T CHANGE)
-	#########################################################################################################################
+
+MANEUVER_VELOCITY_SETPOINT = np.array([0.5, 0.0, 0.0])
+MANEUVER_REFERENCE_FRAME = 'bu'
+MANEUVER_DURATION = 2.0
+
+#########################################################################################################################
+# CONSTANTS (DON'T CHANGE)
+#########################################################################################################################
 class Constants:
 
     RATE = 10 # [hz]
@@ -149,7 +154,6 @@ def get_lenu_velocity(q_bu_lenu, v__fin, fin, static_transforms=None):
 
         v__lenu = np.array(v__lenu[0:3])
         return v__lenu
-<<<<<<< HEAD
  
 #########################################################################################################################
 # TRANSLATION CONTROLLER
@@ -222,7 +226,15 @@ class TranslationController:
         # They encode the same velocity information in different package
 
 
+        # timedelta (datetime.timedelta object) is the amount of time the velocity message will be published for
+        timedelta = datetime.timedelta(seconds = duration)
 
+        # Record the start time
+        start_time = datetime.datetime.now()
+
+        # Create velocity setpoint
+        # Note difference: vsp_bu_lenu__lenu is an array, vel_setpoint_bu_lenu__lenu is a Twist message
+        # They encode the same velocity information in different package
 
 
 	'''TODO-START: FILL IN CODE HERE 

@@ -1,3 +1,6 @@
+#bu vectors ([0,1, 0],[0,0,1],[0,-1,0],[0,0,-1])
+
+
 #!/usr/bin/env python
 
 import rospy
@@ -17,9 +20,9 @@ from geometry_msgs.msg import Twist, PoseStamped
 # Maneuver inputs (placed at top for ease of modification)
 
 
-MANEUVER_VELOCITY_SETPOINT = np.array([0.5, 0.0, 0.0])
-MANEUVER_REFERENCE_FRAME = 'bu'
-MANEUVER_DURATION = 2.0
+velocities = [np.array([0.0,1.0, 0.0]),np.array([0.0,0.0,1.0]),np.array([0.0,-1.0, 0.0]),np.array([0.0,0.0, 1.0])]
+maneuver_reference_Frame = 'bu'
+durations = [1.0,1.0,1.0,1.0]
 
 #########################################################################################################################
 # CONSTANTS (DON'T CHANGE)
@@ -84,7 +87,7 @@ class StaticTransforms():
     R_bu2fc = R_fc2bu.T
     
     def __init__(self):
-        pass
+        pass #<-----------------------------------------------------------------------------------------------------------------------put rotation stuff here
     
     def coord_transform(self, v__fin, fin, fout):
         ''' transform vector v which is represented in frame fin into its representation in frame fout
@@ -156,9 +159,9 @@ def get_lenu_velocity(q_bu_lenu, v__fin, fin, static_transforms=None):
 #########################################################################################################################
 class TranslationController:
 
-    def __init__(self, maneuver_velocity_setpoint=np.array([0.1, 0.0, 0.0]),
-                       maneuver_reference_frame='bu',
-                       maneuver_duration=3.0):
+    def __init__(self, maneuver_velocity_setpoint,
+                       maneuver_reference_frame,
+                       maneuver_duration):
         """ Object that manages velocity commands for OFFBOARD mode
         Attributes:
         - vel_sepoint_pub: rospy publisher for cmd_vel_unstamped topic
@@ -219,13 +222,7 @@ class TranslationController:
 
         # Create velocity setpoint
         # Note difference: vsp_bu_lenu__lenu is an array, vel_setpoint_bu_lenu__lenu is a Twist message
-        # They encode the same velocity information in different package 
-	
-    	# if timedelta == MANEUVER_DURATION:
-    	
-     #        	self.vel_setpoint_bu_lenu_lenu.linear.x = 0
-     #        	self.vel_setpoint_bu_lenu_lenu.linear.y = 0
-     #       		self.vel_setpoint_bu_lenu_lenu.linear.z = 0
+        # They encode the same velocity information in different package
 
 
 
@@ -263,10 +260,6 @@ class TranslationController:
         ''' change setpoint to zero velocity. streaming_offboard_points automatically sends info
         '''
         self.vel_setpoint_bu_lenu__lenu = Twist()
-        vel = get_lenu_velocity(self.q_bu_lenu, vel, man.ref)
-        self.vel_setpoint_bu_lenu__lenu.linear.x = vel[0]
-        self.vel_setpoint_bu_lenu__lenu.linear.y = vel[1]
-        self.vel_setpoint_bu_lenu__lenu.linear.z = vel[2]
 
     #################################################################################################################################
     # DO NOT MODIFY
@@ -347,22 +340,26 @@ class TranslationController:
             if not self.prev_state.mode == "OFFBOARD":
                 # just switched to OFFBOARD, call move
                 rospy.loginfo("Entering OFFBOARD Mode")
-                self.execute_maneuver(  self.maneuver_velocity_setpoint, 
-                                        self.maneuver_reference_frame, 
-                                        self.maneuver_duration)
+                for i in range(0,len(velocities)):
+                    maneuver_velocity_setpoint=velocities[i]
+                    maneuver_reference_frame = maneuver_reference_Frame
+                    maneuver_duration=duration[i]
+                    self.execute_maneuver(  self.maneuver_velocity_setpoint, 
+                                            self.maneuver_reference_frame, 
+                                            self.maneuver_duration)
             
     #################################################################################################################################
     #################################################################################################################################
 
 if __name__ == '__main__':
 
-    controller = TranslationController(MANEUVER_VELOCITY_SETPOINT, MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
+    controller = TranslationController([velocities[i] for i in range(0,len(velocities))], maneuver_reference_Frame, [durations[i] for i in range(0,len(velocities))])
 
 
     # In order to ter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
     #######################################
-    
+      
     #######################################
 
 
