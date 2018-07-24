@@ -90,14 +90,17 @@ class LineTracker:
             xer, yer = (vector_to_target.x, vector_to_target.y)
 
             linevec = np.array([vx,vy])
-            # TODO-START: Create velocity controller based on above specs
-    def actuate_command(xerr, yerr, kp):
-	xcmd = xer * (-kp)
-	ycmd = yer * (-kp)
 
-    vel_cmd = actuate command(xer, yer, kp) 	
- 
-   
+	    kpx = .75
+
+	    kpy = .75
+
+            actuate command(xer, yer, kpx, kpy)
+            # TODO-START: Create velocity controller based on above specs
+    def actuate_command(xerr, yerr, kpx, kpy):
+	cx = xer * (-kpx)
+	cy = yer * (-kpy)
+	return (cx, cy)
 
 px1 = cols-1
 px2 = 0
