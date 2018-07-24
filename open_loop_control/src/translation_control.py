@@ -21,8 +21,8 @@ from geometry_msgs.msg import Twist, PoseStamped
 
 
 velocities = [np.array([0.0,1.0, 0.0]),np.array([0.0,0.0,1.0]),np.array([0.0,-1.0, 0.0]),np.array([0.0,0.0, 1.0])]
-maneuver_reference_Frame = 'bu'
-durations = [1.0,1.0,1.0,1.0]
+maneuver_reference_Frame = ['bu','bu','bu','bu']
+durations = [2.0,2.0,2.0,2.0]
 
 #########################################################################################################################
 # CONSTANTS (DON'T CHANGE)
@@ -353,7 +353,7 @@ class TranslationController:
 
 if __name__ == '__main__':
 
-    controller = TranslationController([velocities[i] for i in range(0,len(velocities))], maneuver_reference_Frame, [durations[i] for i in range(0,len(velocities))])
+    controller = TranslationController([velocities[i] for i in range(0,len(velocities))], [maneuver_reference_Frame[i] for i in range(0,len(velocities))], [durations[i] for i in range(0,len(velocities))])
 
 
     # In order to ter offboard mode, the drone must already be receiving commands

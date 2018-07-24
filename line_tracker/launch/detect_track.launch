@@ -1,5 +1,8 @@
-<!-- Line Tracker: Launch file for mavros and open loop-->
+<!-- Line Tracker: Launch file for mavros, detector, and tracker-->
 <launch>
+
+  <!-- Set Mavros reference frame -->
+  <node pkg="rosservice" type="rosservice" name="global_loc" args="call --wait /mavros/setpoint_velocity/mav_frame 8"/>
 
   <!-- Launch mavros -->
   <arg name="fcu_url" default="tcp://127.0.0.1:5760" />
@@ -23,6 +26,8 @@
   </include>
 
   <!-- Launch detector node -->
-  <node pkg="aero_control" name="translation_controller" type="square_albert.py"/>
+  <node pkg="aero_control" name="detector" type="detector.py"/>
 
+  <!-- Launch tracker node -->
+  <node pkg="aero_control" name="tracker" type="tracker.py"/>
 </launch>

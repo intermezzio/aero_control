@@ -239,7 +239,7 @@ class TranslationController:
         '''
 
         # raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
-        velsp_bu_lenu__lenu = get_lenu_velocity(self.q_bu_lenu, velsp__fin, fin, self.static_transforms)
+		velsp_bu_lenu__lenu = get_lenu_velocity(self.q_bu_lenu, velsp__fin, fin, self.static_transforms)
         self.vel_setpoint_bu_lenu__lenu = Twist()
         self.vel_setpoint_bu_lenu__lenu.linear.x = velsp_bu_lenu__lenu[0]
         self.vel_setpoint_bu_lenu__lenu.linear.y = velsp_bu_lenu__lenu[1]
