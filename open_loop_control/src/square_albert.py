@@ -149,9 +149,12 @@ def get_lenu_velocity(q_bu_lenu, v__fin, fin, static_transforms=None):
 
         v__lenu = np.array(v__lenu[0:3])
         return v__lenu
+
+
+
 	 
 velocities = [np.array([0.0,1.0, 0.0]),np.array([0.0,0.0,1.0]),np.array([0.0,-1.0, 0.0]),np.array([0.0,0.0, 1.0])]
-durations = [1.0,1.0,1.0,1.0]
+durations = [2.0,2.0,2.0,2.0]
 
 
 for i in range(0,len(velocities)): #<---------------------------------------------------------------------------------------------------------watch for processing and time!!!
