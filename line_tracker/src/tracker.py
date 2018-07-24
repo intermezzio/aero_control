@@ -15,6 +15,9 @@ from mavros_msgs.msg import State
 from cv_bridge import CvBridge, CvBridgeError
 from copy import deepcopy
 
+
+WINDOW_HEIGHT = 128
+WINDOW_WIDTH = 128
 NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED = .5 # [m/s]
 K_P_X = 0 # TODO: decide upon initial K_P_X
@@ -49,7 +52,8 @@ class LineTracker:
 
     def line_param_cb(self, line_params):
         mode = getattr(self.current_state, "mode", None)
-        if (mode is not None and mode != "MANUAL") or NO_ROBOT:
+        if mode not in (None, "MANUAL") or NO_ROBOT:
+            global WINDOW_HEIGHT, WINDOW_WIDTH
             """ Map line paramaterization to a velocity setpoint so the robot will approach and follow the LED strip
             
             Note: Recall the formatting of a Line message when dealing with line_params
@@ -64,6 +68,10 @@ class LineTracker:
             Be sure to publish your error using self.pub_error.publish(Vector3(x_error,y_error,0))
     
             """
+            x, y, vx, vy = line_params
+            p_frame_center = np.array([WINDOW_WIDTH/2, WINDOW_HEIGHT/2])
+            
+            linevec = np.array([vx,vy])
             # TODO-START: Create velocity controller based on above specs
             raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
             # TODO-END
