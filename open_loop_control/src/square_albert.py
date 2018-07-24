@@ -360,10 +360,19 @@ time.sleep(MANEUVER_DURATION)
     #################################################################################################################################
     #################################################################################################################################
 
-def make_pattern():
+def make_square():
+    global MANEUVER_VELOCITY_SETPOINT
+    global MANEUVER_REFERENCE_FRAME
+    global MANEUVER_DURATION
+
+    MANEUVER_VELOCITY_SETPOINT = np.array([0.5, 0.0, 0.0])
+    MANEUVER_REFERENCE_FRAME = 'bu'
+    MANEUVER_DURATION = 2.0
+
+    controller = TranslationController()
     ####SQUARE
-    for i in range(0,len(MANEUVER_VELOCITY_SETPOINT)):
-         controller = TranslationController(MANEUVER_VELOCITY_SETPOINT[i], MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION[i])
+    # for i in range(0,len(MANEUVER_VELOCITY_SETPOINT)):
+    #      pass
 
     # In order to ter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
@@ -385,4 +394,4 @@ def make_pattern():
     print('DONE!')
 
 if __name__ == "__main__":
-    make_pattern()
+    make_square()
