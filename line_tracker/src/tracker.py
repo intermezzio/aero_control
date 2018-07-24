@@ -87,20 +87,32 @@ class LineTracker:
 
             vector_to_target = (r_to_target.points[1] - r_to_target.points[0])
 
-            cx, cy = (vector_to_target.x, vector_to_target.y)
+            xer, yer = (vector_to_target.x, vector_to_target.y)
 
             linevec = np.array([vx,vy])
             # TODO-START: Create velocity controller based on above specs
-    def actuate_acceleration_command(self, acc_cmd, dt=_TIME_STEP):
-        self.__v += acc_cmd*dt
-        self.__x += self.__v*dt
-    
-    def p_control( y_err,kp):
-        cmd = y_err*(-kp)
-	return cmd
+    def actuate_command(xerr, yerr, kp):
+	xcmd = xer * (-kp)
+	ycmd = yer * (-kp)
 
-    def points(self, kp):
-        vel_cmd = p_control(err_gamma, kp)
+    vel_cmd = actuate command(xer, yer, kp) 	
+ 
+   
+
+px1 = cols-1
+px2 = 0
+py1 = righty
+py2 = lefty
+
+p_line_center_x = (px1+px2)/2
+p_line_center_y = (py1+py2)/2
+
+r_line_unit = (vx[0],vy[0])
+
+m = vy[0]/vx[0]
+b = p_line_center_y - m*p_line_center_x
+
+
 
    
             # TODO-END
