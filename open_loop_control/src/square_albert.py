@@ -352,21 +352,6 @@ for i in range(0,len(velocities)):
 	    #################################################################################################################################
 	    #################################################################################################################################
 
-	# MANEUVER_VELOCITY_SETPOINT_1 = np.array([0.0,1.0, 0.0])
-	# MANEUVER_REFERENCE_FRAME_1 = 'bu'
-	# MANEUVER_DURATION_1 = 1.0
-
-	# MANEUVER_VELOCITY_SETPOINT_2 = np.array([0.0,0.0,1.0])
-	# MANEUVER_REFERENCE_FRAME_2 = 'bu'
-	# MANEUVER_DURATION_2 = 1.0
-
-	# MANEUVER_VELOCITY_SETPOINT_3 = np.array([0.0,-1.0, 0.0])
-	# MANEUVER_REFERENCE_FRAME_3 = 'bu'
-	# MANEUVER_DURATION_3 = 1.0
-
-	# MANEUVER_VELOCITY_SETPOINT_4 = np.array([0.0,0.0, 1.0])
-	# MANEUVER_REFERENCE_FRAME_4 = 'bu'
-	# MANEUVER_DURATION_4 = 1.0
 
 	if __name__ == '__main__':
 
