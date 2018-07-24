@@ -5,7 +5,7 @@ from sensor_msgs.msg import Image
 import numpy as np
 from scipy.stats import linregress
 from matplotlib.lines import Line2D
-import matplotlib.pyplot as plt
+
 
 
 
@@ -32,14 +32,14 @@ class ImageToCV:
 
 
         white_thresh = 255
-        black_thresh = 255
+        black_thresh = 245
 
         k_dim = 10
         kernel = np.ones((k_dim,k_dim),np.uint8)
 
         d = np.copy(img) #preserves raw images, but requires more time and processing power    
         d = cv2.inRange(d,black_thresh,white_thresh)
-        d = cv2.dilate(d,kernel)
+        d = cv2.morphologyEx(d,cv2.MORPH_CLOSE,kernel)
         d = cv2.resize(d, (0,0), fx=10, fy=10)
 
         ret,thresh = cv2.threshold(d,0,255,0)
@@ -50,7 +50,8 @@ class ImageToCV:
         [vx,vy,x,y] = cv2.fitLine(cntrs, cv2.DIST_L2,0,0.01,0.01)
         lefty = int((-x*vy/vx) + y)
         righty = int(((cols-x)*vy/vx)+y)
-        regression = cv2.line(d,(cols-1,righty),(0,lefty),(255,255,255),2)
+        regression = cv2.line(d,(cols-1,righty),(0,lefty),(0,0,255),2)
+        regression = cv2.cvtColor(regression, cv2.COLOR_BGR2RGB)
 
 
 
