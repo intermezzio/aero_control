@@ -153,14 +153,6 @@ def get_lenu_velocity(q_bu_lenu, v__fin, fin, static_transforms=None):
 
 
 	 
-velocities = [np.array([0.0,1.0, 0.0]),np.array([0.0,0.0,1.0]),np.array([0.0,-1.0, 0.0]),np.array([0.0,0.0, 1.0])]
-durations = [2.0,2.0,2.0,2.0]
-
-
-for i in range(0,len(velocities)): #<---------------------------------------------------------------------------------------------------------watch for processing and time!!!
-	MANEUVER_VELOCITY_SETPOINT = velocities[i]
-	MANEUVER_REFERENCE_FRAME = 'bu'
-	MANEUVER_DURATION = durations[i]
 
 
 	#########################################################################################################################
@@ -168,9 +160,9 @@ for i in range(0,len(velocities)): #<-------------------------------------------
 	#########################################################################################################################
 	class TranslationController:
 
-	    def __init__(self, maneuver_velocity_setpoint=MANEUVER_VELOCITY_SETPOINT,
-	                       maneuver_reference_frame=MANEUVER_REFERENCE_FRAME,
-	                       maneuver_duration=MANEUVER_DURATION):
+	    def __init__(self, maneuver_velocity_setpoint,
+	                       maneuver_reference_frame,
+	                       maneuver_duration):
 	        """ Object that manages velocity commands for OFFBOARD mode
 	        Attributes:
 	        - vel_sepoint_pub: rospy publisher for cmd_vel_unstamped topic
@@ -349,10 +341,19 @@ for i in range(0,len(velocities)): #<-------------------------------------------
 	            if not self.prev_state.mode == "OFFBOARD":
 	                # just switched to OFFBOARD, call move
 	                rospy.loginfo("Entering OFFBOARD Mode")
-	                self.execute_maneuver(  self.maneuver_velocity_setpoint, 
-	                                        self.maneuver_reference_frame, 
-	                                        self.maneuver_duration)
-	 
+	                
+					velocities = [np.array([0.0,1.0, 0.0]),np.array([0.0,0.0,1.0]),np.array([0.0,-1.0, 0.0]),np.array([0.0,0.0, 1.0])]
+					durations = [2.0,2.0,2.0,2.0]
+
+
+					for i in range(0,len(velocities)): #<---------------------------------------------------------------------------------------------------------watch for processing and time!!!
+						maneuver_velocity_setpoint = velocities[i]
+						maneuver_reference_frame = 'bu'
+						maneuver_duration = durations[i]
+		                self.execute_maneuver(  self.maneuver_velocity_setpoint, 
+		                                        self.maneuver_reference_frame, 
+		                                        self.maneuver_duration)
+
 	time.sleep(MANEUVER_DURATION)           
 	    #################################################################################################################################
 	    #################################################################################################################################
