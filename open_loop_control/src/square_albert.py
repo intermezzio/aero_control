@@ -20,7 +20,7 @@ from geometry_msgs.msg import Twist, PoseStamped
 
 MANEUVER_VELOCITY_SETPOINT = [np.array([0.0,1.0, 0.0]),np.array([0.0,0.0,1.0]),np.array([0.0,-1.0, 0.0]),np.array([0.0,0.0, 1.0])]
 MANEUVER_REFERENCE_FRAME = 'bu'
-MANEUVER_DURATION = 1.0
+MANEUVER_DURATION = [1.0,1.0,1.0,1.0]
 
 # Maneuver inputs (placed at top for ease of modification)
 
@@ -367,18 +367,9 @@ if __name__ == '__main__':
 
 
 # 	####SQUARE
-
-    controller = TranslationController([i for i in MANEUVER_VELOCITY_SETPOINT], MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
-
-#     controller_2 = TranslationController(MANEUVER_VELOCITY_SETPOINT_2, MANEUVER_REFERENCE_FRAME_2, MANEUVER_DURATION_2)
-#     time.sleep(2)
-    
-#     controller_3 = TranslationController(MANEUVER_VELOCITY_SETPOINT_3, MANEUVER_REFERENCE_FRAME_3, MANEUVER_DURATION_3)
-#     time.sleep(2)
-
-#     controller_4 = TranslationController(MANEUVER_VELOCITY_SETPOINT_4, MANEUVER_REFERENCE_FRAME_4, MANEUVER_DURATION_4)
-#     time.sleep(2)
-
+	for i in range(0,len(MANEUVER_VELOCITY_SETPOINT)):
+		 controller = TranslationController(MANEUVER_VELOCITY_SETPOINT[i], MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION[i])
+   
     # In order to ter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
     #######################################
@@ -389,12 +380,11 @@ if __name__ == '__main__':
     # In order to enter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
 
+	rospy.spin()
 
-    rospy.spin()
-
-    controller.stop_streaming_offboard_points()
+	controller.stop_streaming_offboard_points()
     # controller_2.stop_streaming_offboard_points()
     # controller_3.stop_streaming_offboard_points()
     # controller_4.stop_streaming_offboard_points()
 
-    print('DONE!')
+	print('DONE!')
