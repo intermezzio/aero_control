@@ -350,9 +350,7 @@ class TranslationController:
             if not self.prev_state.mode == "OFFBOARD":
                 # just switched to OFFBOARD, call move
                 rospy.loginfo("Entering OFFBOARD Mode")
-                self.execute_maneuver(  self.maneuver_velocity_setpoint, 
-                                        self.maneuver_reference_frame, 
-                                        self.maneuver_duration)
+                self.square()
             
     #################################################################################################################################
     #################################################################################################################################
