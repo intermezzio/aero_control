@@ -8,6 +8,7 @@ import threading
 import mavros
 import datetime
 import math
+import time
 
 import numpy as np 
 import tf.transformations as tft
@@ -17,7 +18,7 @@ from mavros_msgs.msg import State
 from geometry_msgs.msg import Twist, PoseStamped
 
 
-# Maneuver inputs (placed at top for ease of modification)
+    # Maneuver inputs (placed at top for ease of modification)
 
 
 MANEUVER_VELOCITY_SETPOINT = np.array([0.5, 0.0, 0.0])
@@ -154,14 +155,16 @@ def get_lenu_velocity(q_bu_lenu, v__fin, fin, static_transforms=None):
         v__lenu = np.array(v__lenu[0:3])
         return v__lenu
  
+
+
 #########################################################################################################################
 # TRANSLATION CONTROLLER
 #########################################################################################################################
 class TranslationController:
 
-    def __init__(self, maneuver_velocity_setpoint=np.array([0.1, 0.0, 0.0]),
-                       maneuver_reference_frame='bu',
-                       maneuver_duration=3.0):
+    def __init__(self, maneuver_velocity_setpoint,
+                       maneuver_reference_frame,
+                       maneuver_duration):
         """ Object that manages velocity commands for OFFBOARD mode
         Attributes:
         - vel_sepoint_pub: rospy publisher for cmd_vel_unstamped topic
@@ -228,7 +231,7 @@ class TranslationController:
 
 
 
-	'''TODO-START: FILL IN CODE HERE 
+    '''TODO-START: FILL IN CODE HERE 
         Use the provided functions to calculate the desired velocity of the body-up frame with respect to the 
         local ENU frame, expressed in local ENU coordinates (i.e. vsp_bu_lenu__lenu).
         Encode this in the linear portion of the Twist message and assign to the member variable
@@ -236,7 +239,7 @@ class TranslationController:
         '''
 
         # raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
-        velsp_bu_lenu__lenu = get_lenu_velocity(self.q_bu_lenu, velsp__fin, fin, self.static_transforms)
+		velsp_bu_lenu__lenu = get_lenu_velocity(self.q_bu_lenu, velsp__fin, fin, self.static_transforms)
         self.vel_setpoint_bu_lenu__lenu = Twist()
         self.vel_setpoint_bu_lenu__lenu.linear.x = velsp_bu_lenu__lenu[0]
         self.vel_setpoint_bu_lenu__lenu.linear.y = velsp_bu_lenu__lenu[1]
@@ -340,32 +343,55 @@ class TranslationController:
             if not self.prev_state.mode == "OFFBOARD":
                 # just switched to OFFBOARD, call move
                 rospy.loginfo("Entering OFFBOARD Mode")
-                self.execute_maneuver(  self.maneuver_velocity_setpoint, 
-                                        self.maneuver_reference_frame, 
-                                        self.maneuver_duration)
-            
+                
+                velocities = [np.array([0.0,1.0, 0.0]),np.array([0.0,0.0,1.0]),np.array([0.0,-1.0, 0.0]),np.array([0.0,0.0, 1.0])]
+                durations = [2.0,2.0,2.0,2.0]
+
+
+                for i in range(0,len(velocities)): #<---------------------------------------------------------------------------------------------------------watch for processing and time!!!
+                    maneuver_velocity_setpoint = velocities[i]
+                    maneuver_reference_frame = 'bu'
+                    maneuver_duration = durations[i]
+                    self.execute_maneuver(  self.maneuver_velocity_setpoint, 
+                                            self.maneuver_reference_frame, 
+                                            self.maneuver_duration)
+
+time.sleep(MANEUVER_DURATION)           
     #################################################################################################################################
     #################################################################################################################################
 
-if __name__ == '__main__':
+def make_square():
+    global MANEUVER_VELOCITY_SETPOINT
+    global MANEUVER_REFERENCE_FRAME
+    global MANEUVER_DURATION
 
-    controller = TranslationController(MANEUVER_VELOCITY_SETPOINT, MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
+    MANEUVER_VELOCITY_SETPOINT = np.array([0.5, 0.0, 0.0])
+    MANEUVER_REFERENCE_FRAME = 'bu'
+    MANEUVER_DURATION = 2.0
 
+    controller = TranslationController()
+    ####SQUARE
+    # for i in range(0,len(MANEUVER_VELOCITY_SETPOINT)):
+    #      pass
 
     # In order to ter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
     #######################################
-      
+
     #######################################
 
 
     # In order to enter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
 
-
     rospy.spin()
 
     controller.stop_streaming_offboard_points()
+    # controller_2.stop_streaming_offboard_points()
+    # controller_3.stop_streaming_offboard_points()
+    # controller_4.stop_streaming_offboard_points()
+
     print('DONE!')
 
-    
+if __name__ == "__main__":
+    make_square()
