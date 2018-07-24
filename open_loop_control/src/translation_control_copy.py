@@ -258,7 +258,7 @@ class TranslationController:
         self.vel_setpoint_bu_lenu__lenu = Twist()
     
 
-    square = [np.array([0,1,0]), np.array([0,0,1]), np.array([0,0,1]), np.array([0,-1,0]), np.array([0,0,-1])]
+    square = [np.array([0,1,0]), np.array([0,0,1]), np.array([0,-1,0]), np.array([0,0,-1])]
 
     def square(self):
     	for i in square:
