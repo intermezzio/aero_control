@@ -5,17 +5,27 @@ import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+<<<<<<< HEAD
 # from aero_control.msg import Line
+=======
+from aero_control_staffonly.msg import Line
+>>>>>>> e4c0ffb44b6ba48a10dbc3d9e0846ec8ec677559
 import sys
 
 DEBUG = True
 
 class LineDetector:
     def __init__(self):
+<<<<<<< HEAD
         self.sub_cam = rospy.Subscriber("/aero_downward_camera/image", Image, self.image_cb)
         self.pub_param = rospy.Publisher("/image_to_cv/processed", Image, queue_size=1)
         self.bridge = CvBridge() 
         # TODO create a publisher for line parameterizations
+=======
+        raise Exception("CODE INCOMPLETE! Delete this exception and complete the following lines")
+        # self.sub_cam = # TODO: subscribe to downward facing camera, and set callaback to image_cb
+        # self.pub_param = # TODO: create a publisher for line parameterizations
+>>>>>>> e4c0ffb44b6ba48a10dbc3d9e0846ec8ec677559
         
         # TODO-START: create a CvBridge instance
         # TODO-END
