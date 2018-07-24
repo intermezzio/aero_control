@@ -21,7 +21,7 @@ velocities = [np.array([0.0,1.0, 0.0]),np.array([0.0,0.0,1.0]),np.array([0.0,-1.
 durations = [1.0,1.0,1.0,1.0]
 
 
-for i in range(0,len(velocities)):
+for i in range(0,len(velocities)): #<---------------------------------------------------------------------------------------------------------watch for processing and time!!!
 	MANEUVER_VELOCITY_SETPOINT = velocities[i]
 	MANEUVER_REFERENCE_FRAME = 'bu'
 	MANEUVER_DURATION = durations[i]
@@ -365,6 +365,7 @@ for i in range(0,len(velocities)):
 	    #######################################
 	    
 	    #######################################
+		print(MANEUVER_VELOCITY_SETPOINT, MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
 
 
 	    # In order to enter offboard mode, the drone must already be receiving commands
