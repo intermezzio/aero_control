@@ -73,7 +73,18 @@ class LineTracker:
             
             linevec = np.array([vx,vy])
             # TODO-START: Create velocity controller based on above specs
-            raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
+    def actuate_acceleration_command(self, acc_cmd, dt=_TIME_STEP):
+        self.__v += acc_cmd*dt
+        self.__x += self.__v*dt
+    
+    def p_control( y_err,kp):
+        cmd = y_err*(-kp)
+	return cmd
+
+    def points(self, kp):
+        vel_cmd = p_control(err_gamma, kp)
+
+   
             # TODO-END
 
     def state_cb(self, state):
