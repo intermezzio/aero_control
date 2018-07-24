@@ -263,6 +263,10 @@ class TranslationController:
         ''' change setpoint to zero velocity. streaming_offboard_points automatically sends info
         '''
         self.vel_setpoint_bu_lenu__lenu = Twist()
+        vel = get_lenu_velocity(self.q_bu_lenu, vel, man.ref)
+        self.vel_setpoint_bu_lenu__lenu.linear.x = vel[0]
+        self.vel_setpoint_bu_lenu__lenu.linear.y = vel[1]
+        self.vel_setpoint_bu_lenu__lenu.linear.z = vel[2]
 
     #################################################################################################################################
     # DO NOT MODIFY
@@ -358,7 +362,7 @@ if __name__ == '__main__':
     # In order to ter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
     #######################################
-      
+    
     #######################################
 
 
@@ -366,30 +370,6 @@ if __name__ == '__main__':
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
 
 
-        #Square ######################
-    fin = 'bu'                  #
-    velsp__fin = []
-    duration = []
-
-    velsp__fin.append([0,1, 0])  #
-    duration.append(2)          #
-                                #
-    velsp__fin.append([0,0,1])   #
-    duration.append(2)          #
-                                #
-    velsp__fin.append([0,0,1])   #
-    duration.append(2)          #
-
-    velsp__fin.append([0,-1,0])
-    duration.append(2)
-
-    velsp__fin.append([0,0,-1])   #
-    duration.append(2)          #
-    ###############################
-
-        # Iterate through maneuvers
-    for i in range(len(velsp__fin)):
-        controller.execute_maneuver(velsp__fin[i], fin, duration[i])
     rospy.spin()
 
     controller.stop_streaming_offboard_points()

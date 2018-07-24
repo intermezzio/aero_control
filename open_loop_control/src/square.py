@@ -12,9 +12,6 @@ duration.append(2)       	#
                          	#
 velsp__fin.append([0,0,1])   #
 duration.append(2)       	#
-                         	#
-velsp__fin.append([0,0,1])   #
-duration.append(2)       	#
 
 velsp__fin.append([0,-1,0])
 duration.append(2)
