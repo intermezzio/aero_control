@@ -159,9 +159,9 @@ def get_lenu_velocity(q_bu_lenu, v__fin, fin, static_transforms=None):
 #########################################################################################################################
 class TranslationController:
 
-    def __init__(self, maneuver_velocity_setpoint=[i for i in MANEUVER_VELOCITY_SETPOINT],
+    def __init__(self, maneuver_velocity_setpoint=[MANEUVER_VELOCITY_SETPOINT[i] for i in range(0,len(MANEUVER_VELOCITY_SETPOINT))],
                        maneuver_reference_frame=MANEUVER_REFERENCE_FRAME,
-                       maneuver_duration=MANEUVER_DURATION):
+                       maneuver_duration=[MANEUVER_DURATION[i]  for i in range(0,len(MANEUVER_VELOCITY_SETPOINT))]):
         """ Object that manages velocity commands for OFFBOARD mode
         Attributes:
         - vel_sepoint_pub: rospy publisher for cmd_vel_unstamped topic
