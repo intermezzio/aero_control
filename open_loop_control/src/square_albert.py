@@ -17,6 +17,139 @@ from copy import deepcopy
 from mavros_msgs.msg import State
 from geometry_msgs.msg import Twist, PoseStamped
 
+
+	# Maneuver inputs (placed at top for ease of modification)
+
+	#########################################################################################################################
+	# CONSTANTS (DON'T CHANGE)
+	#########################################################################################################################
+class Constants:
+
+    RATE = 10 # [hz]
+    MAX_DISTANCE = 2 # [m]
+    MAX_SPEED = .5 # [m/s]
+    MIN_SPEED = 0.01 # [m/s]
+
+class StaticTransforms():
+    # Variable Notation:
+    # v__x: vector expressed in "x" frame
+    # q_x_y: quaternion of "x" frame with respect to "y" frame
+    # p_x_y__z: position of "x" frame with respect to "y" frame expressed in "z" coordinates
+    # v_x_y__z: velocity of "x" frame with respect to "y" frame expressed in "z" coordinates
+    # R_x2y: rotation matrix that maps vector represented in frame "x" to representation in frame "y" (right-multiply column vec)
+    #
+    # Frame Subscripts:
+    # m = marker frame (x-right, y-up, z-out when looking at marker)
+    # dc = downward-facing camera
+    # fc = forward-facing camera
+    # bu = body-up frame (x-forward, y-left, z-up, similar to ENU)
+    # bd = body-down frame (x-forward, y-right, z-down, similar to NED)
+    # lenu = local East-North-Up world frame ("local" implies that it may not be aligned with east and north, but z is up)
+    # lned = local North-East-Down world frame ("local" implies that it may not be aligned with north and east, but z is down)
+    
+    # local ENU and local NED
+    R_lenu2lned = np.array([[0.0, 1.0, 0.0, 0.0],
+                            [1.0, 0.0, 0.0, 0.0],
+                            [0.0, 0.0, -1.0, 0.0],
+                            [0.0, 0.0, 0.0, 0.0]])
+
+    # body-up and body-down
+    R_bu2bd = tft.rotation_matrix(np.pi, (1,0,0))
+
+    # downward camera and body-down
+    R_dc2bd = tft.identity_matrix()
+
+    # forward camera and body-down
+    R_fc2bd = np.array([[0.0, 0.0, 1.0, 0.0],
+                        [1.0, 0.0, 0.0, 0.0],
+                        [0.0, 1.0, 0.0, 0.0],
+                        [0.0, 0.0, 0.0, 1.0]])
+    
+    # Find inverse rotation matrices 
+    R_lned2lenu = R_lenu2lned.T
+    R_bd2bu = R_bu2bd.T
+    R_bd2dc = R_dc2bd.T
+    R_bd2fc = R_fc2bd.T
+    
+    # Find chained rotation matrices from downward-camera to forward-camera
+    # NOTE: 'concatenate_matrices' is actually doing a matrix multiplication, 'concatenate' is a 
+    # bad name for this function, but we didn't make it up. See here:
+    # https://github.com/davheld/tf/blob/master/src/tf/transformations.py
+    R_dc2fc = tft.concatenate_matrices(R_bd2fc, R_dc2bd)
+    R_fc2dc = R_dc2fc.T
+    R_dc2bu = tft.concatenate_matrices(R_bd2bu, R_dc2bd)
+    R_bu2dc = R_dc2bu.T
+    R_fc2bu = tft.concatenate_matrices(R_bd2bu, R_fc2bd)
+    R_bu2fc = R_fc2bu.T
+    
+    def __init__(self):
+        pass #<-----------------------------------------------------------------------------------------------------------------------put rotation stuff here
+    
+    def coord_transform(self, v__fin, fin, fout):
+        ''' transform vector v which is represented in frame fin into its representation in frame fout
+        Args:
+        - v__fin: 3D vector represented in fin coordinates
+        - fin: string describing input coordinate frame (bd, bu, fc, dc, lned, lenu)
+        - fout: string describing output coordinate frame (bd, bu, fc, dc, lned, lenu)
+        Returns
+        - v__fout: vector v represent in fout coordinates
+        '''
+        
+        # trivial transform, checking input shape
+        if fin==fout:
+            v4__fin = list(v__fin)+[0.0]
+            R = tft.identity_matrix()
+            v4__fout = np.dot(R, v4__fin)
+            v__fout = np.array(v4__fout[0:3])
+            return v__fout
+        
+        # check for existence of rotation matrix
+        R_str = 'R_{}2{}'.format(fin, fout)
+        try:
+            R_i2o = getattr(self, R_str)
+        except AttributeError:
+            err = 'No static transform exists from {} to {}.'.format(fin, fout)
+            err += ' Are you sure these frames are not moving relative to each other?'
+            raise AttributeError(err)
+        
+        # perform transform
+        v4__fin = list(v__fin) + [0.0]
+        v4__fout = np.dot(R_i2o, v4__fin)
+        v__fout = np.array(v4__fout[0:3])
+        return v__fout
+
+def get_lenu_velocity(q_bu_lenu, v__fin, fin, static_transforms=None):
+        '''tranforms a vector represented in fin frame to vector in lenu frame
+        Args:
+        - v__fin: 3D vector represented in input frame coordinates
+        - fin: string describing input coordinate frame (bd, bu, fc, dc)
+        Returns:
+        - v__lenu: 3D vector v represented in local ENU world frame
+        '''
+
+        # create static transforms if none given
+        if static_transforms is None:
+            static_transforms = StaticTransforms()
+
+        if fin=='lenu':
+            v__lenu = v__fin
+
+        elif fin=='lned':
+            v__lenu = static_transforms.coord_transform(v__fin, 'lned', 'lenu')
+
+        else:
+            # create rotation matrix from quaternion
+            R_bu2lenu = tft.quaternion_matrix(q_bu_lenu)
+            
+            # represent vector v in body-down coordinates
+            v__bu = static_transforms.coord_transform(v__fin, fin, 'bu')
+            
+            # calculate lenu representation of v
+            v__lenu = np.dot(R_bu2lenu, list(v__bu)+[0.0])
+
+        v__lenu = np.array(v__lenu[0:3])
+        return v__lenu
+	 
 velocities = [np.array([0.0,1.0, 0.0]),np.array([0.0,0.0,1.0]),np.array([0.0,-1.0, 0.0]),np.array([0.0,0.0, 1.0])]
 durations = [1.0,1.0,1.0,1.0]
 
@@ -26,138 +159,7 @@ for i in range(0,len(velocities)): #<-------------------------------------------
 	MANEUVER_REFERENCE_FRAME = 'bu'
 	MANEUVER_DURATION = durations[i]
 
-	# Maneuver inputs (placed at top for ease of modification)
 
-	#########################################################################################################################
-	# CONSTANTS (DON'T CHANGE)
-	#########################################################################################################################
-	class Constants:
-
-	    RATE = 10 # [hz]
-	    MAX_DISTANCE = 2 # [m]
-	    MAX_SPEED = .5 # [m/s]
-	    MIN_SPEED = 0.01 # [m/s]
-
-	class StaticTransforms():
-	    # Variable Notation:
-	    # v__x: vector expressed in "x" frame
-	    # q_x_y: quaternion of "x" frame with respect to "y" frame
-	    # p_x_y__z: position of "x" frame with respect to "y" frame expressed in "z" coordinates
-	    # v_x_y__z: velocity of "x" frame with respect to "y" frame expressed in "z" coordinates
-	    # R_x2y: rotation matrix that maps vector represented in frame "x" to representation in frame "y" (right-multiply column vec)
-	    #
-	    # Frame Subscripts:
-	    # m = marker frame (x-right, y-up, z-out when looking at marker)
-	    # dc = downward-facing camera
-	    # fc = forward-facing camera
-	    # bu = body-up frame (x-forward, y-left, z-up, similar to ENU)
-	    # bd = body-down frame (x-forward, y-right, z-down, similar to NED)
-	    # lenu = local East-North-Up world frame ("local" implies that it may not be aligned with east and north, but z is up)
-	    # lned = local North-East-Down world frame ("local" implies that it may not be aligned with north and east, but z is down)
-	    
-	    # local ENU and local NED
-	    R_lenu2lned = np.array([[0.0, 1.0, 0.0, 0.0],
-	                            [1.0, 0.0, 0.0, 0.0],
-	                            [0.0, 0.0, -1.0, 0.0],
-	                            [0.0, 0.0, 0.0, 0.0]])
-
-	    # body-up and body-down
-	    R_bu2bd = tft.rotation_matrix(np.pi, (1,0,0))
-
-	    # downward camera and body-down
-	    R_dc2bd = tft.identity_matrix()
-
-	    # forward camera and body-down
-	    R_fc2bd = np.array([[0.0, 0.0, 1.0, 0.0],
-	                        [1.0, 0.0, 0.0, 0.0],
-	                        [0.0, 1.0, 0.0, 0.0],
-	                        [0.0, 0.0, 0.0, 1.0]])
-	    
-	    # Find inverse rotation matrices 
-	    R_lned2lenu = R_lenu2lned.T
-	    R_bd2bu = R_bu2bd.T
-	    R_bd2dc = R_dc2bd.T
-	    R_bd2fc = R_fc2bd.T
-	    
-	    # Find chained rotation matrices from downward-camera to forward-camera
-	    # NOTE: 'concatenate_matrices' is actually doing a matrix multiplication, 'concatenate' is a 
-	    # bad name for this function, but we didn't make it up. See here:
-	    # https://github.com/davheld/tf/blob/master/src/tf/transformations.py
-	    R_dc2fc = tft.concatenate_matrices(R_bd2fc, R_dc2bd)
-	    R_fc2dc = R_dc2fc.T
-	    R_dc2bu = tft.concatenate_matrices(R_bd2bu, R_dc2bd)
-	    R_bu2dc = R_dc2bu.T
-	    R_fc2bu = tft.concatenate_matrices(R_bd2bu, R_fc2bd)
-	    R_bu2fc = R_fc2bu.T
-	    
-	    def __init__(self):
-	        pass #<-----------------------------------------------------------------------------------------------------------------------put rotation stuff here
-	    
-	    def coord_transform(self, v__fin, fin, fout):
-	        ''' transform vector v which is represented in frame fin into its representation in frame fout
-	        Args:
-	        - v__fin: 3D vector represented in fin coordinates
-	        - fin: string describing input coordinate frame (bd, bu, fc, dc, lned, lenu)
-	        - fout: string describing output coordinate frame (bd, bu, fc, dc, lned, lenu)
-	        Returns
-	        - v__fout: vector v represent in fout coordinates
-	        '''
-	        
-	        # trivial transform, checking input shape
-	        if fin==fout:
-	            v4__fin = list(v__fin)+[0.0]
-	            R = tft.identity_matrix()
-	            v4__fout = np.dot(R, v4__fin)
-	            v__fout = np.array(v4__fout[0:3])
-	            return v__fout
-	        
-	        # check for existence of rotation matrix
-	        R_str = 'R_{}2{}'.format(fin, fout)
-	        try:
-	            R_i2o = getattr(self, R_str)
-	        except AttributeError:
-	            err = 'No static transform exists from {} to {}.'.format(fin, fout)
-	            err += ' Are you sure these frames are not moving relative to each other?'
-	            raise AttributeError(err)
-	        
-	        # perform transform
-	        v4__fin = list(v__fin) + [0.0]
-	        v4__fout = np.dot(R_i2o, v4__fin)
-	        v__fout = np.array(v4__fout[0:3])
-	        return v__fout
-
-	def get_lenu_velocity(q_bu_lenu, v__fin, fin, static_transforms=None):
-	        '''tranforms a vector represented in fin frame to vector in lenu frame
-	        Args:
-	        - v__fin: 3D vector represented in input frame coordinates
-	        - fin: string describing input coordinate frame (bd, bu, fc, dc)
-	        Returns:
-	        - v__lenu: 3D vector v represented in local ENU world frame
-	        '''
-
-	        # create static transforms if none given
-	        if static_transforms is None:
-	            static_transforms = StaticTransforms()
-
-	        if fin=='lenu':
-	            v__lenu = v__fin
-
-	        elif fin=='lned':
-	            v__lenu = static_transforms.coord_transform(v__fin, 'lned', 'lenu')
-
-	        else:
-	            # create rotation matrix from quaternion
-	            R_bu2lenu = tft.quaternion_matrix(q_bu_lenu)
-	            
-	            # represent vector v in body-down coordinates
-	            v__bu = static_transforms.coord_transform(v__fin, fin, 'bu')
-	            
-	            # calculate lenu representation of v
-	            v__lenu = np.dot(R_bu2lenu, list(v__bu)+[0.0])
-
-	        v__lenu = np.array(v__lenu[0:3])
-	        return v__lenu
-	 
 	#########################################################################################################################
 	# TRANSLATION CONTROLLER
 	#########################################################################################################################
@@ -358,7 +360,6 @@ for i in range(0,len(velocities)): #<-------------------------------------------
 
 	# 	####SQUARE
 		controller = TranslationController(MANEUVER_VELOCITY_SETPOINT, MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION)
-		time.sleep(MANEUVER_DURATION)
 	   
 	    # In order to ter offboard mode, the drone must already be receiving commands
 	    # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
