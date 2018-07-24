@@ -363,28 +363,29 @@ class TranslationController:
 # MANEUVER_REFERENCE_FRAME_4 = 'bu'
 # MANEUVER_DURATION_4 = 1.0
 
-if __name__ == '__main__':
+def make_pattern():
+    ####SQUARE
+    for i in range(0,len(MANEUVER_VELOCITY_SETPOINT)):
+    	 controller = TranslationController(MANEUVER_VELOCITY_SETPOINT[i], MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION[i])
 
-
-# 	####SQUARE
-	for i in range(0,len(MANEUVER_VELOCITY_SETPOINT)):
-		 controller = TranslationController(MANEUVER_VELOCITY_SETPOINT[i], MANEUVER_REFERENCE_FRAME, MANEUVER_DURATION[i])
-   
     # In order to ter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
     #######################################
-    
+
     #######################################
 
 
     # In order to enter offboard mode, the drone must already be receiving commands
     # TODO: Write code that publishes "don't move" velocity commands until the drone is place into offboard mode
 
-	rospy.spin()
+    rospy.spin()
 
-	controller.stop_streaming_offboard_points()
+    controller.stop_streaming_offboard_points()
     # controller_2.stop_streaming_offboard_points()
     # controller_3.stop_streaming_offboard_points()
     # controller_4.stop_streaming_offboard_points()
 
-	print('DONE!')
+    print('DONE!')
+
+if __name__ == "__main__":
+    make_pattern()
