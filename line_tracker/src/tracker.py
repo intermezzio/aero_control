@@ -15,7 +15,7 @@ import mavros
 from mavros_msgs.msg import State
 from cv_bridge import CvBridge, CvBridgeError
 from copy import deepcopy
-# from sympy import Point, Line
+import sympy as sym
 
 
 WINDOW_HEIGHT = 128
@@ -71,54 +71,72 @@ class LineTracker:
             Be sure to publish your error using self.pub_error.publish(Vector3(x_error,y_error,0))
     
             """
+            px1 = cols-1
+            px2 = 0
+            py1 = righty
+            py2 = lefty
+
+            p_line_center_x = (px1+px2)/2
+            p_line_center_y = (py1+py2)/2
+
+            r_line_unit = (vx[0],vy[0])
+
+            m = vy[0]/vx[0]
+            b = p_line_center_y - m*p_line_center_x
+
+            distances = [20000]
+            xs = []
+            ys = []
+            for x1 in range(0,d.shape[0]):
+                y1 = m*x1 + b
+                dist = np.sqrt((x1 - img_center_x)**2 + (y1 - img_center_y)**2)
+                if dist < distances[-1]:
+                    distances.append(dist)
+                    xs.append(x1)
+                    ys.append(y1)
+
+            p_line_closest_center = (xs[-1],ys[-1])
+            p_line_closest_center_x = xs[-1]
+            p_line_closest_center_y = ys[-1]
+
+            p_target = (vx[0]+p_line_closest_center_x,vy[0]+p_line_closest_center_y)
+            p_target_x = vx[0]+p_line_closest_center_x
+            p_target_y = vy[0]+p_line_closest_center_y
+
+            r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y)
+
+            x_error = p_target_x - p_line_closest_center_x
+            y_error = p_target_y - p_line_closest_center_y
+
+            '''
             x, y, vx, vy = line_params
-            p_frame_center = Point(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
-            p1 = Point(x, y)
-            p2 = Point(x + vx, y + vy)
+            p_frame_center = sym.Point(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
+            p1 = sym.Point(x, y)
+            p2 = sym.Point(x + vx, y + vy)
             line_of_best_fit = Line(p1, p2)
 
             perp_bisector = line_of_best_fit.perpendicular_bisector(p_frame_center)
 
             p_line_closest_center = perp_bisector.intersection(line_of_best_fit)
 
-            p_target = Point(p_line_closest_center.x + vx, p_line_closest_center.y + vy)
+            p_target = sym.Point(p_line_closest_center.x + vx, p_line_closest_center.y + vy)
 
-            r_to_target = Line(p_frame_center, p_target)
+            r_to_target = sym.Line(p_frame_center, p_target)
 
             vector_to_target = (r_to_target.points[1] - r_to_target.points[0])
 
             xer, yer = (vector_to_target.x, vector_to_target.y)
 
             linevec = np.array([vx,vy])
-
-	    kpx = .75
-
-	    kpy = .75
-
-            actuate command(xer, yer, kpx, kpy)
+            '''
+            
+            actuate command(x_error, y_error)
             # TODO-START: Create velocity controller based on above specs
-    def actuate_command(xerr, yerr, kpx, kpy):
-	cx = xer * (-kpx)
-	cy = yer * (-kpy)
-	return (cx, cy)
-
-px1 = cols-1
-px2 = 0
-py1 = righty
-py2 = lefty
-
-p_line_center_x = (px1+px2)/2
-p_line_center_y = (py1+py2)/2
-
-r_line_unit = (vx[0],vy[0])
-
-m = vy[0]/vx[0]
-b = p_line_center_y - m*p_line_center_x
-
-
-
-   
-            # TODO-END
+    def actuate_command(x_error, y_error):
+        global K_P_X, K_P_Y
+        cx = x_error * (-K_P_X)
+        cy = y_error * (-K_P_Y)
+        return (cx, cy)
 
     def state_cb(self, state):
         """ Starts setpoint streamer when mode is "POSCTL" and disables it when mode is "MANUAL"
