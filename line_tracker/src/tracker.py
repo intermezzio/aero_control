@@ -49,8 +49,8 @@ class LineTracker:
         #  with respect to the world frame parameterized in the body-down frame
         self.velocity_setpoint = None
 
-        while not rospy.is_shutdown() and self.current_state == None:
-            pass  # Wait for connection
+        # while not rospy.is_shutdown() and self.current_state == None:
+        #     pass  # Wait for connection
 
     def line_param_cb(self, line_params):
         mode = getattr(self.current_state, "mode", None)
@@ -119,7 +119,7 @@ class LineTracker:
             x_err = p_target_x - p_line_closest_center_x
             y_err = p_target_y - p_line_closest_center_y
 
-            print(x_err,y_err)
+            # print(x_err,y_err)
 
             self.pub_error.publish(Vector3(x_err,y_err,0))
 
@@ -162,17 +162,18 @@ class LineTracker:
             self.offboard_point_streaming = True
             while (not rospy.is_shutdown()) and self.offboard_point_streaming:
                 # Publish commands
-                if (self.vel_setpnt is not None):
+                if (self.velocity_setpoint is not None):
                     # limit speed for safety
                     velocity_setpoint_limited = deepcopy(self.velocity_setpoint)
-                    speed = np.linalg.norm([velocity_setpoint_limited.linear.x,
-                                            velocity_setpoint_limited.linear.y,
-                                            velocity_setpoint_limited.linear.z])
+                    speed = np.linalg.norm([velocity_setpoint_limited.twist.linear.x,
+                                            velocity_setpoint_limited.twist.linear.y,
+                                            velocity_setpoint_limited.twist.linear.z])
                     if speed > MAX_SPEED:
                         velocity_setpoint_limited.linear.x *= MAX_SPEED / speed
                         velocity_setpoint_limited.linear.y *= MAX_SPEED / speed
                         velocity_setpoint_limited.linear.z *= MAX_SPEED / speed
 
+                    rospy.loginfo(velocity_setpoint_limited)
                     # Publish limited setpoint
                     self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited)
                 self.rate.sleep()
@@ -193,6 +194,7 @@ class LineTracker:
 if __name__ == "__main__":
     rospy.init_node("line_tracker")
     d = LineTracker()
+    d.start_streaming_offboard_points()
     print("DONE")
     rospy.spin()
 d.stop_streaming_offboard_points()
