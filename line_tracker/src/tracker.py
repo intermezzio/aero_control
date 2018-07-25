@@ -8,13 +8,14 @@ import numpy as np
 from geometry_msgs.msg import TwistStamped, PoseStamped, Quaternion, Point, Vector3
 from sensor_msgs.msg import Image
 from tf.transformations import quaternion_from_euler, quaternion_matrix
-from aero_control_staffonly.msg import Line, TrackerParams
+# from aero_control_staffonly.msg import Line, TrackerParams
+from aero_control.msg import Line
 import cv2
 import mavros
 from mavros_msgs.msg import State
 from cv_bridge import CvBridge, CvBridgeError
 from copy import deepcopy
-from sympy import Point, Line
+# from sympy import Point, Line
 
 
 WINDOW_HEIGHT = 128
@@ -23,6 +24,7 @@ NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED = .5 # [m/s]
 K_P_X = 0 # TODO: decide upon initial K_P_X
 K_P_Y = 0 # TODO: decide upon initial K_P_Y
+_TIME_STEP = 0.1
 class LineTracker:
     def __init__(self, rate=10):
         """ Initializes publishers and subscribers, sets initial values for vars
@@ -36,7 +38,7 @@ class LineTracker:
 
         self.pub_local_velocity_setpoint = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
         self.sub_line_param = rospy.Subscriber("/line/param", Line, self.line_param_cb)
-        self.pub_error = rospy.publisher("/line/error", Vector3, queue_size=1)
+        self.pub_error = rospy.publisher("/line/error", Vector3(cx,cy), queue_size=1)
 
 
         # Variables dealing with publishing setpoint

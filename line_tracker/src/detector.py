@@ -67,8 +67,8 @@ class LineDetector:
         lefty = int((-x*vy/vx) + y)
         righty = int(((cols-x)*vy/vx)+y)
         regression = cv2.line(d,(cols-1,righty),(0,lefty),(0,255,0),20)
-        # xaxis = cv2.line(d,(0,640),(1280,640),(255,255,255),10)
-        # yaxis = cv2.line(d,(640,1280),(640,0),(255,255,255),10)
+        xaxis = cv2.line(d,(0,img_center_y),(rows,img_center_y),(255,255,255),10)
+        yaxis = cv2.line(d,(img_center_x,cols),(img_center_x,0),(255,255,255),10)
 
         ##||||||||||||||||||||||||||||||||||||||||||||||||||##
         ##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV## I think this will work for tracker.py
@@ -106,7 +106,15 @@ class LineDetector:
         p_target_x = vx[0]+p_line_closest_center_x
         p_target_y = vy[0]+p_line_closest_center_y
 
-        r_to_target = (img_center_x + p_target_x, img_center_y + p_target_y)
+        r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y)
+
+        x_error = p_target_x - p_line_closest_center_x
+        y_error = p_target_y - p_line_closest_center_y
+
+        new_line = cv2.line(d, (img_center_x,int(r_to_target_x)),(img_center_y,int(r_to_target_y)),(255,255,255),20)
+        
+
+        print(p_line_closest_center,p_target,x_error,y_error)
 
         
 
@@ -126,7 +134,7 @@ class LineDetector:
             # TODO-OPTIONAL-END
 
         # TODO-START: return x, y, vx, and vy in that order
-        return x,y,vx,vy 
+        return x,y,vx,vy,x_error, y_error 
         # TODO-END
 
     def image_cb(self, data):
