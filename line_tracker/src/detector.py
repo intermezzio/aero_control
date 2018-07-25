@@ -5,9 +5,9 @@ import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-# from aero_control.msg import
 from copy import deepcopy
-
+# from shapely.geometry import LineString, Point
+# from aero_control.msg import
 from aero_control.msg import Line
 import sys
 
@@ -59,20 +59,57 @@ class LineDetector:
         im2,contours,hierarchy = cv2.findContours(thresh, 1, 2)#adds the pixels in the threshold to the list of possible contours
         max_contours = max(contours, key = cv2.contourArea)
 
-        
         rows,cols = d.shape[:2]
-        img_center = (rows/2,cols/2)
+        img_center_x, img_center_y = rows/2, cols/2
+        p_frame_center = (img_center_x,img_center_y)
 
         [vx,vy,x,y] = cv2.fitLine(max_contours, cv2.DIST_L2,0,0.01,0.01)
         lefty = int((-x*vy/vx) + y)
         righty = int(((cols-x)*vy/vx)+y)
         regression = cv2.line(d,(cols-1,righty),(0,lefty),(0,255,0),20)
+        # xaxis = cv2.line(d,(0,640),(1280,640),(255,255,255),10)
+        # yaxis = cv2.line(d,(640,1280),(640,0),(255,255,255),10)
+
+        ##||||||||||||||||||||||||||||||||||||||||||||||||||##
+        ##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV## I think this will work for tracker.py
 
 
+        px1 = cols-1
+        px2 = 0
+        py1 = righty
+        py2 = lefty
 
+        p_line_center_x = (px1+px2)/2
+        p_line_center_y = (py1+py2)/2
 
+        r_line_unit = (vx[0],vy[0])
+
+        m = vy[0]/vx[0]
+        b = p_line_center_y - m*p_line_center_x
+
+        distances = [20000]
+        xs = []
+        ys = []
+        for x1 in range(0,d.shape[0]):
+            y1 = m*x1 + b
+            dist = np.sqrt((x1 - img_center_x)**2 + (y1 - img_center_y)**2)
+            if dist < distances[-1]:
+                distances.append(dist)
+                xs.append(x1)
+                ys.append(y1)
+
+        p_line_closest_center = (xs[-1],ys[-1])
+        p_line_closest_center_x = xs[-1]
+        p_line_closest_center_y = ys[-1]
+
+        p_target = (vx[0]+p_line_closest_center_x,vy[0]+p_line_closest_center_y)
+        p_target_x = vx[0]+p_line_closest_center_x
+        p_target_y = vy[0]+p_line_closest_center_y
+
+        r_to_target = (img_center_x + p_target_x, img_center_y + p_target_y)
 
         
+
 
 
         # TODO-END
