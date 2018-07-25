@@ -14,6 +14,7 @@ import mavros
 from mavros_msgs.msg import State
 from cv_bridge import CvBridge, CvBridgeError
 from copy import deepcopy
+from sympy import Point, Line
 
 
 WINDOW_HEIGHT = 128
@@ -69,8 +70,23 @@ class LineTracker:
     
             """
             x, y, vx, vy = line_params
-            p_frame_center = np.array([WINDOW_WIDTH/2, WINDOW_HEIGHT/2])
-            
+            p_frame_center = Point(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
+            p1 = Point(x, y)
+            p2 = Point(x + vx, y + vy)
+            line_of_best_fit = Line(p1, p2)
+
+            perp_bisector = line_of_best_fit.perpendicular_bisector(p_frame_center)
+
+            p_line_closest_center = perp_bisector.intersection(line_of_best_fit)
+
+            p_target = Point(p_line_closest_center.x + vx, p_line_closest_center.y + vy)
+
+            r_to_target = Line(p_frame_center, p_target)
+
+            vector_to_target = (r_to_target.points[1] - r_to_target.points[0])
+
+            cx, cy = (vector_to_target.x, vector_to_target.y)
+
             linevec = np.array([vx,vy])
             # TODO-START: Create velocity controller based on above specs
     def actuate_acceleration_command(self, acc_cmd, dt=_TIME_STEP):
