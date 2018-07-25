@@ -8,14 +8,13 @@ import numpy as np
 from geometry_msgs.msg import TwistStamped, PoseStamped, Quaternion, Point, Vector3
 from sensor_msgs.msg import Image
 from tf.transformations import quaternion_from_euler, quaternion_matrix
-# from aero_control_staffonly.msg import Line, TrackerParams
 from aero_control.msg import Line
 import cv2
 import mavros
 from mavros_msgs.msg import State
 from cv_bridge import CvBridge, CvBridgeError
 from copy import deepcopy
-# from sympy import Point, Line
+
 
 
 WINDOW_HEIGHT = 128
@@ -38,7 +37,7 @@ class LineTracker:
 
         self.pub_local_velocity_setpoint = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
         self.sub_line_param = rospy.Subscriber("/line/param", Line, self.line_param_cb)
-        self.pub_error = rospy.publisher("/line/error", Vector3(cx,cy), queue_size=1)
+        self.pub_error = rospy.Publisher("/line/error", Vector3, queue_size=1)
 
 
         # Variables dealing with publishing setpoint
@@ -55,52 +54,88 @@ class LineTracker:
 
     def line_param_cb(self, line_params):
         mode = getattr(self.current_state, "mode", None)
-        if mode not in (None, "MANUAL") or NO_ROBOT:
-            global WINDOW_HEIGHT, WINDOW_WIDTH
-            """ Map line paramaterization to a velocity setpoint so the robot will approach and follow the LED strip
+        # if mode not in (None, "MANUAL") or NO_ROBOT:
             
-            Note: Recall the formatting of a Line message when dealing with line_params
 
-            Recomended Steps: 
-            
-            Read the documentation at https://bwsi-uav.github.io/website/line_following.html
+        """ Map line paramaterization to a velocity setpoint so the robot will approach and follow the LED strip
+        
+        Note: Recall the formatting of a Line message when dealing with line_params
 
-            After calculating your various control signals, place them in self.velocity_setpoint (which
-                is a TwistStamped, meaning self.velocity_setpoint.twist.linear.x is x vel for example)
+        Recomended Steps: 
+        
+        Read the documentation at https://bwsi-uav.github.io/website/line_following.html
 
-            Be sure to publish your error using self.pub_error.publish(Vector3(x_error,y_error,0))
-    
-            """
-            x, y, vx, vy = line_params
-            p_frame_center = Point(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
-            p1 = Point(x, y)
-            p2 = Point(x + vx, y + vy)
-            line_of_best_fit = Line(p1, p2)
+        After calculating your various control signals, place them in self.velocity_setpoint (which
+            is a TwistStamped, meaning self.velocity_setpoint.twist.linear.x is x vel for example)
 
-            perp_bisector = line_of_best_fit.perpendicular_bisector(p_frame_center)
+        Be sure to publish your error using self.pub_error.publish(Vector3(x_error,y_error,0))
 
-            p_line_closest_center = perp_bisector.intersection(line_of_best_fit)
+        """
 
-            p_target = Point(p_line_closest_center.x + vx, p_line_closest_center.y + vy)
+        # TODO-START: Create velocity controller based on above specs
 
-            r_to_target = Line(p_frame_center, p_target)
+        img_center_x = 64
+        img_center_y = 64
 
-            vector_to_target = (r_to_target.points[1] - r_to_target.points[0])
+        x = line_params.x
+        y = line_params.y
+        vx = line_params.vx
+        vy = line_params.vy
 
-            cx, cy = (vector_to_target.x, vector_to_target.y)
+        px1 = 127
+        px2 = 0
+        py1 = int(((128-x)*vy/vx)+y)
+        py2 = int((-x*vy/vx) + y)
 
-            linevec = np.array([vx,vy])
-            # TODO-START: Create velocity controller based on above specs
+        p_line_center_x = (px1+px2)/2
+        p_line_center_y = (py1+py2)/2
+
+        r_line_unit = (vx,vy)
+
+        m = vy/vx
+        b = p_line_center_y - m*p_line_center_x
+
+        distances = [20000]
+        xs = []
+        ys = []
+        for x1 in range(0,px1):
+            y1 = m*x1 + b
+            dist = np.sqrt((x1 - img_center_x)**2 + (y1 - img_center_y)**2)
+            if dist < distances[-1]:
+                distances.append(dist)
+                xs.append(x1)
+                ys.append(y1)
+
+        p_line_closest_center = (xs[-1],ys[-1])
+        p_line_closest_center_x = xs[-1]
+        p_line_closest_center_y = ys[-1]
+
+        p_target = (vx+p_line_closest_center_x,vy+p_line_closest_center_y)
+        p_target_x = vx+p_line_closest_center_x
+        p_target_y = vy+p_line_closest_center_y
+
+        r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
+
+        x_err = p_target_x - p_line_closest_center_x
+        y_err = p_target_y - p_line_closest_center_y
+
+        print(x_err,y_err)
+
+        self.pub_error.publish(Vector3(x_err,y_err,0))
+        return x_err, y_err
+
+
     def actuate_acceleration_command(self, acc_cmd, dt=_TIME_STEP):
         self.__v += acc_cmd*dt
         self.__x += self.__v*dt
     
-    def p_control( y_err,kp):
-        cmd = y_err*(-kp)
-	return cmd
+    def p_control(x_err,y_err):
+        cmd_x = x_err*(-1*K_P_X)
+        cmd_y = y_err*(-1*K_P_Y)
+        return cmd_x, cmd_y
 
     def points(self, kp):
-        vel_cmd = p_control(err_gamma, kp)
+        vel_cmd_x = p_control(err_gamma, kp)
 
    
             # TODO-END
@@ -156,5 +191,6 @@ class LineTracker:
 if __name__ == "__main__":
     rospy.init_node("line_tracker")
     d = LineTracker()
+    print("DONE")
     rospy.spin()
 d.stop_streaming_offboard_points()

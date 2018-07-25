@@ -16,7 +16,7 @@ DEBUG = True
 class LineDetector:
     def __init__(self):
         self.sub_cam = rospy.Subscriber("/aero_downward_camera/image", Image, self.image_cb)
-        self.pub_param = rospy.Publisher("/image_to_cv/processed", Image, queue_size=1)
+        self.pub_param = rospy.Publisher("/line/param", Line, queue_size=1)
         self.bridge = CvBridge() 
         # TODO create a publisher for line parameterizations
 
@@ -27,15 +27,15 @@ class LineDetector:
         # TODO-START: create a CvBridge instance
         # TODO-END
 
-    def image_cb(self, msg):
-        try:
-            cv_image = self.bridge.imgmsg_to_cv2(msg, "8UC1")
+    # def image_cb(self, msg):
+    #     try:
+    #         cv_image = self.bridge.imgmsg_to_cv2(msg, "8UC1")
 
-        except CvBridgeError as e:
-            print(e)
+    #     except CvBridgeError as e:
+    #         print(e)
 
         # cv2.imshow(cv_image) # shows the image, might be VERY slow (optional)
-        self.parameterizeLine(cv_image)
+        # self.parameterizeLine(cv_image)
 
     def parameterizeLine(self, cv_image):
         """ Fit a line to LED strip
@@ -65,13 +65,8 @@ class LineDetector:
 
         [vx,vy,x,y] = cv2.fitLine(max_contours, cv2.DIST_L2,0,0.01,0.01)
         lefty = int((-x*vy/vx) + y)
-        righty = int(((cols-x)*vy/vx)+y)
+        righty = sint(((cols-x)*vy/vx)+y)
         regression = cv2.line(d,(cols-1,righty),(0,lefty),(0,255,0),20)
-        # xaxis = cv2.line(d,(0,img_center_y),(rows,img_center_y),(255,255,255),10)
-        # yaxis = cv2.line(d,(img_center_x,cols),(img_center_x,0),(255,255,255),10)
-
-        ##||||||||||||||||||||||||||||||||||||||||||||||||||##
-        ##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV## I think this will work for tracker.py
 
 
         px1 = cols-1
@@ -79,45 +74,14 @@ class LineDetector:
         py1 = righty
         py2 = lefty
 
-        p_line_center_x = (px1+px2)/2
-        p_line_center_y = (py1+py2)/2
-
-        r_line_unit = (vx[0],vy[0])
-
-        m = vy[0]/vx[0]
-        b = p_line_center_y - m*p_line_center_x
-
-        distances = [20000]
-        xs = []
-        ys = []
-        for x1 in range(0,d.shape[0]):
-            y1 = m*x1 + b
-            dist = np.sqrt((x1 - img_center_x)**2 + (y1 - img_center_y)**2)
-            if dist < distances[-1]:
-                distances.append(dist)
-                xs.append(x1)
-                ys.append(y1)
-
-        p_line_closest_center = (xs[-1],ys[-1])
-        p_line_closest_center_x = xs[-1]
-        p_line_closest_center_y = ys[-1]
-
-        p_target = (vx[0]+p_line_closest_center_x,vy[0]+p_line_closest_center_y)
-        p_target_x = vx[0]+p_line_closest_center_x
-        p_target_y = vy[0]+p_line_closest_center_y
-
-        r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y)
-
-        x_error = p_target_x - p_line_closest_center_x
-        y_error = p_target_y - p_line_closest_center_y
-
-        new_line = cv2.line(d, (img_center_x,img_center_y),(int(p_line_closest_center_x),int(p_line_closest_center_y)),(255,255,255),5)
-        new_line = cv2.line(d, (img_center_x,img_center_y),(int(p_target_x),int(p_target_y)),(255,255,255),5)
 
 
-        print(p_line_closest_center,p_target,x_error,y_error)
+        ##||||||||||||||||||||||||||||||||||||||||||||||||||##
+        ##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV## I think this will work for tracker.py
 
-        
+
+
+        # print(p_line_closest_center,p_target,x_error,y_error)
 
         
 
@@ -130,14 +94,15 @@ class LineDetector:
              # delete ths line and add your code if you want debug images
 
             try:
-                self.pub_param.publish(self.bridge.cv2_to_imgmsg(d, "8UC1"))
+                # self.pub_param.publish(self.bridge.cv2_to_imgmsg(d, "8UC1"))
+                pass
 
             except CvBridgeError as e:
                 print(e)
             # TODO-OPTIONAL-END
 
         # TODO-START: return x, y, vx, and vy in that order
-        return x,y,vx,vy,x_error, y_error 
+        return x,y,vx,vy
         # TODO-END
 
     def image_cb(self, data):
@@ -151,6 +116,7 @@ class LineDetector:
             msg.y = y
             msg.vx = vx
             msg.vy = vy
+
 
             self.pub_param.publish(msg)
 
