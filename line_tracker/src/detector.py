@@ -65,7 +65,7 @@ class LineDetector:
 
         [vx,vy,x,y] = cv2.fitLine(max_contours, cv2.DIST_L2,0,0.01,0.01)
         lefty = int((-x*vy/vx) + y)
-        righty = sint(((cols-x)*vy/vx)+y)
+        righty = int(((cols-x)*vy/vx)+y)
         regression = cv2.line(d,(cols-1,righty),(0,lefty),(0,255,0),20)
 
 
