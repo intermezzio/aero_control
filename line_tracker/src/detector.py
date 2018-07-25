@@ -53,26 +53,32 @@ class LineDetector:
         d = deepcopy(cv_image) #preserves raw images, but requires more time and processing power    
         d = cv2.inRange(d,lower,upper)
         d = cv2.morphologyEx(d,cv2.MORPH_CLOSE,kernel)
-        d = cv2.resize(d, (0,0), fx=10, fy=10)
+       # d = cv2.resize(d, (0,0), fx=10, fy=10)
 
         ret,thresh = cv2.threshold(d,0,255,0)
         im2,contours,hierarchy = cv2.findContours(thresh, 1, 2)#adds the pixels in the threshold to the list of possible contours
-        max_contours = max(contours, key = cv2.contourArea)
+        
+        if len(contours) > 0:
+            max_contours = max(contours, key = lambda x: cv2.contourArea(x))
 
-        rows,cols = d.shape[:2]
-        img_center_x, img_center_y = rows/2, cols/2
-        p_frame_center = (img_center_x,img_center_y)
+            rows,cols = d.shape[:2]
+            img_center_x, img_center_y = rows/2, cols/2
+            p_frame_center = (img_center_x,img_center_y)
 
-        [vx,vy,x,y] = cv2.fitLine(max_contours, cv2.DIST_L2,0,0.01,0.01)
-        lefty = int((-x*vy/vx) + y)
-        righty = int(((cols-x)*vy/vx)+y)
-        regression = cv2.line(d,(cols-1,righty),(0,lefty),(0,255,0),20)
+            [vx,vy,x,y] = cv2.fitLine(max_contours, cv2.DIST_L2,0,0.01,0.01)
+	    if vx < 0:
+		vx = -1*vx
+		vy *= -1
+	    
+            lefty = int((-x*vy/vx) + y)
+            righty = int(((cols-x)*vy/vx)+y)
+            regression = cv2.line(d,(cols-1,righty),(0,lefty),(0,255,0),2)
 
 
-        px1 = cols-1
-        px2 = 0
-        py1 = righty
-        py2 = lefty
+            px1 = cols-1
+            px2 = 0
+            py1 = righty
+            py2 = lefty
 
 
 
@@ -89,20 +95,20 @@ class LineDetector:
 
         # TODO-END
         
-        if DEBUG:
-            # TODO-OPTIONAL-START: publish an image showing your line on top of the LED strip image
-             # delete ths line and add your code if you want debug images
+            if DEBUG:
+                # TODO-OPTIONAL-START: publish an image showing your line on top of the LED strip image
+                 # delete ths line and add your code if you want debug images
 
-            try:
-                # self.pub_param.publish(self.bridge.cv2_to_imgmsg(d, "8UC1"))
-                pass
+                try:
+                    # self.pub_param.publish(self.bridge.cv2_to_imgmsg(d, "8UC1"))
+                    pass
 
-            except CvBridgeError as e:
-                print(e)
-            # TODO-OPTIONAL-END
+                except CvBridgeError as e:
+                    print(e)
+                # TODO-OPTIONAL-END
 
-        # TODO-START: return x, y, vx, and vy in that order
-        return x,y,vx,vy
+            # TODO-START: return x, y, vx, and vy in that order
+            return x,y,vx,vy
         # TODO-END
 
     def image_cb(self, data):
