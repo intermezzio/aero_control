@@ -23,6 +23,7 @@ NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED = .5 # [m/s]
 K_P_X = 1.0 # TODO: decide upon initial K_P_X
 K_P_Y = 1.0 # TODO: decide upon initial K_P_Y
+K_P_YAW = 0.1
 num_unit_vecs = 50
 _TIME_STEP = 0.1
 class LineTracker:
@@ -39,6 +40,7 @@ class LineTracker:
         self.pub_local_velocity_setpoint = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
         self.sub_line_param = rospy.Subscriber("/line/param", Line, self.line_param_cb)
         self.pub_error = rospy.Publisher("/line/error", Vector3, queue_size=1)
+
 
 
         # Variables dealing with publishing setpoint
@@ -108,6 +110,19 @@ class LineTracker:
                     ys.append(y1)
 
 
+
+            while vy < 0:
+                yaw_angle = -1*(90 - np.arctan(vx/vy))
+
+            while vy > 0:
+                yaw_angle = 90 - np.arctan(vx/vy)
+
+
+
+
+
+
+
             if len(xs) > 0 and len(ys) > 0:
 
                 p_line_closest_center = (xs[-1],ys[-1])
@@ -132,7 +147,7 @@ class LineTracker:
                         self.pub_error.publish(Vector3(1.0,y_err,0))
 
                     self.pub_error.publish(Vector3(x_err,y_err,0))
-                    self.p_control(x_err,y_err)
+                    self.p_control(x_err,y_err,yaw_angle)
         # return x_err, y_err
 
 
@@ -140,14 +155,17 @@ class LineTracker:
         self.__v += acc_cmd*dt
         self.__x += self.__v*dt
     
-    def p_control(self,x_err,y_err):
+    def p_control(self,x_err,y_err,yaw_angle):
         cmd_x = x_err*(1*K_P_X)
         cmd_y = y_err*(-1*K_P_Y)
+        cmd_yaw = yaw_angle*(-1*K_P_YAW)
+
 
         self.velocity_setpoint = TwistStamped()
         self.velocity_setpoint.twist.linear.x = cmd_x
         self.velocity_setpoint.twist.linear.y = cmd_y
         self.velocity_setpoint.twist.linear.z = 0
+        self.velocity_setpoint.twist.angular.z = cmd_yaw
    
             # TODO-END
 
