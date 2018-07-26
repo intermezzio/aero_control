@@ -19,11 +19,11 @@ from copy import deepcopy
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = True # set to True to test on laptop
+NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED = .5 # [m/s]
 K_P_X = 1.0 # TODO: decide upon initial K_P_X
 K_P_Y = 1.0 # TODO: decide upon initial K_P_Y
-num_unit_vecs = 50
+num_unit_vecs = 10
 _TIME_STEP = 0.1
 class LineTracker:
     def __init__(self, rate=10):
@@ -115,21 +115,21 @@ class LineTracker:
                 p_line_closest_center_y = ys[-1]
 
                 p_target = (vx+p_line_closest_center_x,vy+p_line_closest_center_y)
-                p_target_x = num_unit_vecs*vx+p_line_closest_center_x
-                p_target_y = num_unit_vecs*vy+p_line_closest_center_y
+                p_target_x = vx+p_line_closest_center_x
+                p_target_y = vy+p_line_closest_center_y
 
                 # r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
 
-                x_err = (-1*img_center_x + p_target_x)   
-                y_err = (-1*img_center_y + p_target_y) 
+                x_err = num_unit_vecs*(img_center_x - p_target_x)   
+                y_err = num_unit_vecs*(img_center_y - p_target_y) 
 
-               # if x_err and y_err:
-                #    m_thresh = 1000000
-                 #   largest_int = 9223372036854775807
-                  #  if -1*largest_int < m and m < -1*m_thresh: 
-                   #     self.pub_error.publish(Vector3(1.0,y_err,0))
-                    #if m_thresh < m and m <largest_int:
-                     #   self.pub_error.publish(Vector3(1.0,y_err,0))
+                if x_err and y_err:
+                    m_thresh = 1000000
+                    largest_int = 9223372036854775807
+                    if -1*largest_int < m and m < -1*m_thresh: 
+                        self.pub_error.publish(Vector3(1.0,y_err,0))
+                    if m_thresh < m and m <largest_int:
+                        self.pub_error.publish(Vector3(1.0,y_err,0))
 
                     self.pub_error.publish(Vector3(x_err,y_err,0))
                     self.p_control(x_err,y_err)
@@ -141,12 +141,15 @@ class LineTracker:
         self.__x += self.__v*dt
     
     def p_control(self,x_err,y_err):
-        cmd_x = x_err*(1*K_P_X)
+        cmd_x = x_err*(-1*K_P_X)
         cmd_y = y_err*(-1*K_P_Y)
 
+	cmd_x__bu = cmd_y
+	cmd_y__bu = cmd_x
+
         self.velocity_setpoint = TwistStamped()
-        self.velocity_setpoint.twist.linear.x = cmd_x
-        self.velocity_setpoint.twist.linear.y = cmd_y
+        self.velocity_setpoint.twist.linear.x = cmd_x__bu
+        self.velocity_setpoint.twist.linear.y = cmd_y__bu
         self.velocity_setpoint.twist.linear.z = 0
    
             # TODO-END
