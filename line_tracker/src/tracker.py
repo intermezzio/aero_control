@@ -19,11 +19,11 @@ from copy import deepcopy
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = False # set to True to test on laptop
+NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED = .5 # [m/s]
 K_P_X = 1.0 # TODO: decide upon initial K_P_X
 K_P_Y = 1.0 # TODO: decide upon initial K_P_Y
-num_unit_vecs = 10
+num_unit_vecs = 50
 _TIME_STEP = 0.1
 class LineTracker:
     def __init__(self, rate=10):
@@ -115,13 +115,13 @@ class LineTracker:
                 p_line_closest_center_y = ys[-1]
 
                 p_target = (vx+p_line_closest_center_x,vy+p_line_closest_center_y)
-                p_target_x = vx+p_line_closest_center_x
-                p_target_y = vy+p_line_closest_center_y
+                p_target_x = num_unit_vecs*vx+p_line_closest_center_x
+                p_target_y = num_unit_vecs*vy+p_line_closest_center_y
 
                 # r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
 
-                x_err = num_unit_vecs*(img_center_x - p_target_x)   
-                y_err = num_unit_vecs*(img_center_y - p_target_y) 
+                x_err = (-1*img_center_x + p_target_x)   
+                y_err = (-1*img_center_y + p_target_y) 
 
                 if x_err and y_err:
                     m_thresh = 1000000

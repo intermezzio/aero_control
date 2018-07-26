@@ -54,7 +54,7 @@ class LineDetector:
         d = deepcopy(cv_image) #preserves raw images, but requires more time and processing power    
         d = cv2.inRange(d,lower,upper)
         d = cv2.morphologyEx(d,cv2.MORPH_CLOSE,kernel)
-        d = cv2.resize(d, (0,0), fx=10, fy=10)
+        # d = cv2.resize(d, (0,0), fx=10, fy=10)
 # 
         ret,thresh = cv2.threshold(d,0,255,0)
         im2,contours,hierarchy = cv2.findContours(thresh, 1, 2)#adds the pixels in the threshold to the list of possible contours
