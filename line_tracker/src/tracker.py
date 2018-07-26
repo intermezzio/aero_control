@@ -21,8 +21,8 @@ WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
 NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED = .5 # [m/s]
-K_P_X = 0.1 # TODO: decide upon initial K_P_X
-K_P_Y = 0.1 # TODO: decide upon initial K_P_Y
+K_P_X = 1.0 # TODO: decide upon initial K_P_X
+K_P_Y = 1.0 # TODO: decide upon initial K_P_Y
 _TIME_STEP = 0.1
 class LineTracker:
     def __init__(self, rate=10):
@@ -106,24 +106,32 @@ class LineTracker:
                     xs.append(x1)
                     ys.append(y1)
 
-            p_line_closest_center = (xs[-1],ys[-1])
-            p_line_closest_center_x = xs[-1]
-            p_line_closest_center_y = ys[-1]
 
-            p_target = (vx+p_line_closest_center_x,vy+p_line_closest_center_y)
-            p_target_x = vx+p_line_closest_center_x
-            p_target_y = vy+p_line_closest_center_y
+            if len(xs) > 0 and len(ys) > 0:
 
-            r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
+                p_line_closest_center = (xs[-1],ys[-1])
+                p_line_closest_center_x = xs[-1]
+                p_line_closest_center_y = ys[-1]
 
-            x_err = p_target_x - p_line_closest_center_x
-            y_err = p_target_y - p_line_closest_center_y
+                p_target = (vx+p_line_closest_center_x,vy+p_line_closest_center_y)
+                p_target_x = vx+p_line_closest_center_x
+                p_target_y = vy+p_line_closest_center_y
 
-            # print(x_err,y_err)
+                r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
 
-            self.pub_error.publish(Vector3(x_err,y_err,0))
+                x_err = p_line_closest_center_x - p_target_x   
+                y_err = p_line_closest_center_y - p_target_y 
 
-            self.p_control(x_err,y_err)
+                if x_err and y_err:
+                    m_thresh = 1000000
+                    largest_int = 9223372036854775807
+                    if -1*largest_int < m and m < -1*m_thresh: 
+                        self.pub_error.publish(Vector3(1.0,y_err,0))
+                    if m_thresh < m and m <largest_int:
+                        self.pub_error.publish(Vector3(1.0,y_err,0))
+
+                    self.pub_error.publish(Vector3(x_err,y_err,0))
+                    self.p_control(x_err,y_err)
         # return x_err, y_err
 
 
@@ -132,7 +140,7 @@ class LineTracker:
         self.__x += self.__v*dt
     
     def p_control(self,x_err,y_err):
-        cmd_x = x_err*(-1*K_P_X)
+        cmd_x = x_err*(1*K_P_X)
         cmd_y = y_err*(-1*K_P_Y)
 
         self.velocity_setpoint = TwistStamped()
@@ -169,9 +177,9 @@ class LineTracker:
                                             velocity_setpoint_limited.twist.linear.y,
                                             velocity_setpoint_limited.twist.linear.z])
                     if speed > MAX_SPEED:
-                        velocity_setpoint_limited.linear.x *= MAX_SPEED / speed
-                        velocity_setpoint_limited.linear.y *= MAX_SPEED / speed
-                        velocity_setpoint_limited.linear.z *= MAX_SPEED / speed
+                        velocity_setpoint_limited.twist.linear.x *= MAX_SPEED / speed
+                        velocity_setpoint_limited.twist.linear.y *= MAX_SPEED / speed
+                        velocity_setpoint_limited.twist.linear.z *= MAX_SPEED / speed
 
                     rospy.loginfo(velocity_setpoint_limited)
                     # Publish limited setpoint
