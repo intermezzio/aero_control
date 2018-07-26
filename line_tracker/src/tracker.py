@@ -23,6 +23,7 @@ NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED = .5 # [m/s]
 K_P_X = 1.0 # TODO: decide upon initial K_P_X
 K_P_Y = 1.0 # TODO: decide upon initial K_P_Y
+num_unit_vecs = 10
 _TIME_STEP = 0.1
 class LineTracker:
     def __init__(self, rate=10):
@@ -117,10 +118,10 @@ class LineTracker:
                 p_target_x = vx+p_line_closest_center_x
                 p_target_y = vy+p_line_closest_center_y
 
-                r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
+                # r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
 
-                x_err = p_line_closest_center_x - p_target_x   
-                y_err = p_line_closest_center_y - p_target_y 
+                x_err = num_unit_vecs*(img_center_x - p_target_x)   
+                y_err = num_unit_vecs*(img_center_y - p_target_y) 
 
                 if x_err and y_err:
                     m_thresh = 1000000

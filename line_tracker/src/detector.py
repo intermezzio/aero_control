@@ -118,10 +118,12 @@ class LineDetector:
                 p_target_x = vx[0]+p_line_closest_center_x
                 p_target_y = vy[0]+p_line_closest_center_y
 
-                r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
+                # r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
 
-                x_err = p_target_x - p_line_closest_center_x
-                y_err = p_target_y - p_line_closest_center_y
+                num_unit_vecs = 30
+
+                x_err = num_unit_vecs*(img_center_x - p_target_x)   
+                y_err = num_unit_vecs*(img_center_y - p_target_y) 
 
                 new_line = cv2.line(d,(img_center_x,img_center_y),(p_line_closest_center_x,p_line_closest_center_y),(255,255,255),10)
 
