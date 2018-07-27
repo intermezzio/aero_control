@@ -5,7 +5,7 @@ import time
 import threading
 import numpy as np
 import tf
-from tf.transformations import * as tft
+from tf.transformations import * 
 from geometry_msgs.msg import Twist, PoseStamped, TwistStamped, PoseArray
 from ar_track_alvar_msgs.msg import AlvarMarkers, AlvarMarker
 from std_msgs.msg import String
@@ -105,10 +105,10 @@ class ARObstacleController:
                 mode = 0
                 # raise Exception("Correct the finite state here!")
 
-                self.finite_state = 0
+                self.finite_state = mode
 
 
-        if mode = 0:
+        if mode == 0:
             self.finite_state = mode
 
         
@@ -116,7 +116,7 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
-        	marker = min(self.markers, key= pose.pose.position.x)
+        	self.current_obstacle_tag = min(self.markers, key= marker.pose.pose.position.x)
 
             
     def generate_vel(self): # assesses course of action using finite states
@@ -233,7 +233,7 @@ class ARObstacleController:
             self.clear_history(x=True, z=True)
             self.t_obstacle_start = None
             self.update_finite_state(force=True)
-   def avoid_hurdle(self): # commands vel such that hurdle can be avoided open-loop
+    def avoid_hurdle(self): # commands vel such that hurdle can be avoided open-loop
         td = datetime.now()-self.t_obstacle_start
 
 ###########################################################################################################################
