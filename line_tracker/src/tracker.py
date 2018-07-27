@@ -146,8 +146,8 @@ class LineTracker:
                     #if m_thresh < m and m <largest_int:
                      #   self.pub_error.publish(Vector3(1.0,y_err,0))
 
-                    self.pub_error.publish(Vector3(x_err,y_err,0))
-                    self.p_control(x_err,y_err,yaw_angle)
+                self.pub_error.publish(Vector3(x_err,y_err,0))
+                self.p_control(x_err,y_err,yaw_angle)
         # return x_err, y_err
 
 
