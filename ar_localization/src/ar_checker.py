@@ -85,6 +85,18 @@ class ARDistChecker:
         # rospy.loginfo("dist of %d: %f"%(marker.id, marker.pose.pose.position.z))
         return 1.0
 
+    def PID_control(variables, type=None):
+    	"""
+		Calculate the new commands for different variables given their errors
+		Accepts a list of variables in a list of length 2 tuples:
+		[ (error1, var1)
+		  (error2, var2)]
+		An example of this is the following:
+		[ (0.2, 'x')
+		  (0.5, 'y')
+		  (45, 'theta')]
+    	"""
+    	
 
 if __name__ == '__main__':
     rospy.init_node('ar_checker')
