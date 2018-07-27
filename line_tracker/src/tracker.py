@@ -109,17 +109,10 @@ class LineTracker:
                     xs.append(x1)
                     ys.append(y1)
 
-
-
-            while vy < 0:
-                yaw_angle = -1*(90 - np.arctan(vx/vy))
-
-            while vy > 0:
-                yaw_angle = 90 - np.arctan(vx/vy)
-
-
-
-
+            if vy < 0: #axes are switched LOL
+                yaw_angle = -1*(0 - np.arctan(vx/vy))
+            if vy > 0:
+                yaw_angle = 0 - np.arctan(vx/vy)
 
 
 
@@ -147,7 +140,8 @@ class LineTracker:
                      #   self.pub_error.publish(Vector3(1.0,y_err,0))
 
                 self.pub_error.publish(Vector3(x_err,y_err,0))
-                self.p_control(x_err,y_err,yaw_angle)
+
+            self.p_control(x_err,y_err,yaw_angle)
         # return x_err, y_err
 
 
@@ -156,16 +150,17 @@ class LineTracker:
         self.__x += self.__v*dt
     
     def p_control(self,x_err,y_err,yaw_angle):
+        self.velocity_setpoint = TwistStamped()
         cmd_x = x_err*(1*K_P_X)
         cmd_y = y_err*(-1*K_P_Y)
-        cmd_yaw = yaw_angle*(-1*K_P_YAW)
+        if yaw_angle:
+            cmd_yaw = yaw_angle*(-1*K_P_YAW)
+            self.velocity_setpoint.twist.angular.z = cmd_yaw
 
 
-        self.velocity_setpoint = TwistStamped()
         self.velocity_setpoint.twist.linear.x = cmd_x
         self.velocity_setpoint.twist.linear.y = cmd_y
         self.velocity_setpoint.twist.linear.z = 0
-        self.velocity_setpoint.twist.angular.z = cmd_yaw
    
             # TODO-END
 
@@ -200,9 +195,10 @@ class LineTracker:
                         velocity_setpoint_limited.twist.linear.y *= MAX_SPEED / speed
                         velocity_setpoint_limited.twist.linear.z *= MAX_SPEED / speed
 
-                    rospy.loginfo(velocity_setpoint_limited)
                     # Publish limited setpoint
                     self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited)
+                    # self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited.twist.angular.z) 
+                    rospy.loginfo(velocity_setpoint_limited)
                 self.rate.sleep()
 
         self.offboard_point_streaming_thread = threading.Thread(target=run_streaming)
