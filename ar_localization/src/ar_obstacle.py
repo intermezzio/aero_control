@@ -18,7 +18,7 @@ from mavros_msgs.msg import State
 # TODO: decide on points at which you want to hover in front of obstacles before flying through
 ###########################################################################################################################
 _DIST_TO_OBST = {24:[0.5,0.0,0.0,0.0],12:[0.5,0.0,0.0,0.0], 9:[0.5, 0.0, 0.0, 0.0]} 
-raise Exception("Decide on how far away from the tag you want to be!!")
+# raise Exception("Decide on how far away from the tag you want to be!!")
 
 ###########################################################################################################################
 # TODO: add desired sequence of obstacles, should match course
@@ -31,11 +31,11 @@ _YAW_DES = 0.0 # radians
 # TODO: decide on K_P values
 ###########################################################################################################################
 # P(ID) constants
-_K_P_X = 0.0
-_K_P_Y = 0.0
-_K_P_Z = 0.0
+_K_P_X = 0.75
+_K_P_Y = 0.75
+_K_P_Z = 0.75
 
-_K_P_YAW = 0.0
+_K_P_YAW = 0.1
 
 _DEBUG = False
 
@@ -88,6 +88,7 @@ class ARObstacleController:
 
         self.update_finite_state()
 
+
     def update_finite_state(self, mode=0, force=False): # updates current phase of avoidance 
         if force:
             self.finite_state = mode
@@ -100,28 +101,37 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: Decide which finite state to enter when you've lost the AR tags
 ###########################################################################################################################
+
                 mode = 0
-                raise Exception("Correct the finite state here!")
+                # raise Exception("Correct the finite state here!")
+
+                self.finite_state = 0
+
 
         if mode = 0:
             self.finite_state = mode
 
+        
         if any(marker.id in self.obstacles for marker in self.markers) and self.finite_state == 0:
 ###########################################################################################################################
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
-            raise Exception("Filter for the best marker you can see!")
+        	marker = min(self.markers, key= pose.pose.position.x)
+
             
     def generate_vel(self): # assesses course of action using finite states
         if self.finite_state == 0:
 ###########################################################################################################################
 # TODO: fill in velocity commands for finite state 0
 ###########################################################################################################################
+
             self.vel_hist[0].insert(0,0.0)
             self.vel_hist[1].insert(0,0.0)
             self.vel_hist[2].insert(0,0.0)
             self.vel_hist[3].insert(0,0.0)
-            raise Exception("Fill in Hover commands!")
+
+
+            # raise Exception("Fill in Hover commands!")
 
         elif self.finite_state == 1:
             self.fly_to_obstacle()
@@ -181,6 +191,9 @@ class ARObstacleController:
         yaw_error = -1*(_DIST_TO_OBST[target_marker.id][3] - curr_yaw)
         # raise Exception("calculate errors and delete this!!")
 
+##########################################################################################################################
+		#desired - actual
+
 
         if _DEBUG: rospy.loginfo("error: x: %.04f y: %.04f z: %.04f yaw %.04f" % (x_error, y_error, z_error, yaw_error))
 
@@ -229,7 +242,7 @@ class ARObstacleController:
         t_up = 1.5
         t_forward = 3
 
-        raise Exception("hurdle avoid times!")
+        # raise Exception("hurdle avoid times!")
         if td.total_seconds() < t_up:
             # add to vel_hist here!! (insert at zero)
             self.vel_hist[2].insert(0,t_up)

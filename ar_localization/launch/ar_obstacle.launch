@@ -1,6 +1,7 @@
 <!-- Sample launch file for using RealSense R200 camera with rgbd_launch -->
 <launch>
   <!-- node for ar tag tracking -->
+  <node pkg="rosservice" type="rosservice" name="global_loc" args="call --wait /mavros/setpoint_velocity/mav_frame 8"/>
   <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
     <param name="output_frame" type="string" value="camera_rgb_optical_frame"/>
     <param name="marker_size" type="double" value="26.99"/>    
