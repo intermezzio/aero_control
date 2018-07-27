@@ -30,7 +30,6 @@ R_fc2bd = np.array([[0.0, 0.0, 1.0, 0.0],
                     [0.0, 0.0, 0.0, 1.0]])
 
 # Find inverse rotation matrices 
-R_lned2lenu = R_lenu2lned.T
 R_bd2bu = R_bu2bd.T
 R_bd2dc = R_dc2bd.T
 R_bd2fc = R_fc2bd.T
@@ -83,8 +82,8 @@ class ARPoseHandler:
         # think rotation matrices (adjacent ref frames cancel)
 
         marker.pose.pose.position.x = p_m_bu__bu[0]
-        marker.pose.pose.position.y = p_m_bu__bu[1]
-        marker.pose.pose.position.z = p_m_bu__bu[2]
+        marker.pose.pose.position.y = -p_m_bu__bu[1]
+        marker.pose.pose.position.z = -p_m_bu__bu[2]
 
         marker.pose.pose.orientation.x = q_m_bu[0]
         marker.pose.pose.orientation.y = q_m_bu[1]

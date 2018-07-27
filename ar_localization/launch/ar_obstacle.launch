@@ -10,7 +10,7 @@
   <node name="ar_pose_handler" pkg="aero_control" type="ar_pose_handler.py" output="screen"/>
   <node name="ar_obstacle" pkg="aero_control" type="ar_obstacle.py" output="screen"/>
   
-  <<!-- Launch mavros -->
+  <!-- Launch mavros -->
   <arg name="fcu_url" default="tcp://127.0.0.1:5760" />
   <arg name="gcs_url" default="" />
   <arg name="tgt_system" default="1" />
