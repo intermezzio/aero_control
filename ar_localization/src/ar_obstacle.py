@@ -61,7 +61,7 @@ class ARObstacleController:
          1 is flying to obstacle 
          2 is ring flythru (marker id: 24)
          3 is hurdle flyover (marker id: 12)
-         4 is gate flyunder (marker id: )
+         4 is gate flyunder (marker id: 9)
         '''
         self.finite_state = 0 
         self.markers = []
@@ -88,6 +88,7 @@ class ARObstacleController:
 
         self.update_finite_state()
 
+
     def update_finite_state(self, mode=0, force=False): # updates current phase of avoidance 
         if force:
             self.finite_state = mode
@@ -100,26 +101,28 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: Decide which finite state to enter when you've lost the AR tags
 ###########################################################################################################################
-                raise Exception("Correct the finite state here!")
+                self.finite_state = 0
 
         if mode != 0:
             self.finite_state = mode
 
+        
         if any(marker.id in self.obstacles for marker in self.markers) and self.finite_state == 0:
 ###########################################################################################################################
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
-            raise Exception("Filter for the best marker you can see!")
+        	marker = min(self.markers, key= pose.pose.position.x)
+
             
     def generate_vel(self): # assesses course of action using finite states
         if self.finite_state == 0:
 ###########################################################################################################################
 # TODO: fill in velocity commands for finite state 0
 ###########################################################################################################################
-            self.vel_hist[0].insert(,)
-            self.vel_hist[1].insert(,)
-            self.vel_hist[2].insert(,)
-            self.vel_hist[3].insert(,)
+            self.vel_hist[0].insert(0)
+            self.vel_hist[1].insert(0)
+            self.vel_hist[2].insert(0)
+            self.vel_hist[3].insert(0)
             raise Exception("Fill in Hover commands!")
 
         elif self.finite_state == 1:
@@ -172,9 +175,9 @@ class ARObstacleController:
         curr_yaw = self.get_yaw(target_marker.pose.pose.orientation)
 ###########################################################################################################################
 # TODO: calculate errors from desired pose/current pose
-###########################################################################################################################
-
-        x_error = None
+##########################################################################################################################
+		#desired - actual
+        x_error = (target_marker.pose.pose.position.x + 0.5) - target_marker.pose.pose.position.x
         y_error = None
         z_error = None
         yaw_error = None
