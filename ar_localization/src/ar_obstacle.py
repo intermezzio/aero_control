@@ -188,10 +188,10 @@ class ARObstacleController:
 # TODO: calculate errors from desired pose/current pose
 ###########################################################################################################################
 
-        x_error = target_marker.pose.pose.position.x - _DIST_TO_OBST[target_marker.id][0] 
-        y_error = target_marker.pose.pose.position.y - _DIST_TO_OBST[target_marker.id][1] 
-        z_error = target_marker.pose.pose.position.z  - _DIST_TO_OBST[target_marker.id][2] 
-        yaw_error = 0 - curr_yaw
+        x_error = _DIST_TO_OBST[target_marker.id][0] - target_marker.pose.pose.position.x
+        y_error = _DIST_TO_OBST[target_marker.id][1] - target_marker.pose.pose.position.y
+        z_error = _DIST_TO_OBST[target_marker.id][2] - target_marker.pose.pose.position.z
+        yaw_error = - curr_yaw
 
         rospy.pub_error.publish(Vector3(x_error,y_error,z_error,yaw_error))
         # raise Exception("calculate errors and delete this!!")
