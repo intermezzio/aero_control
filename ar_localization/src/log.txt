@@ -1,0 +1,248 @@
+... logging to /home/uav/.ros/log/7bf852f4-942a-11e8-b4dd-d6290aa85454/roslaunch-flying-squirrel-9772.log
+Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/uav/bwsi-uav/catkin_ws/src/aero_control/ar_localization/launch/ar_obstacle.launch
+[1mstarted roslaunch server http://flying-squirrel:33887/[0m
+
+SUMMARY
+========
+
+CLEAR PARAMETERS
+ * /mavros/
+
+PARAMETERS
+ * /ar_track_alvar/marker_size: 26.99
+ * /ar_track_alvar/output_frame: camera_rgb_optica...
+ * /camera/camera_nodelet_manager/num_worker_threads: 4
+ * /camera/depth_rectify_depth/interpolation: 0
+ * /camera/disparity_depth/max_range: 4.0
+ * /camera/disparity_depth/min_range: 0.5
+ * /camera/disparity_registered_sw/max_range: 4.0
+ * /camera/disparity_registered_sw/min_range: 0.5
+ * /camera/driver/base_frame_id: camera_link
+ * /camera/driver/camera_type: R200
+ * /camera/driver/color_fps: 30
+ * /camera/driver/color_frame_id: camera_rgb_frame
+ * /camera/driver/color_height: 480
+ * /camera/driver/color_optical_frame_id: camera_rgb_optica...
+ * /camera/driver/color_width: 640
+ * /camera/driver/depth_fps: 30
+ * /camera/driver/depth_frame_id: camera_depth_frame
+ * /camera/driver/depth_height: 360
+ * /camera/driver/depth_optical_frame_id: camera_depth_opti...
+ * /camera/driver/depth_width: 480
+ * /camera/driver/enable_color: True
+ * /camera/driver/enable_depth: True
+ * /camera/driver/enable_fisheye: False
+ * /camera/driver/enable_imu: False
+ * /camera/driver/enable_ir2: True
+ * /camera/driver/enable_ir: True
+ * /camera/driver/enable_pointcloud: False
+ * /camera/driver/enable_tf: True
+ * /camera/driver/fisheye_frame_id: camera_fisheye_frame
+ * /camera/driver/fisheye_optical_frame_id: camera_fisheye_op...
+ * /camera/driver/imu_frame_id: camera_imu_frame
+ * /camera/driver/imu_optical_frame_id: camera_imu_optica...
+ * /camera/driver/ir2_frame_id: camera_ir2_frame
+ * /camera/driver/ir2_optical_frame_id: camera_ir2_optica...
+ * /camera/driver/ir_frame_id: camera_ir_frame
+ * /camera/driver/ir_optical_frame_id: camera_ir_optical...
+ * /camera/driver/mode: manual
+ * /camera/driver/serial_no: 
+ * /camera/driver/usb_port_id: 
+ * /camera/points_xyzrgb_sw_registered/queue_size: 100
+ * /mavros/cmd/use_comp_id_system_control: False
+ * /mavros/conn/heartbeat_rate: 1.0
+ * /mavros/conn/system_time_rate: 1.0
+ * /mavros/conn/timeout: 10.0
+ * /mavros/conn/timesync_rate: 10.0
+ * /mavros/distance_sensor/hrlv_ez4_pub/field_of_view: 0.0
+ * /mavros/distance_sensor/hrlv_ez4_pub/frame_id: hrlv_ez4_sonar
+ * /mavros/distance_sensor/hrlv_ez4_pub/id: 0
+ * /mavros/distance_sensor/hrlv_ez4_pub/orientation: PITCH_270
+ * /mavros/distance_sensor/hrlv_ez4_pub/send_tf: True
+ * /mavros/distance_sensor/hrlv_ez4_pub/sensor_position/x: 0.0
+ * /mavros/distance_sensor/hrlv_ez4_pub/sensor_position/y: 0.0
+ * /mavros/distance_sensor/hrlv_ez4_pub/sensor_position/z: -0.1
+ * /mavros/distance_sensor/laser_1_sub/id: 3
+ * /mavros/distance_sensor/laser_1_sub/orientation: PITCH_270
+ * /mavros/distance_sensor/laser_1_sub/subscriber: True
+ * /mavros/distance_sensor/lidarlite_pub/field_of_view: 0.0
+ * /mavros/distance_sensor/lidarlite_pub/frame_id: lidarlite_laser
+ * /mavros/distance_sensor/lidarlite_pub/id: 1
+ * /mavros/distance_sensor/lidarlite_pub/orientation: PITCH_270
+ * /mavros/distance_sensor/lidarlite_pub/send_tf: True
+ * /mavros/distance_sensor/lidarlite_pub/sensor_position/x: 0.0
+ * /mavros/distance_sensor/lidarlite_pub/sensor_position/y: 0.0
+ * /mavros/distance_sensor/lidarlite_pub/sensor_position/z: -0.1
+ * /mavros/distance_sensor/sonar_1_sub/id: 2
+ * /mavros/distance_sensor/sonar_1_sub/orientation: PITCH_270
+ * /mavros/distance_sensor/sonar_1_sub/subscriber: True
+ * /mavros/fake_gps/eph: 2.0
+ * /mavros/fake_gps/epv: 2.0
+ * /mavros/fake_gps/fix_type: 3
+ * /mavros/fake_gps/geo_origin/alt: 408.0
+ * /mavros/fake_gps/geo_origin/lat: 47.3667
+ * /mavros/fake_gps/geo_origin/lon: 8.55
+ * /mavros/fake_gps/gps_rate: 5.0
+ * /mavros/fake_gps/mocap_transform: True
+ * /mavros/fake_gps/satellites_visible: 5
+ * /mavros/fake_gps/tf/child_frame_id: fix
+ * /mavros/fake_gps/tf/frame_id: map
+ * /mavros/fake_gps/tf/listen: False
+ * /mavros/fake_gps/tf/rate_limit: 10.0
+ * /mavros/fake_gps/tf/send: False
+ * /mavros/fake_gps/use_mocap: True
+ * /mavros/fake_gps/use_vision: False
+ * /mavros/fcu_protocol: v2.0
+ * /mavros/fcu_url: tcp://127.0.0.1:5760
+ * /mavros/gcs_url: 
+ * /mavros/global_position/child_frame_id: base_link
+ * /mavros/global_position/frame_id: map
+ * /mavros/global_position/gps_uere: 1.0
+ * /mavros/global_position/rot_covariance: 99999.0
+ * /mavros/global_position/tf/child_frame_id: base_link
+ * /mavros/global_position/tf/frame_id: map
+ * /mavros/global_position/tf/global_frame_id: earth
+ * /mavros/global_position/tf/send: False
+ * /mavros/global_position/use_relative_alt: True
+ * /mavros/image/frame_id: px4flow
+ * /mavros/imu/angular_velocity_stdev: 0.000349065850399
+ * /mavros/imu/frame_id: base_link
+ * /mavros/imu/linear_acceleration_stdev: 0.0003
+ * /mavros/imu/magnetic_stdev: 0.0
+ * /mavros/imu/orientation_stdev: 1.0
+ * /mavros/local_position/frame_id: map
+ * /mavros/local_position/tf/child_frame_id: base_link
+ * /mavros/local_position/tf/frame_id: map
+ * /mavros/local_position/tf/send: False
+ * /mavros/local_position/tf/send_fcu: False
+ * /mavros/mission/pull_after_gcs: True
+ * /mavros/mocap/use_pose: True
+ * /mavros/mocap/use_tf: False
+ * /mavros/odometry/frame_tf/body_frame_orientation: frd
+ * /mavros/odometry/frame_tf/local_frame: vision_ned
+ * /mavros/plugin_blacklist: ['safety_area', '...
+ * /mavros/plugin_whitelist: []
+ * /mavros/px4flow/frame_id: px4flow
+ * /mavros/px4flow/ranger_fov: 0.118682389136
+ * /mavros/px4flow/ranger_max_range: 5.0
+ * /mavros/px4flow/ranger_min_range: 0.3
+ * /mavros/safety_area/p1/x: 1.0
+ * /mavros/safety_area/p1/y: 1.0
+ * /mavros/safety_area/p1/z: 1.0
+ * /mavros/safety_area/p2/x: -1.0
+ * /mavros/safety_area/p2/y: -1.0
+ * /mavros/safety_area/p2/z: -1.0
+ * /mavros/setpoint_accel/send_force: False
+ * /mavros/setpoint_attitude/reverse_thrust: False
+ * /mavros/setpoint_attitude/tf/child_frame_id: target_attitude
+ * /mavros/setpoint_attitude/tf/frame_id: map
+ * /mavros/setpoint_attitude/tf/listen: False
+ * /mavros/setpoint_attitude/tf/rate_limit: 50.0
+ * /mavros/setpoint_attitude/use_quaternion: False
+ * /mavros/setpoint_position/mav_frame: LOCAL_NED
+ * /mavros/setpoint_position/tf/child_frame_id: target_position
+ * /mavros/setpoint_position/tf/frame_id: map
+ * /mavros/setpoint_position/tf/listen: False
+ * /mavros/setpoint_position/tf/rate_limit: 50.0
+ * /mavros/setpoint_velocity/mav_frame: LOCAL_NED
+ * /mavros/startup_px4_usb_quirk: True
+ * /mavros/sys/disable_diag: False
+ * /mavros/sys/min_voltage: 10.0
+ * /mavros/target_component_id: 1
+ * /mavros/target_system_id: 1
+ * /mavros/tdr_radio/low_rssi: 40
+ * /mavros/time/time_ref_source: fcu
+ * /mavros/time/timesync_avg_alpha: 0.6
+ * /mavros/time/timesync_mode: MAVLINK
+ * /mavros/vibration/frame_id: base_link
+ * /mavros/vision_pose/tf/child_frame_id: vision_estimate
+ * /mavros/vision_pose/tf/frame_id: map
+ * /mavros/vision_pose/tf/listen: False
+ * /mavros/vision_pose/tf/rate_limit: 10.0
+ * /mavros/vision_speed/listen_twist: True
+ * /mavros/vision_speed/twist_cov: True
+ * /rosdistro: kinetic
+ * /rosversion: 1.12.13
+
+NODES
+  /camera/
+    camera_nodelet_manager (nodelet/nodelet)
+    depth_metric (nodelet/nodelet)
+    depth_metric_rect (nodelet/nodelet)
+    depth_points (nodelet/nodelet)
+    depth_rectify_depth (nodelet/nodelet)
+    depth_registered_sw_metric_rect (nodelet/nodelet)
+    disparity_depth (nodelet/nodelet)
+    disparity_registered_sw (nodelet/nodelet)
+    driver (nodelet/nodelet)
+    ir_rectify_ir (nodelet/nodelet)
+    points_xyzrgb_sw_registered (nodelet/nodelet)
+    register_depth_rgb (nodelet/nodelet)
+    rgb_debayer (nodelet/nodelet)
+    rgb_rectify_color (nodelet/nodelet)
+    rgb_rectify_mono (nodelet/nodelet)
+  /
+    ar_obstacle (aero_control/ar_obstacle.py)
+    ar_pose_handler (aero_control/ar_pose_handler.py)
+    ar_track_alvar (ar_track_alvar/individualMarkersNoKinect)
+    global_loc (rosservice/rosservice)
+    mavros (mavros/mavros_node)
+
+[1mROS_MASTER_UR[0m[ INFO] [1532981056.006517843]: Initializing nodelet with 4 worker threads.[0m
+Intel RealSense F200_camera ; 2.60.0.0
+Intel RealSense LR200_camera ; 2.0.71.18
+Intel RealSense R200_camera ; 1.0.72.06
+Intel RealSense SR300_camera ; 3.10.10.0
+Intel RealSense ZR300_adapter ; 1.29.0.0
+Intel RealSense ZR300_camera ; 2.0.71.28
+Intel RealSense ZR300_motion_module ; 1.25.0.0
+[0m[ INFO] [1532981056.302647361]: Subscribing to info topic[0m
+[0m[ INFO] [1532981056.529580941]: AR tracker reconfigured: ENABLED 8.00 26.99 0.08 0.20[0m
+[INFO] [1532981057.635123]: ARPoseHandler Started!
+I=http://localhost:11311[0m
+]2;/home/uav/bwsi-uav/catkin_ws/src/aero_control/ar_localization/launch/ar_obstacle.launch http://localhost:11311
+[1mprocess[global_loc-1]: started with pid [9799][0m
+[1mprocess[ar_track_alvar-2]: started with pid [9800][0m
+[1mprocess[ar_pose_handler-3]: started with pid [9801][0m
+[1mprocess[ar_obstacle-4]: started with pid [9802][0m
+[1mprocess[mavros-5]: started with pid [9803][0m
+[1mprocess[camera/camera_nodelet_manager-6]: started with pid [9804][0m
+[1mprocess[camera/driver-7]: started with pid [9805][0m
+[1mprocess[camera/rgb_debayer-8]: started with pid [9806][0m
+[1mprocess[camera/rgb_rectify_mono-9]: started with pid [9808][0m
+[1mprocess[camera/rgb_rectify_color-10]: started with pid [9815][0m
+[1mprocess[camera/ir_rectify_ir-11]: started with pid [9821][0m
+[1mprocess[camera/depth_rectify_depth-12]: started with pid [9830][0m
+[1mprocess[camera/depth_metric_rect-13]: started with pid [9839][0m
+[1mprocess[camera/depth_metric-14]: started with pid [9846][0m
+[1mprocess[camera/depth_points-15]: started with pid [9857][0m
+[1mprocess[camera/register_depth_rgb-16]: started with pid [9867][0m
+[1mprocess[camera/points_xyzrgb_sw_registered-17]: started with pid [9875][0m
+[1mprocess[camera/depth_registered_sw_metric_rect-18]: started with pid [9885][0m
+[1mprocess[camera/disparity_depth-19]: started with pid [9890][0m
+[1mprocess[camera/disparity_registered_sw-20]: started with pid [9895][0m
+[camera/disparity_registered_sw-20] killing on exit
+[camera/depth_registered_sw_metric_rect-18] killing on exit
+[camera/disparity_depth-19] killing on exit
+[camera/points_xyzrgb_sw_registered-17] killing on exit
+[camera/register_depth_rgb-16] killing on exit
+[camera/depth_metric-14] killing on exit
+[camera/depth_points-15] killing on exit
+[camera/depth_metric_rect-13] killing on exit
+[camera/depth_rectify_depth-12] killing on exit
+[camera/ir_rectify_ir-11] killing on exit
+[camera/rgb_rectify_mono-9] killing on exit
+[camera/rgb_rectify_color-10] killing on exit
+[camera/rgb_debayer-8] killing on exit
+[camera/camera_nodelet_manager-6] killing on exit
+[camera/driver-7] killing on exit
+[mavros-5] killing on exit
+[ar_pose_handler-3] killing on exit
+[ar_track_alvar-2] killing on exit
+[global_loc-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

@@ -23,7 +23,7 @@ _DIST_TO_OBST = {20:[0.5,0.0,0.0,0.0],12:[0.5,0.0,0.0,0.0], 9:[0.5, 0.0, 0.0, 0.
 ###########################################################################################################################
 # TODO: add desired sequence of obstacles, should match course
 ###########################################################################################################################
-_OBST_SEQ = [] 
+_OBST_SEQ = [20] 
 
 _YAW_DES = 0.0 # radians
 
@@ -67,7 +67,7 @@ class ARObstacleController:
         self.finite_state = 0 
         self.markers = []
         self.vel_hist = [[],[],[],[]]
-        self.current_obstacle_seq = 20
+        self.current_obstacle_seq = 0
         self.current_obstacle_tag = None
         self.t_marker_last_seen = None
         self.t_obstacle_start = None
@@ -91,6 +91,7 @@ class ARObstacleController:
 
 
     def update_finite_state(self, mode=0, force=False): # updates current phase of avoidance 
+
         if force:
             self.finite_state = mode
             return
@@ -117,14 +118,13 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
-        	for marker in self.markers:
-                self.current_obstacle_tag = min(self.markers, key= pose.pose.position.x).id
-
-        	    self.finite_state = 1
-                return
+		self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
+        	self.finite_state = 1
+		print(self.finite_state)
+                return 
 
             
-    def generate_vel(self): # assesses course of action using finite states
+    def generate_vel(self): # assesses course of action using finite state
         if self.finite_state == 0:
 ###########################################################################################################################
 # TODO: fill in velocity commands for finite state 0
@@ -172,13 +172,14 @@ class ARObstacleController:
 
     def fly_to_obstacle(self): # once an AR tag is detected, fly to that obstacle to prepare for avoidance
         marker_list = [marker for marker in self.markers if marker.id  in self.obstacles]
+	print("helloooooo")
         if len(marker_list) < 1: return
         target_marker = min(marker_list, \
             key=lambda marker: marker.pose.pose.position.x)
-
+	
         if target_marker is None: 
             self.update_finite_state()
-            rospy.loginfo("no obstacles found!")
+            print("no obstacles found!")
             return
 
         if target_marker.id != _OBST_SEQ[self.current_obstacle_seq]:
@@ -189,13 +190,21 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: calculate errors from desired pose/current pose
 ###########################################################################################################################
+	
+	#twist_msg = Twist
 
-        x_error = _DIST_TO_OBST[target_marker.id][0] - target_marker.pose.pose.position.x
-        y_error = _DIST_TO_OBST[target_marker.id][1] - target_marker.pose.pose.position.y
-        z_error = _DIST_TO_OBST[target_marker.id][2] - target_marker.pose.pose.position.z
-        yaw_error = - curr_yaw
+        x_error = -1*(_DIST_TO_OBST[target_marker.id][0] - target_marker.pose.pose.position.x) 
+        y_error = -1*(_DIST_TO_OBST[target_marker.id][1] - target_marker.pose.pose.position.y)
+        z_error = (_DIST_TO_OBST[target_marker.id][2] - target_marker.pose.pose.position.z)
+        yaw_error = 0 - curr_yaw
 
-        rospy.pub_error.publish(Vector3(x_error,y_error,z_error,yaw_error))
+	print(x_error,y_error,z_error,yaw_error)
+
+	return
+
+	
+	#self.pub_error.publish(twist_msg)
+        
         # raise Exception("calculate errors and delete this!!")
 
 ##########################################################################################################################
@@ -205,11 +214,13 @@ class ARObstacleController:
         if _DEBUG: rospy.loginfo("error: x: %.04f y: %.04f z: %.04f yaw %.04f" % (x_error, y_error, z_error, yaw_error))
 
         if abs(x_error) < 0.1 and abs(y_error) < 0.1 and abs(z_error) < 0.1: # we can start flying thru
+	    print("in the right spot to fly")
             # above thresholds (0.1 for all currently) are modifiable!!
             self.update_finite_state(self.obstacles[target_marker.id])
             self.current_obstacle_seq+= 1 if self.current_obstacle_seq < len(_OBST_SEQ) else 0
             return
-
+	
+	print("going to obstacle")
         self.vel_hist[0].insert(0,x_error*_K_P_X)
         self.vel_hist[1].insert(0,y_error*_K_P_Y)
         self.vel_hist[2].insert(0,z_error*_K_P_Z)
@@ -395,6 +406,7 @@ class ARObstacleController:
         self.current_pose = msg
 
 if __name__ == '__main__':
+
     rospy.init_node('ar_obstacle')
     a = ARObstacleController()
 
