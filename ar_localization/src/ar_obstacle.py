@@ -208,7 +208,7 @@ class ARObstacleController:
             self.current_obstacle_seq+= 1 if self.current_obstacle_seq < len(_OBST_SEQ) else 0
             return
 
-        self.vel_hist[0].insert(0,x_error*_K_P_X)
+        self.vel_hist[0].insert(0,x_error*-_K_P_X)
         self.vel_hist[1].insert(0,y_error*_K_P_Y)
         self.vel_hist[2].insert(0,z_error*_K_P_Z)
         self.vel_hist[3].insert(0,yaw_error*_K_P_YAW)
