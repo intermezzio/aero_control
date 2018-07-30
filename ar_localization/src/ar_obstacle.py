@@ -107,7 +107,7 @@ class ARObstacleController:
                 # raise Exception("Correct the finite state here!")
 
                 self.finite_state = mode
-
+                return
 
         if mode == 0:
             self.finite_state = mode
@@ -118,7 +118,8 @@ class ARObstacleController:
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
         	self.current_obstacle_tag = min(self.markers, key= marker.pose.pose.position.x).id
-        return
+
+        	self.finite_state = 1
 
             
     def generate_vel(self): # assesses course of action using finite states
@@ -192,12 +193,12 @@ class ARObstacleController:
         z_error = target_marker.pose.pose.position.z  - _DIST_TO_OBST[target_marker.id][2] 
         yaw_error = 0 - curr_yaw
 
-        msg.linear.x = x_error
-        msg.linear.y = y_error
-        msg.linear.z = z_error
-        msg.linear.yaw_error = yaw_error
+        # msg.linear.x = x_error
+        # msg.linear.y = y_error
+        # msg.linear.z = z_error
+        # msg.linear.yaw_error = yaw_error
 
-        rospy.pub_error.publish(msg)
+        # rospy.pub_error.publish(msg)
         # raise Exception("calculate errors and delete this!!")
 
 ##########################################################################################################################
