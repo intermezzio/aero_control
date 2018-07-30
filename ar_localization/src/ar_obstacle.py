@@ -17,13 +17,13 @@ from mavros_msgs.msg import State
 ###########################################################################################################################
 # TODO: decide on points at which you want to hover in front of obstacles before flying through
 ###########################################################################################################################
-_DIST_TO_OBST = {20:[0.5,0.0,0.0,0.0],12:[0.5,0.0,0.0,0.0], 9:[0.5, 0.0, 0.0, 0.0]} 
+_DIST_TO_OBST = {20:[0.5, 0.0, 0.0, 0.0],12:[0.5, 0.0, 0.0, 0.0], 9:[0.5, 0.0, 0.0, 0.0]} 
 # raise Exception("Decide on how far away from the tag you want to be!!")
 
 ###########################################################################################################################
 # TODO: add desired sequence of obstacles, should match course
 ###########################################################################################################################
-_OBST_SEQ = [] 
+_OBST_SEQ = [24] 
 
 _YAW_DES = 0.0 # radians
 
@@ -211,7 +211,7 @@ class ARObstacleController:
             self.current_obstacle_seq+= 1 if self.current_obstacle_seq < len(_OBST_SEQ) else 0
             return
 
-        self.vel_hist[0].insert(0,x_error*_K_P_X)
+        self.vel_hist[0].insert(0,x_error*-_K_P_X)
         self.vel_hist[1].insert(0,y_error*_K_P_Y)
         self.vel_hist[2].insert(0,z_error*_K_P_Z)
         self.vel_hist[3].insert(0,yaw_error*_K_P_YAW)
