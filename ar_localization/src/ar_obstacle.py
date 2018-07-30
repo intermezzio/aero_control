@@ -11,6 +11,7 @@ from ar_track_alvar_msgs.msg import AlvarMarkers, AlvarMarker
 from std_msgs.msg import String
 
 
+
 import mavros
 from mavros_msgs.msg import State
 # Distance constants
@@ -243,13 +244,13 @@ class ARObstacleController:
 # TODO: decide how long / at what vel to go up/forward to avoid ring
 ###########################################################################################################################
 
-        t_up = 2
-        t_forward = 3
+        t_up = 1
+        t_forward = 1.5
         # raise Exception("ring avoid times!!")
         if td.total_seconds() < t_up:
             # Add to vel hist here!!
            
-            vel_ring_up = self.local_vel_sp.twist.linear.z = 2
+            vel_ring_up = self.local_vel_sp.twist.linear.z = .5
             self.vel_hist[2].insert(0,vel_ring_up)
             rospy.loginfo("ring avoid: going up!")
 
@@ -257,7 +258,7 @@ class ARObstacleController:
             self.clear_history(z=True)
             # Add to vel_hist here!!
             dist_ring_forward = 5
-            vel_ring_forward = self.local_vel_sp.twist.linear.x = 2
+            vel_ring_forward = self.local_vel_sp.twist.linear.x = 1
             self.vel_hist[0].insert(0,vel_ring_forward)
             rospy.loginfo("ring avoid: going forward!")
 
@@ -274,14 +275,13 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: decide how long / at what vel to go up/forward to avoid hurdle
 ###########################################################################################################################
-        t_up = 1.5
-        t_forward = 3
+        t_up = 1
+        t_forward = 1.5
 
         # raise Exception("hurdle avoid times!")
         if td.total_seconds() < t_up:
             # add to vel_hist here!! (insert at zero)
-            dist_hurdle_up = 3
-            vel_hurdle_up = self.local_vel_sp.twist.linear.z = 2
+            vel_hurdle_up = self.local_vel_sp.twist.linear.z = .5
             self.vel_hist[2].insert(0,vel_hurdle_up)
             if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
 
@@ -289,7 +289,7 @@ class ARObstacleController:
             self.clear_history(z=True)
             # add to vel_hist here!! (insert at zero)
             dist_hurdle_forward = 2
-            vel_hurdle_forward = self.local_vel_sp.twist.linear.x = 2
+            vel_hurdle_forward = self.local_vel_sp.twist.linear.x = 1
             self.vel_hist[0].insert(0,vel_hurdle_forward)
             if _DEBUG: rospy.loginfo("hurdle avoid: going forward!")
 
@@ -304,19 +304,19 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: decide how long / at what vel to go down/forward to avoid gate
 ###########################################################################################################################
-        t_down = 2
-        t_forward = 3
+        t_down = 1
+        t_forward = 1.5
         if td.total_seconds() < 0.5:
             # add to vel_hist here (insert at zero)
             
-            vel_gate_down = self.local_vel_sp.twist.linear.z = 2
+            vel_gate_down = self.local_vel_sp.twist.linear.z = .5
             self.vel_hist[2].insert(0,vel_gate_down)            
             if _DEBUG: rospy.loginfo("gate avoid: going down!")
         elif td.total_seconds() < 7 and td.total_seconds() > 0.5:
             self.clear_history(z=True)
             # add to vel_hist here (insert at zero)
             
-            vel_gate_forward = 2
+            vel_gate_forward = 1
             self.vel_hist[0].insert(0,dist_gate_forward)
             if _DEBUG: rospy.loginfo("gate avoid: going forward")
         else:
@@ -381,7 +381,7 @@ class ARObstacleController:
         def run_streaming():
             self.offboard_vel_streaming = True
 	    print(self.current_state.mode)
-            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
+            while not rospy.is_shutdown() and self.current_state.mode == 'OFFBOARD':
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
