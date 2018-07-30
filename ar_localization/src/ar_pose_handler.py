@@ -82,8 +82,8 @@ class ARPoseHandler:
         # think rotation matrices (adjacent ref frames cancel)
 
         marker.pose.pose.position.x = p_m_bu__bu[0]
-        marker.pose.pose.position.y = -p_m_bu__bu[1]
-        marker.pose.pose.position.z = -p_m_bu__bu[2]
+        marker.pose.pose.position.y = p_m_bu__bu[1]
+        marker.pose.pose.position.z = p_m_bu__bu[2]
 
         marker.pose.pose.orientation.x = q_m_bu[0]
         marker.pose.pose.orientation.y = q_m_bu[1]
