@@ -117,7 +117,8 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
-        	self.current_obstacle_tag = min(self.markers, key= marker.pose.pose.position.x)
+        	self.current_obstacle_tag = min(self.markers, key= marker.pose.pose.position.x).id
+        return
 
             
     def generate_vel(self): # assesses course of action using finite states
