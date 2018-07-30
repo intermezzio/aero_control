@@ -47,6 +47,7 @@ class ARObstacleController:
         self.local_pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.local_pose_cb)
         self.local_pose_sp_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
         self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
+        self.pub_error = rospy.Publisher("/line/error", Twist, queue_size=1)
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
@@ -185,10 +186,17 @@ class ARObstacleController:
 # TODO: calculate errors from desired pose/current pose
 ###########################################################################################################################
 
-        x_error = _DIST_TO_OBST[target_marker.id][0] - target_marker.pose.pose.position.x
-        y_error = _DIST_TO_OBST[target_marker.id][1] - target_marker.pose.pose.position.y
-        z_error = _DIST_TO_OBST[target_marker.id][2] - target_marker.pose.pose.position.z
-        yaw_error = -1*(_DIST_TO_OBST[target_marker.id][3] - curr_yaw)
+        x_error = target_marker.pose.pose.position.x - _DIST_TO_OBST[target_marker.id][0] 
+        y_error = target_marker.pose.pose.position.y - _DIST_TO_OBST[target_marker.id][1] 
+        z_error = target_marker.pose.pose.position.z  - _DIST_TO_OBST[target_marker.id][2] 
+        yaw_error = 0 - curr_yaw
+
+        msg.linear.x = x_error
+        msg.linear.y = y_error
+        msg.linear.z = z_error
+        msg.linear.yaw_error = yaw_error
+
+        rospy.pub_error.publish(msg)
         # raise Exception("calculate errors and delete this!!")
 
 ##########################################################################################################################
@@ -220,19 +228,26 @@ class ARObstacleController:
         # raise Exception("ring avoid times!!")
         if td.total_seconds() < t_up:
             # Add to vel hist here!!
-            self.vel_hist[2].insert(0,t_up)
+            dist_ring_up = 3
+            vel_ring_up = self.local_vel_sp.twist.linear.x = dist_ring_up/t_up
+            self.vel_hist[2].insert(0,vel_ring_up)
             rospy.loginfo("ring avoid: going up!")
 
         elif td.total_seconds() < t_forward and td.total_seconds() > t_up:
             self.clear_history(z=True)
             # Add to vel_hist here!!
-            self.vel_hist[0].insert(0,forward)
+            dist_ring_forward = 5
+            vel_ring_forward = self.local_vel_sp.twist.linear.x = dist_ring_forward/t_forward
+            self.vel_hist[0].insert(0,vel_ring_forward)
             rospy.loginfo("ring avoid: going forward!")
 
         else:
             self.clear_history(x=True, z=True)
             self.t_obstacle_start = None
             self.update_finite_state(force=True)
+
+
+
     def avoid_hurdle(self): # commands vel such that hurdle can be avoided open-loop
         td = datetime.now()-self.t_obstacle_start
 
@@ -245,13 +260,19 @@ class ARObstacleController:
         # raise Exception("hurdle avoid times!")
         if td.total_seconds() < t_up:
             # add to vel_hist here!! (insert at zero)
-            self.vel_hist[2].insert(0,t_up)
+            dist_hurdle_up = 3
+            vel_hurdle_up = self.local_vel_sp.twist.linear.x = dist_hurdle_up/t_up
+            self.vel_hist[2].insert(0,vel_hurdle_up)
             if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
+
         elif td.total_seconds() < t_forward and td.total_seconds() > t_up:
             self.clear_history(z=True)
             # add to vel_hist here!! (insert at zero)
-            self.vel_hist[0].insert(0,forward)
+            dist_hurdle_forward = 2
+            vel_hurdle_forward = self.local_vel_sp.twist.linear.x = dist_hurdle_forward/t_forward
+            self.vel_hist[0].insert(0,vel_hurdle_forward)
             if _DEBUG: rospy.loginfo("hurdle avoid: going forward!")
+
         else:
             self.clear_history(x=True, z=True)
             self.t_obstacle_start = None
@@ -267,12 +288,16 @@ class ARObstacleController:
         t_forward = 3
         if td.total_seconds() < 0.5:
             # add to vel_hist here (insert at zero)
-            self.vel_hist[2].insert(0,t_down)            
+            dist_gate_down = 3
+            vel_gate_down = self.local_vel_sp.twist.linear.x = dist_gate_down/t_down
+            self.vel_hist[2].insert(0,vel_gate_down)            
             if _DEBUG: rospy.loginfo("gate avoid: going down!")
         elif td.total_seconds() < 7 and td.total_seconds() > 0.5:
             self.clear_history(z=True)
             # add to vel_hist here (insert at zero)
-            self.vel_hist[0].insert(0,forward)
+            dist_gate_forward = 3
+            vel_gate_forward = dist_gate_forward/t_forward
+            self.vel_hist[0].insert(0,dist_gate_forward)
             if _DEBUG: rospy.loginfo("gate avoid: going forward")
         else:
             self.clear_history(x=True, z=True)
@@ -302,7 +327,6 @@ class ARObstacleController:
         self.local_vel_sp.twist.linear.y = y_vel
         self.local_vel_sp.twist.linear.z = z_vel
         self.local_vel_sp.twist.angular.z = yaw_vel
-
 
     def get_yaw(self,quat_msg): # converts orientation quaternion to euler and gets yaw
         q_a_wenu = [quat_msg.x,quat_msg.y,quat_msg.z,quat_msg.w]
