@@ -17,13 +17,13 @@ from mavros_msgs.msg import State
 ###########################################################################################################################
 # TODO: decide on points at which you want to hover in front of obstacles before flying through
 ###########################################################################################################################
-_DIST_TO_OBST = {20:[0.5,0.0,0.0,0.0],12:[0.5,0.0,0.0,0.0], 9:[0.5, 0.0, 0.0, 0.0]} 
+_DIST_TO_OBST = {24:[0.5, 0.0, 0.0, 0.0],12:[0.5, 0.0, 0.0, 0.0], 9:[0.5, 0.0, 0.0, 0.0]} 
 # raise Exception("Decide on how far away from the tag you want to be!!")
 
 ###########################################################################################################################
 # TODO: add desired sequence of obstacles, should match course
 ###########################################################################################################################
-_OBST_SEQ = [20] 
+_OBST_SEQ = [24] 
 
 _YAW_DES = 0.0 # radians
 
@@ -190,12 +190,11 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: calculate errors from desired pose/current pose
 ###########################################################################################################################
-	
-	#twist_msg = Twist
 
-        x_error = -1*(_DIST_TO_OBST[target_marker.id][0] - target_marker.pose.pose.position.x) 
-        y_error = -1*(_DIST_TO_OBST[target_marker.id][1] - target_marker.pose.pose.position.y)
-        z_error = (_DIST_TO_OBST[target_marker.id][2] - target_marker.pose.pose.position.z)
+
+        x_error = _DIST_TO_OBST[target_marker.id][0] - target_marker.pose.pose.position.x 
+        y_error = _DIST_TO_OBST[target_marker.id][1] - target_marker.pose.pose.position.y
+        z_error = _DIST_TO_OBST[target_marker.id][2] - target_marker.pose.pose.position.z
         yaw_error = 0 - curr_yaw
 
 	print(x_error,y_error,z_error,yaw_error)
@@ -203,7 +202,7 @@ class ARObstacleController:
 	return
 
 	
-	#self.pub_error.publish(twist_msg)
+	self.pub_error.publish(Vector3(x_error,y_error,z_error))
         
         # raise Exception("calculate errors and delete this!!")
 
@@ -221,7 +220,7 @@ class ARObstacleController:
             return
 	
 	print("going to obstacle")
-        self.vel_hist[0].insert(0,x_error*_K_P_X)
+        self.vel_hist[0].insert(0,x_error*-_K_P_X)
         self.vel_hist[1].insert(0,y_error*_K_P_Y)
         self.vel_hist[2].insert(0,z_error*_K_P_Z)
         self.vel_hist[3].insert(0,yaw_error*_K_P_YAW)
