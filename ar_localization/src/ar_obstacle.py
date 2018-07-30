@@ -249,8 +249,8 @@ class ARObstacleController:
         # raise Exception("ring avoid times!!")
         if td.total_seconds() < t_up:
             # Add to vel hist here!!
-            dist_ring_up = 3
-            vel_ring_up = self.local_vel_sp.twist.linear.x = dist_ring_up/t_up
+           
+            vel_ring_up = self.local_vel_sp.twist.linear.z = 2
             self.vel_hist[2].insert(0,vel_ring_up)
             rospy.loginfo("ring avoid: going up!")
 
@@ -258,7 +258,7 @@ class ARObstacleController:
             self.clear_history(z=True)
             # Add to vel_hist here!!
             dist_ring_forward = 5
-            vel_ring_forward = self.local_vel_sp.twist.linear.x = dist_ring_forward/t_forward
+            vel_ring_forward = self.local_vel_sp.twist.linear.x = 2
             self.vel_hist[0].insert(0,vel_ring_forward)
             rospy.loginfo("ring avoid: going forward!")
 
@@ -282,7 +282,7 @@ class ARObstacleController:
         if td.total_seconds() < t_up:
             # add to vel_hist here!! (insert at zero)
             dist_hurdle_up = 3
-            vel_hurdle_up = self.local_vel_sp.twist.linear.x = dist_hurdle_up/t_up
+            vel_hurdle_up = self.local_vel_sp.twist.linear.z = 2
             self.vel_hist[2].insert(0,vel_hurdle_up)
             if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
 
@@ -290,7 +290,7 @@ class ARObstacleController:
             self.clear_history(z=True)
             # add to vel_hist here!! (insert at zero)
             dist_hurdle_forward = 2
-            vel_hurdle_forward = self.local_vel_sp.twist.linear.x = dist_hurdle_forward/t_forward
+            vel_hurdle_forward = self.local_vel_sp.twist.linear.x = 2
             self.vel_hist[0].insert(0,vel_hurdle_forward)
             if _DEBUG: rospy.loginfo("hurdle avoid: going forward!")
 
@@ -309,15 +309,15 @@ class ARObstacleController:
         t_forward = 3
         if td.total_seconds() < 0.5:
             # add to vel_hist here (insert at zero)
-            dist_gate_down = 3
-            vel_gate_down = self.local_vel_sp.twist.linear.x = dist_gate_down/t_down
+            
+            vel_gate_down = self.local_vel_sp.twist.linear.z = 2
             self.vel_hist[2].insert(0,vel_gate_down)            
             if _DEBUG: rospy.loginfo("gate avoid: going down!")
         elif td.total_seconds() < 7 and td.total_seconds() > 0.5:
             self.clear_history(z=True)
             # add to vel_hist here (insert at zero)
-            dist_gate_forward = 3
-            vel_gate_forward = dist_gate_forward/t_forward
+            
+            vel_gate_forward = 2
             self.vel_hist[0].insert(0,dist_gate_forward)
             if _DEBUG: rospy.loginfo("gate avoid: going forward")
         else:
