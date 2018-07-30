@@ -67,7 +67,7 @@ class ARObstacleController:
         self.finite_state = 0 
         self.markers = []
         self.vel_hist = [[],[],[],[]]
-        self.current_obstacle_seq = 20
+        self.current_obstacle_seq = None
         self.current_obstacle_tag = None
         self.t_marker_last_seen = None
         self.t_obstacle_start = None
@@ -118,8 +118,9 @@ class ARObstacleController:
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
         	for marker in self.markers:
-                self.current_obstacle_tag = min(self.markers, key= pose.pose.position.x).id
-
+                # self.current_obstacle_tag = 
+                # print(min(self.markers, key= marker.pose.pose.position.x).id)
+                print(marker)
         	    self.finite_state = 1
                 return
 
@@ -193,7 +194,7 @@ class ARObstacleController:
         x_error = _DIST_TO_OBST[target_marker.id][0] - target_marker.pose.pose.position.x
         y_error = _DIST_TO_OBST[target_marker.id][1] - target_marker.pose.pose.position.y
         z_error = _DIST_TO_OBST[target_marker.id][2] - target_marker.pose.pose.position.z
-        yaw_error = - curr_yaw
+        yaw_error = 0 - curr_yaw
 
         rospy.pub_error.publish(Vector3(x_error,y_error,z_error,yaw_error))
         # raise Exception("calculate errors and delete this!!")
