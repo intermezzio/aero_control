@@ -141,7 +141,7 @@ class LineTracker:
                 self.pub_error.publish(Vector3(x_err,y_err,0))
 
 
-                self.p_control(x_err,y_err,yaw_angle)
+                self.p_control(x_err,y_err,yaw_angle,m)
 
         # return x_err, y_err
 
@@ -150,10 +150,10 @@ class LineTracker:
         self.__v += acc_cmd*dt
         self.__x += self.__v*dt
 
-    def p_control(self,x_err,y_err,yaw_angle):
+    def p_control(self,x_err,y_err,yaw_angle,m):
         self.velocity_setpoint = TwistStamped()
-        cmd_x = x_err*(1*K_P_X)
-        cmd_y = y_err*(-1*K_P_Y)
+        cmd_x = x_err*(K_P_X)
+        cmd_y = y_err*(K_P_Y)
         if yaw_angle:
             cmd_yaw = yaw_angle*(-1*K_P_YAW)
             self.velocity_setpoint.twist.angular.z = cmd_yaw
