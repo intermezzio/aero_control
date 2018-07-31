@@ -255,7 +255,7 @@ class ARObstacleController:
             vel_ring_up = self.local_vel_sp.twist.linear.z = .5
             self.vel_hist[2].insert(0,vel_ring_up)
             rospy.loginfo("ring avoid: going up!")
-            rospy.loginfo(current_vel[2] + vel_hurdle_up)
+            rospy.loginfo(current_vel)
 
         elif td.total_seconds() < t_forward and td.total_seconds() > t_up:
             self.clear_history(z=True)
@@ -264,7 +264,7 @@ class ARObstacleController:
             vel_ring_forward = self.local_vel_sp.twist.linear.x = 1
             self.vel_hist[0].insert(0,vel_ring_forward)
             rospy.loginfo("ring avoid: going forward!")
-            rospy.loginfo(current_vel[0] + vel_ring_forward)
+            rospy.loginfo(current_vel)
 
         else:
             self.clear_history(x=True, z=True)
@@ -288,7 +288,7 @@ class ARObstacleController:
             vel_hurdle_up = self.local_vel_sp.twist.linear.z = .5
             self.vel_hist[2].insert(0,vel_hurdle_up)
             if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
-            rospy.loginfo(current_vel[2] + vel_hurdle_up)
+            rospy.loginfo(current_vel)
 
         elif td.total_seconds() < t_forward and td.total_seconds() > t_up:
             self.clear_history(z=True)
@@ -297,7 +297,7 @@ class ARObstacleController:
             vel_hurdle_forward = self.local_vel_sp.twist.linear.x = 1
             self.vel_hist[0].insert(0,vel_hurdle_forward)
             if _DEBUG: rospy.loginfo("hurdle avoid: going forward!")
-            rospy.loginfo(current_vel[0] + vel_hurdle_forward)
+            rospy.loginfo(current_vel)
 
         else:
             self.clear_history(x=True, z=True)
@@ -318,7 +318,7 @@ class ARObstacleController:
             vel_gate_down = self.local_vel_sp.twist.linear.z = -.5
             self.vel_hist[2].insert(0,vel_gate_down)            
             if _DEBUG: rospy.loginfo("gate avoid: going down!")
-            rospy.loginfo(current_vel[2] + vel_gate_down)
+            rospy.loginfo(current_vel)
 
         elif td.total_seconds() < 7 and td.total_seconds() > 0.5:
             self.clear_history(z=True)
@@ -327,7 +327,7 @@ class ARObstacleController:
             vel_gate_forward = 1
             self.vel_hist[0].insert(0,dist_gate_forward)
             if _DEBUG: rospy.loginfo("gate avoid: going forward")
-            rospy.loginfo(current_vel[0] + vel_gate_forward)
+            rospy.loginfo(current_vel)
 
         else:
             self.clear_history(x=True, z=True)
