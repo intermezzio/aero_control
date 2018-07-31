@@ -47,7 +47,7 @@ class ARObstacleController:
         self.local_pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.local_pose_cb)
         self.local_pose_sp_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
         self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
-        self.pub_error = rospy.Publisher("/line/error", Vector3, queue_size=1)
+        self.pub_error = rospy.Publisher("/line/error", Twist, queue_size=1) # set data type to publish to error
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
@@ -205,7 +205,7 @@ class ARObstacleController:
 	return
 
 	
-	self.pub_error.publish(Vector3(x_error,y_error,z_error))
+	self.pub_error.publish(Twist(x_error,y_error,z_error, yaw_error)) # publish commands in a twist message
         
         # raise Exception("calculate errors and delete this!!")
 
