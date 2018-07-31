@@ -25,7 +25,7 @@ _DIST_TO_OBST = {20:[0.5, 0.0, 0.0, 0.0],12:[0.5, 0.0, 0.0, 0.0], 9:[0.5, 0.0, 0
 ###########################################################################################################################
 _OBST_SEQ = [20] 
 
-_YAW_DES = 0.0 # radians
+_YAW_DES = -np.pi/2 # radians
 
 ###########################################################################################################################
 # TODO: decide on K_P values
@@ -47,7 +47,7 @@ class ARObstacleController:
         self.local_pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.local_pose_cb)
         self.local_pose_sp_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
         self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
-        self.pub_error = rospy.Publisher("/line/error", Twist, queue_size=1) # set data type to publish to error
+        self.pub_error = rospy.Publisher("/obs_error", Twist, queue_size=1) # set data type to publish to error
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
@@ -67,7 +67,7 @@ class ARObstacleController:
         self.finite_state = 0 
         self.markers = []
         self.vel_hist = [[],[],[],[]]
-        self.current_obstacle_seq = None
+        self.current_obstacle_seq = 0
 
         self.current_obstacle_tag = None
         self.t_marker_last_seen = None
@@ -128,6 +128,7 @@ class ARObstacleController:
 
             
     def generate_vel(self): # assesses course of action using finite state
+
         if self.finite_state == 0:
 ###########################################################################################################################
 # TODO: fill in velocity commands for finite state 0
@@ -143,7 +144,7 @@ class ARObstacleController:
 
         elif self.finite_state == 1:
             self.fly_to_obstacle()
-
+	    print("hiiiiiiiiiii")
         elif self.finite_state == 2:
             rospy.logerr("avoiding ring")
             self.current_obstacle_tag = 20
@@ -198,14 +199,22 @@ class ARObstacleController:
         x_error = _DIST_TO_OBST[target_marker.id][0] - target_marker.pose.pose.position.x 
         y_error = _DIST_TO_OBST[target_marker.id][1] - target_marker.pose.pose.position.y
         z_error = _DIST_TO_OBST[target_marker.id][2] - target_marker.pose.pose.position.z
-        yaw_error = 0 - curr_yaw
+        yaw_error = _YAW_DES - curr_yaw
 
+
+	tw_err = Twist()
+	tw_err.linear.x = x_error
+	tw_err.linear.y = y_error
+	tw_err.linear.z = z_error
+	tw_err.angular.z = yaw_error
 	print(x_error,y_error,z_error,yaw_error)
 
+
+	self.pub_error.publish(tw_err)
 	return
 
-	
-	self.pub_error.publish(Twist(x_error,y_error,z_error, yaw_error)) # publish commands in a twist message
+
+ # publish commands in a twist message
         
         # raise Exception("calculate errors and delete this!!")
 
@@ -372,6 +381,7 @@ class ARObstacleController:
     def start_streaming_offboard_vel(self):
         def run_streaming():
             self.offboard_vel_streaming = True
+	    print(self.current_state.mode)
             while not rospy.is_shutdown() and self.current_state.mode == 'OFFBOARD':
         
         # Publish a "don't move" velocity command
