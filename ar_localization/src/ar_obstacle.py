@@ -17,13 +17,13 @@ from mavros_msgs.msg import State
 ###########################################################################################################################
 # TODO: decide on points at which you want to hover in front of obstacles before flying through
 ###########################################################################################################################
-_DIST_TO_OBST = {24:[0.5, 0.0, 0.0, 0.0],12:[0.5, 0.0, 0.0, 0.0], 20:[0.5, 0.0, 0.0, 0.0]} 
+_DIST_TO_OBST = {24:[-1.0, 0.0, 0.0, 0.0],9:[-1.0, 0.0, 0.0, 0.0], 12:[-1.5, 0.0, -0.5, 0.0]} 
 # raise Exception("Decide on how far away from the tag you want to be!!")
 
 ###########################################################################################################################
 # TODO: add desired sequence of obstacles, should match course
 ###########################################################################################################################
-_OBST_SEQ = [20] 
+_OBST_SEQ = [24] 
 
 _YAW_DES = -np.pi/2 # radians
 
@@ -51,7 +51,7 @@ class ARObstacleController:
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
-        self.obstacles = {12 : 3, 24 : 2, 9: 4} # dict (marker -> mode)
+        self.obstacles = {24 : 2, 9 : 3, 12: 4} # dict (marker -> mode)
         self.rate = rospy.Rate(hz)
         self.current_state = State()
         self.current_pose = None
@@ -123,6 +123,7 @@ class ARObstacleController:
 
                 self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
                 self.finite_state = self.obstacles[self.current_obstacle_tag]
+                print("OBSTACLE SEEN")
                 print(self.finite_state)
                 return 
 
@@ -144,7 +145,7 @@ class ARObstacleController:
 
         elif self.finite_state == 1:
             self.fly_to_obstacle()
-	    print("hiiiiiiiiiii")
+	    	print("hiiiiiiiiiii")
         elif self.finite_state == 2:
             rospy.logerr("avoiding ring")
             #self.current_obstacle_tag = 24
@@ -177,7 +178,7 @@ class ARObstacleController:
 
     def fly_to_obstacle(self): # once an AR tag is detected, fly to that obstacle to prepare for avoidance
         marker_list = [marker for marker in self.markers if marker.id  in self.obstacles]
-	print("helloooooo")
+		print("helloooooo")
         if len(marker_list) < 1: return
         target_marker = min(marker_list, \
             key=lambda marker: marker.pose.pose.position.x)
@@ -203,15 +204,15 @@ class ARObstacleController:
         yaw_error = _YAW_DES - curr_yaw
 
 
-	tw_err = Twist()
-	tw_err.linear.x = x_error
-	tw_err.linear.y = y_error
-	tw_err.linear.z = z_error
-	tw_err.angular.z = yaw_error
-	print(x_error,y_error,z_error,yaw_error)
+		tw_err = Twist()
+		tw_err.linear.x = x_error
+		tw_err.linear.y = y_error
+		tw_err.linear.z = z_error
+		tw_err.angular.z = yaw_error
+		print(x_error,y_error,z_error,yaw_error)
 
 
-	self.pub_error.publish(tw_err)
+		self.pub_error.publish(tw_err)
 
 
  # publish commands in a twist message
@@ -382,7 +383,7 @@ class ARObstacleController:
         def run_streaming():
             self.offboard_vel_streaming = True
 	    print(self.current_state.mode)
-            while not rospy.is_shutdown() and self.current_state.mode == 'OFFBOARD':
+            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
