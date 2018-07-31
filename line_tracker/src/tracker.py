@@ -110,6 +110,9 @@ class LineTracker:
                     xs.append(x1)
                     ys.append(y1)
 
+            yaw_angle = np.arctan(vy/vx)
+
+
             if vy < 0: #axes are switched LOL
                 yaw_angle = -1*(0 - np.arctan(vx/vy))
             if vy > 0:
