@@ -382,7 +382,7 @@ class ARObstacleController:
         def run_streaming():
             self.offboard_vel_streaming = True
 	    print(self.current_state.mode)
-            while not rospy.is_shutdown() and self.current_state.mode == 'OFFBOARD':
+            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
