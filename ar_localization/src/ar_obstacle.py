@@ -17,13 +17,13 @@ from mavros_msgs.msg import State
 ###########################################################################################################################
 # TODO: decide on points at which you want to hover in front of obstacles before flying through
 ###########################################################################################################################
-_DIST_TO_OBST = {24:[0.5, 0.0, 0.0, 0.0],12:[0.5, 0.0, 0.0, 0.0], 20:[0.5, 0.0, 0.0, 0.0]} 
+_DIST_TO_OBST = {24:[-1.0, 0.0, 0.0, 0.0],9:[-1.0, 0.0, 0.0, 0.0], 12:[-1.5, 0.0, -0.5, 0.0]} 
 # raise Exception("Decide on how far away from the tag you want to be!!")
 
 ###########################################################################################################################
 # TODO: add desired sequence of obstacles, should match course
 ###########################################################################################################################
-_OBST_SEQ = [20] 
+_OBST_SEQ = [24, 9, 12] 
 
 _YAW_DES = -np.pi/2 # radians
 
@@ -177,7 +177,7 @@ class ARObstacleController:
 
     def fly_to_obstacle(self): # once an AR tag is detected, fly to that obstacle to prepare for avoidance
         marker_list = [marker for marker in self.markers if marker.id  in self.obstacles]
-	print("helloooooo")
+		print("helloooooo")
         if len(marker_list) < 1: return
         target_marker = min(marker_list, \
             key=lambda marker: marker.pose.pose.position.x)
@@ -203,15 +203,15 @@ class ARObstacleController:
         yaw_error = _YAW_DES - curr_yaw
 
 
-	tw_err = Twist()
-	tw_err.linear.x = x_error
-	tw_err.linear.y = y_error
-	tw_err.linear.z = z_error
-	tw_err.angular.z = yaw_error
-	print(x_error,y_error,z_error,yaw_error)
+		tw_err = Twist()
+		tw_err.linear.x = x_error
+		tw_err.linear.y = y_error
+		tw_err.linear.z = z_error
+		tw_err.angular.z = yaw_error
+		print(x_error,y_error,z_error,yaw_error)
 
 
-	self.pub_error.publish(tw_err)
+		self.pub_error.publish(tw_err)
 
 
  # publish commands in a twist message
