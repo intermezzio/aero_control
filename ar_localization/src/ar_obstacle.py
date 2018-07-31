@@ -240,7 +240,7 @@ class ARObstacleController:
     def avoid_ring(self): # commands vel such that ring can be avoided open-loop
         
         td = datetime.now()-self.t_obstacle_start
-
+	print("AVOID RING")
 ###########################################################################################################################
 # TODO: decide how long / at what vel to go up/forward to avoid ring
 ###########################################################################################################################
@@ -251,7 +251,7 @@ class ARObstacleController:
         if td.total_seconds() < t_up:
             # Add to vel hist here!!
 
-            
+            print("Avoid Ring")
             vel_ring_up = self.local_vel_sp.twist.linear.z = .5
             self.vel_hist[2].insert(0,vel_ring_up)
             rospy.loginfo("ring avoid: going up!")

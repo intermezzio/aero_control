@@ -1,5 +1,5 @@
 roscore &
-cd ~/bwsi-uav/catkin_ws/src/aero-control/nice_on
+#cd ~/bwsi-uav/catkin_ws/src/aero-control/nice_on
 # play NiceOn1.wav
  
 sudo systemctl start aero-teraranger.service
