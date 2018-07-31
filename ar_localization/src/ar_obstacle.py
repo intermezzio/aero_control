@@ -145,7 +145,6 @@ class ARObstacleController:
 
         elif self.finite_state == 1:
             self.fly_to_obstacle()
-	    	print("hiiiiiiiiiii")
         elif self.finite_state == 2:
             rospy.logerr("avoiding ring")
             #self.current_obstacle_tag = 24
@@ -178,7 +177,6 @@ class ARObstacleController:
 
     def fly_to_obstacle(self): # once an AR tag is detected, fly to that obstacle to prepare for avoidance
         marker_list = [marker for marker in self.markers if marker.id  in self.obstacles]
-		print("helloooooo")
         if len(marker_list) < 1: return
         target_marker = min(marker_list, \
             key=lambda marker: marker.pose.pose.position.x)
@@ -204,15 +202,15 @@ class ARObstacleController:
         yaw_error = _YAW_DES - curr_yaw
 
 
-		tw_err = Twist()
-		tw_err.linear.x = x_error
-		tw_err.linear.y = y_error
-		tw_err.linear.z = z_error
-		tw_err.angular.z = yaw_error
-		print(x_error,y_error,z_error,yaw_error)
+	tw_err = Twist()
+	tw_err.linear.x = x_error
+	tw_err.linear.y = y_error
+	tw_err.linear.z = z_error
+	tw_err.angular.z = yaw_error
+	print(x_error,y_error,z_error,yaw_error)
 
 
-		self.pub_error.publish(tw_err)
+	self.pub_error.publish(tw_err)
 
 
  # publish commands in a twist message
