@@ -19,6 +19,7 @@ from mavros_msgs.msg import State
 # TODO: decide on points at which you want to hover in front of obstacles before flying through
 ###########################################################################################################################
 _DIST_TO_OBST = {24:[-1.0, 0.0, 0.0, 0.0],9:[-1.0, 0.0, 0.0, 0.0], 12:[-1.5, 0.0, -0.5, 0.0]} 
+
 # raise Exception("Decide on how far away from the tag you want to be!!")
 
 ###########################################################################################################################
@@ -52,7 +53,23 @@ class ARObstacleController:
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
-        self.obstacles = {24 : 2, 9 : 3, 12: 4} # dict (marker -> mode)
+        
+        #Dictionary of Even or Odd numbers
+        self.obstacles = {Odd : 3, Even: 4} # dict (marker -> mode)
+
+
+        #Function to see if the marker.id is even or odd
+        if marker.id % 2 == 0:
+            self.obstacle[marker.id] = 4
+            #Even
+            #Mode 4 = under
+
+        else:
+            self.obstacle[marker.id] = 3
+            #Odd
+            #Mode 3 = Over
+
+
         self.rate = rospy.Rate(hz)
         self.current_state = State()
         self.current_pose = None
@@ -117,6 +134,7 @@ class ARObstacleController:
 
         
         if any(marker.id in self.obstacles for marker in self.markers) and self.finite_state == 0:
+
 ###########################################################################################################################
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
@@ -130,7 +148,7 @@ class ARObstacleController:
 
             
     def generate_vel(self): # assesses course of action using finite state
-
+        rospy.loginfo("INSIDE GENERATE VEL FUNCTION")
         if self.finite_state == 0:
 ###########################################################################################################################
 # TODO: fill in velocity commands for finite state 0
@@ -240,13 +258,13 @@ class ARObstacleController:
     def avoid_ring(self): # commands vel such that ring can be avoided open-loop
         
         td = datetime.now()-self.t_obstacle_start
-	print("AVOID RING")
+	   print("AVOID RING")
 ###########################################################################################################################
 # TODO: decide how long / at what vel to go up/forward to avoid ring
 ###########################################################################################################################
 
-        t_up = 1
-        t_forward = 1.5
+        t_up = 1.5
+        t_forward = 2
         # raise Exception("ring avoid times!!")
         if td.total_seconds() < t_up:
             # Add to vel hist here!!
@@ -391,11 +409,13 @@ class ARObstacleController:
         def run_streaming():
             self.offboard_vel_streaming = True
 	    print(self.current_state.mode)
-            while not rospy.is_shutdown() and self.current_state.mode == 'OFFBOARD':
+            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
         
         # Publish a "don't move" velocity command
+
                 velocity_message = TwistStamped()
                 self.local_vel_sp_pub.publish(velocity_message)
+
                 rospy.loginfo('Waiting to enter offboard mode')
                 rospy.Rate(60).sleep()
 
