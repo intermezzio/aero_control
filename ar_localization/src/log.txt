@@ -1,9 +1,8 @@
-... logging to /home/uav/.ros/log/7bf852f4-942a-11e8-b4dd-d6290aa85454/roslaunch-flying-squirrel-9772.log
+... logging to /home/uav/.ros/log/97bce460-94c4-11e8-b266-ae87b05c4638/roslaunch-flying-squirrel-17498.log
 Checking log directory for disk usage. This may take awhile.
 Press Ctrl-C to interrupt
-Done checking log file disk usage. Usage is <1GB.
 ]2;/home/uav/bwsi-uav/catkin_ws/src/aero_control/ar_localization/launch/ar_obstacle.launch
-[1mstarted roslaunch server http://flying-squirrel:33887/[0m
+[1mstarted roslaunch server http://flying-squirrel:43241/[0m
 
 SUMMARY
 ========
@@ -191,7 +190,8 @@ NODES
     global_loc (rosservice/rosservice)
     mavros (mavros/mavros_node)
 
-[1mROS_MASTER_UR[0m[ INFO] [1532981056.006517843]: Initializing nodelet with 4 worker threads.[0m
+[1mROS_MASTER_URI=http://localhost:11311[0m
+]2;/home/uav/bwsi-u[0m[ INFO] [1533045037.477026236]: Initializing nodelet with 4 worker threads.[0m
 Intel RealSense F200_camera ; 2.60.0.0
 Intel RealSense LR200_camera ; 2.0.71.18
 Intel RealSense R200_camera ; 1.0.72.06
@@ -199,50 +199,416 @@ Intel RealSense SR300_camera ; 3.10.10.0
 Intel RealSense ZR300_adapter ; 1.29.0.0
 Intel RealSense ZR300_camera ; 2.0.71.28
 Intel RealSense ZR300_motion_module ; 1.25.0.0
-[0m[ INFO] [1532981056.302647361]: Subscribing to info topic[0m
-[0m[ INFO] [1532981056.529580941]: AR tracker reconfigured: ENABLED 8.00 26.99 0.08 0.20[0m
-[INFO] [1532981057.635123]: ARPoseHandler Started!
-I=http://localhost:11311[0m
-]2;/home/uav/bwsi-uav/catkin_ws/src/aero_control/ar_localization/launch/ar_obstacle.launch http://localhost:11311
-[1mprocess[global_loc-1]: started with pid [9799][0m
-[1mprocess[ar_track_alvar-2]: started with pid [9800][0m
-[1mprocess[ar_pose_handler-3]: started with pid [9801][0m
-[1mprocess[ar_obstacle-4]: started with pid [9802][0m
-[1mprocess[mavros-5]: started with pid [9803][0m
-[1mprocess[camera/camera_nodelet_manager-6]: started with pid [9804][0m
-[1mprocess[camera/driver-7]: started with pid [9805][0m
-[1mprocess[camera/rgb_debayer-8]: started with pid [9806][0m
-[1mprocess[camera/rgb_rectify_mono-9]: started with pid [9808][0m
-[1mprocess[camera/rgb_rectify_color-10]: started with pid [9815][0m
-[1mprocess[camera/ir_rectify_ir-11]: started with pid [9821][0m
-[1mprocess[camera/depth_rectify_depth-12]: started with pid [9830][0m
-[1mprocess[camera/depth_metric_rect-13]: started with pid [9839][0m
-[1mprocess[camera/depth_metric-14]: started with pid [9846][0m
-[1mprocess[camera/depth_points-15]: started with pid [9857][0m
-[1mprocess[camera/register_depth_rgb-16]: started with pid [9867][0m
-[1mprocess[camera/points_xyzrgb_sw_registered-17]: started with pid [9875][0m
-[1mprocess[camera/depth_registered_sw_metric_rect-18]: started with pid [9885][0m
-[1mprocess[camera/disparity_depth-19]: started with pid [9890][0m
-[1mprocess[camera/disparity_registered_sw-20]: started with pid [9895][0m
+[0m[ INFO] [1533045037.878414996]: FCU URL: tcp://127.0.0.1:5760[0m
+[0m[ INFO] [1533045037.882366101]: tcp0: Server address: 127.0.0.1:5760[0m
+[0m[ INFO] [1533045037.883216696]: GCS bridge disabled[0m
+[0m[ INFO] [1533045037.977290061]: Plugin 3dr_radio loaded[0m
+[0m[ INFO] [1533045037.998212838]: Plugin 3dr_radio initialized[0m
+[0m[ INFO] [1533045037.998394817]: Plugin actuator_control loaded[0m
+[0m[ INFO] [1533045038.079046443]: Plugin actuator_control initialized[0m
+[0m[ INFO] [1533045038.086839013]: Plugin adsb loaded[0m
+[0m[ INFO] [1533045038.146218816]: Plugin adsb initialized[0m
+[0m[ INFO] [1533045038.146479722]: Plugin altitude loaded[0m
+[0m[ INFO] [1533045038.160697917]: Plugin altitude initialized[0m
+[0m[ INFO] [1533045038.160926222]: Plugin cam_imu_sync loaded[0m
+[0m[ INFO] [1533045038.168774081]: Plugin cam_imu_sync initialized[0m
+[0m[ INFO] [1533045038.169124527]: Plugin command loaded[0m
+[0m[ INFO] [1533045038.224510949]: Plugin command initialized[0m
+[0m[ INFO] [1533045038.224754467]: Plugin debug_value loaded[0m
+[0m[ INFO] [1533045038.316983851]: Plugin debug_value initialized[0m
+[0m[ INFO] [1533045038.317057328]: Plugin distance_sensor blacklisted[0m
+[0m[ INFO] [1533045038.317264958]: Plugin fake_gps loaded[0m
+[0m[ INFO] [1533045038.570637015]: Plugin fake_gps initialized[0m
+[0m[ INFO] [1533045038.571025724]: Plugin ftp loaded[0m
+[0m[ INFO] [1533045038.686083543]: Plugin ftp initialized[0m
+[0m[ INFO] [1533045038.686347024]: Plugin global_position loaded[0m
+[0m[ INFO] [1533045038.908973924]: Plugin global_position initialized[0m
+[0m[ INFO] [1533045038.910068962]: Plugin hil loaded[0m
+[0m[ INFO] [1533045039.069512720]: Plugin hil initialized[0m
+[0m[ INFO] [1533045039.069775826]: Plugin home_position loaded[0m
+[0m[ INFO] [1533045039.109272576]: Plugin home_position initialized[0m
+[0m[ INFO] [1533045039.109532057]: Plugin imu loaded[0m
+[0m[ INFO] [1533045039.244102333]: Plugin imu initialized[0m
+[0m[ INFO] [1533045039.244354739]: Plugin local_position loaded[0m
+[0m[ INFO] [1533045039.336074361]: Plugin local_position initialized[0m
+[0m[ INFO] [1533045039.336335030]: Plugin manual_control loaded[0m
+[0m[ INFO] [1533045039.384498970]: Plugin manual_control initialized[0m
+[0m[ INFO] [1533045039.384729375]: Plugin mocap_pose_estimate loaded[0m
+[0m[ INFO] [1533045039.425763499]: Plugin mocap_pose_estimate initialized[0m
+[0m[ INFO] [1533045039.426271298]: Plugin obstacle_distance loaded[0m
+[0m[ INFO] [1533045039.447896279]: Plugin obstacle_distance initialized[0m
+[0m[ INFO] [1533045039.448624021]: Plugin odom loaded[0m
+[0m[ INFO] [1533045039.490445901]: Plugin odom initialized[0m
+[0m[ INFO] [1533045039.490721845]: Plugin param loaded[0m
+[0m[ INFO] [1533045039.508997985]: Plugin param initialized[0m
+[0m[ INFO] [1533045039.509217665]: Plugin px4flow loaded[0m
+[0m[ INFO] [1533045039.564363806]: Plugin px4flow initialized[0m
+[0m[ INFO] [1533045039.564433470]: Plugin rangefinder blacklisted[0m
+[0m[ INFO] [1533045039.564659438]: Plugin rc_io loaded[0m
+[0m[ INFO] [1533045039.624246058]: Plugin rc_io initialized[0m
+[0m[ INFO] [1533045039.624319873]: Plugin safety_area blacklisted[0m
+[0m[ INFO] [1533045039.624534403]: Plugin setpoint_accel loaded[0m
+[0m[ INFO] [1533045039.651748402]: Plugin setpoint_accel initialized[0m
+[0m[ INFO] [1533045039.652073672]: Plugin setpoint_attitude loaded[0m
+[0m[ INFO] [1533045039.736019388]: Plugin setpoint_attitude initialized[0m
+[0m[ INFO] [1533045039.736310870]: Plugin setpoint_position loaded[0m
+[0m[ INFO] [1533045039.818486894]: Plugin setpoint_position initialized[0m
+[0m[ INFO] [1533045039.818791389]: Plugin setpoint_raw loaded[0m
+[0m[ INFO] [1533045039.862582526]: Plugin setpoint_raw initialized[0m
+[0m[ INFO] [1533045039.862972773]: Plugin setpoint_velocity loaded[0m
+[0m[ INFO] [1533045039.916988175]: Plugin setpoint_velocity initialized[0m
+[0m[ INFO] [1533045039.917325021]: Plugin sys_status loaded[0m
+[0m[ INFO] [1533045039.991002408]: Plugin sys_status initialized[0m[INFO] [1533045039.218181]: ARObstacleController Started!
+
+1
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+h[INFO] [1533045039.122515]: ARPoseHandler Started!
+[INFO] [1533045049.373268]: i'm alive!!, pose generation!
+[INFO] [1533045049.374408]: publishing poses!
+[0m[ INFO] [1533045037.757637431]: Subscribing to info topic[0m
+[0m[ INFO] [1533045038.097989761]: AR tracker reconfigured: ENABLED 8.00 26.99 0.08 0.20[0m
+elloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+1
+helloooooo
+(-0.09265085670881923, 0.11063330267852857, -0.10472949207120026, 1.5450871152403707)
+hiiiiiiiiiii
+
+[0m[ INFO] [1533045039.991350354]: Plugin sys_time loaded[0m
+[0m[ INFO] [1533045040.052697590]: TM: Timesync mode: MAVLINK[0m
+[0m[ INFO] [1533045040.061426620]: Plugin sys_time initialized[0m
+[0m[ INFO] [1533045040.061657763]: Plugin trajectory loaded[0m
+[0m[ INFO] [1533045040.112310749]: Plugin trajectory initialized[0m
+[0m[ INFO] [1533045040.112603731]: Plugin vfr_hud loaded[0m
+[0m[ INFO] [1533045040.118718524]: Plugin vfr_hud initialized[0m
+[0m[ INFO] [1533045040.118795938]: Plugin vibration blacklisted[0m
+[0m[ INFO] [1533045040.119041619]: Plugin vision_pose_estimate loaded[0m
+[0m[ INFO] [1533045040.200591591]: Plugin vision_pose_estimate initialized[0m
+[0m[ INFO] [1533045040.200852684]: Plugin vision_speed_estimate loaded[0m
+[0m[ INFO] [1533045040.242713352]: Plugin vision_speed_estimate initialized[0m
+[0m[ INFO] [1533045040.243044997]: Plugin waypoint loaded[0m
+[0m[ INFO] [1533045040.278196633]: Plugin waypoint initialized[0m
+[0m[ INFO] [1533045040.278467389]: Plugin wind_estimation loaded[0m
+[0m[ INFO] [1533045040.285155533]: Plugin wind_estimation initialized[0m
+[0m[ INFO] [1533045040.285257836]: Autostarting mavlink via USB on PX4[0m
+[0m[ INFO] [1533045040.285340963]: Built-in SIMD instructions: SSE, SSE2[0m
+[0m[ INFO] [1533045040.285384464]: Built-in MAVLink package version: 2018.6.6[0m
+[0m[ INFO] [1533045040.285447565]: Known MAVLink dialects: common ardupilotmega ASLUAV autoquad icarous matrixpilot paparazzi slugs standard uAvionix ualberta[0m
+[0m[ INFO] [1533045040.285513617]: MAVROS started. MY ID 1.240, TARGET ID 1.1[0m
+[0m[ INFO] [1533045040.286667894]: IMU: High resolution IMU detected![0m
+[0m[ INFO] [1533045040.318105392]: IMU: Attitude quaternion IMU detected![0m
+[0m[ INFO] [1533045040.433591622]: CON: Got HEARTBEAT, connected. FCU: PX4 Autopilot[0m
+[0m[ INFO] [1533045040.439119801]: IMU: High resolution IMU detected![0m
+[0m[ INFO] [1533045040.449929017]: IMU: Attitude quaternion IMU detected![0m
+[0m[ INFO] [1533045041.449588975]: VER: 1.1: Capabilities         0x000000000000e4ef[0m
+[0m[ INFO] [1533045041.449682927]: VER: 1.1: Flight software:     01080000 (00000000A59E7F95)[0m
+[0m[ INFO] [1533045041.449734603]: VER: 1.1: Middleware software: 01080000 (00000000A59E7F95)[0m
+[0m[ INFO] [1533045041.449774354]: VER: 1.1: OS software:         071600ff (0000000000000000)[0m
+[0m[ INFO] [1533045041.449811405]: VER: 1.1: Board hardware:      0000a4a7[0m
+[0m[ INFO] [1533045041.449849406]: VER: 1.1: VID/PID:             0525:a4a7[0m
+[0m[ INFO] [1533045041.449908295]: VER: 1.1: UID:                 3335511839343335[0m
+[33m[ WARN] [1533045041.450103037]: CMD: Unexpected command 520, result 0[0m
+[33m[ WARN] [1533045041.984556177]: TM : RTT too high for timesync: 21.05 ms.[0m
+[33m[ WARN] [1533045043.183353889]: TM : RTT too high for timesync: 21.54 ms.[0m
+[33m[ WARN] [1533045047.083352312]: TM : RTT too high for timesync: 21.21 ms.[0m
+[33m[ WARN] [1533045047.882948931]: TM : RTT too high for timesync: 20.52 ms.[0m
+[0m[ INFO] [1533045050.434653001]: HP: requesting home position[0m
+[33m[ WARN] [1533045050.683554733]: TM : RTT too high for timesync: 22.01 ms.[0m
+[33m[ WARN] [1533045051.283260535]: TM : RTT too high for timesync: 20.77 ms.[0m
+[33m[ WARN] [1533045052.283216016]: TM : RTT too high for timesync: 21.19 ms.[0m
+Debug:   mavconn: tcp0: recv: v2.0   OK Message-Id: 105 [61 bytes] IDs: 1.1 Seq: 205
+Debug:   mavconn: tcp0: recv: v2.0 !CRC Message-Id: 106 [44 bytes] IDs: 1.100 Seq: 61
+Debug:   mavconn: tcp0: recv: v2.0 !CRC Message-Id: 105 [61 bytes] IDs: 1.1 Seq: 206
+[0m[ INFO] [1533045039.865973168]: /camera/driver - Detected the following camera:
+				- Serial No: 2481001826, USB Port ID: 2-4, Name: Intel RealSense R200, Camera FW: 1.0.71.06[0m
+[33m[ WARN] [1533045039.866069208]: /camera/driver - Detected unvalidated firmware:
+				- 2481001826's current camera firmware is 1.0.71.06, Validated camera firmware is 1.0.72.06[0m
+[0m[ INFO] [1533045039.866111221]: /camera/driver - Connecting to camera with Serial No: 2481001826, USB Port ID: 2-4[0m
+[0m[ INFO] [1533045040.711267461]: /camera/driver - Setting static camera options[0m
+[0m[ INFO] [1533045040.739990459]: /camera/driver - Enabling Depth in manual mode[0m
+[0m[ INFO] [1533045040.740792002]: /camera/driver - Enabling Color in manual mode[0m
+[0m[ INFO] [1533045040.741715149]: /camera/driver - Enabling IR in manual mode[0m
+[0m[ INFO] [1533045040.742088495]: /camera/driver - Enabling IR2 in manual mode[0m
+[0m[ INFO] [1533045040.742386252]: /camera/driver - Starting camera[0m
+[0m[ INFO] [1533045040.772509620]: /camera/driver - Publishing camera transforms (/tf_static)[0m
+[0m[ INFO] [1533045040.775399288]: /camera/driver - Setting dynamic camera options (r200_dc_preset=5)[0m
+[0m[ INFO] [1533045041.442446458]: /camera/driver - Initializing Depth Control Preset to 5[0m
+[0m[ INFO] [1533045044.412180182]: /camera/driver - Setting dynamic camera options[0m
+av/catkin_ws/src/aero_control/ar_localization/launch/ar_obstacle.launch http://localhost:11311
+[1mprocess[global_loc-1]: started with pid [17516][0m
+[1mprocess[ar_track_alvar-2]: started with pid [17517][0m
+[1mprocess[ar_pose_handler-3]: started with pid [17518][0m
+[1mprocess[ar_obstacle-4]: started with pid [17519][0m
+[1mprocess[mavros-5]: started with pid [17520][0m
+[1mprocess[camera/camera_nodelet_manager-6]: started with pid [17521][0m
+[1mprocess[camera/driver-7]: started with pid [17522][0m
+[1mprocess[camera/rgb_debayer-8]: started with pid [17523][0m
+[1mprocess[camera/rgb_rectify_mono-9]: started with pid [17525][0m
+[1mprocess[camera/rgb_rectify_color-10]: started with pid [17536][0m
+[1mprocess[camera/ir_rectify_ir-11]: started with pid [17543][0m
+[1mprocess[camera/depth_rectify_depth-12]: started with pid [17547][0m
+[1mprocess[camera/depth_metric_rect-13]: started with pid [17559][0m
+[1mprocess[camera/depth_metric-14]: started with pid [17566][0m
+[1mprocess[camera/depth_points-15]: started with pid [17574][0m
+[1mprocess[camera/register_depth_rgb-16]: started with pid [17582][0m
+[1mprocess[camera/points_xyzrgb_sw_registered-17]: started with pid [17587][0m
+[1mprocess[camera/depth_registered_sw_metric_rect-18]: started with pid [17589][0m
+[1mprocess[camera/disparity_depth-19]: started with pid [17591][0m
+[1mprocess[camera/disparity_registered_sw-20]: started with pid [17599][0m
+[1m[global_loc-1] process has finished cleanly
+log file: /home/uav/.ros/log/97bce460-94c4-11e8-b266-ae87b05c4638/global_loc-1*.log[0m
 [camera/disparity_registered_sw-20] killing on exit
-[camera/depth_registered_sw_metric_rect-18] killing on exit
 [camera/disparity_depth-19] killing on exit
+[camera/depth_points-15] killing on exit
+[camera/depth_rectify_depth-12] killing on exit
 [camera/points_xyzrgb_sw_registered-17] killing on exit
 [camera/register_depth_rgb-16] killing on exit
-[camera/depth_metric-14] killing on exit
-[camera/depth_points-15] killing on exit
 [camera/depth_metric_rect-13] killing on exit
-[camera/depth_rectify_depth-12] killing on exit
+[camera/depth_registered_sw_metric_rect-18] killing on exit
 [camera/ir_rectify_ir-11] killing on exit
-[camera/rgb_rectify_mono-9] killing on exit
+[camera/depth_metric-14] killing on exit
 [camera/rgb_rectify_color-10] killing on exit
+[camera/rgb_rectify_mono-9] killing on exit
 [camera/rgb_debayer-8] killing on exit
-[camera/camera_nodelet_manager-6] killing on exit
 [camera/driver-7] killing on exit
+[camera/camera_nodelet_manager-6] killing on exit
 [mavros-5] killing on exit
+[ar_obstacle-4] killing on exit
 [ar_pose_handler-3] killing on exit
 [ar_track_alvar-2] killing on exit
-[global_loc-1] killing on exit
 shutting down processing monitor...
 ... shutting down processing monitor complete
 [1mdone[0m

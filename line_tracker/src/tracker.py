@@ -143,7 +143,9 @@ class LineTracker:
 
                 self.pub_error.publish(Vector3(x_err,y_err,0))
 
+
                 self.p_control(x_err,y_err,yaw_angle)
+
         # return x_err, y_err
 
 
