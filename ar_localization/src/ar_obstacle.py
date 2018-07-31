@@ -238,6 +238,7 @@ class ARObstacleController:
         self.vel_hist[3].insert(0,yaw_error*_K_P_YAW)
 
     def avoid_ring(self): # commands vel such that ring can be avoided open-loop
+        
         td = datetime.now()-self.t_obstacle_start
 
 ###########################################################################################################################
@@ -263,7 +264,7 @@ class ARObstacleController:
             vel_ring_forward = self.local_vel_sp.twist.linear.x = 1
             self.vel_hist[0].insert(0,vel_ring_forward)
             rospy.loginfo("ring avoid: going forward!")
-            rospy.loginfor(current_vel[0] + vel_ring_forward)
+            rospy.loginfo(current_vel[0] + vel_ring_forward)
 
         else:
             self.clear_history(x=True, z=True)
