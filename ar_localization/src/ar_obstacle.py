@@ -123,6 +123,7 @@ class ARObstacleController:
 
                 self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
                 self.finite_state = self.obstacles[self.current_obstacle_tag]
+                print("OBSTACLE SEEN")
                 print(self.finite_state)
                 return 
 
@@ -144,7 +145,7 @@ class ARObstacleController:
 
         elif self.finite_state == 1:
             self.fly_to_obstacle()
-	    print("hiiiiiiiiiii")
+	    	print("hiiiiiiiiiii")
         elif self.finite_state == 2:
             rospy.logerr("avoiding ring")
             #self.current_obstacle_tag = 24
