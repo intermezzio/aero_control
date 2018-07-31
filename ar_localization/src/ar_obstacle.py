@@ -23,7 +23,7 @@ _DIST_TO_OBST = {24:[-1.0, 0.0, 0.0, 0.0],9:[-1.0, 0.0, 0.0, 0.0], 12:[-1.5, 0.0
 ###########################################################################################################################
 # TODO: add desired sequence of obstacles, should match course
 ###########################################################################################################################
-_OBST_SEQ = [24, 9, 12] 
+_OBST_SEQ = [24] 
 
 _YAW_DES = -np.pi/2 # radians
 
@@ -51,7 +51,7 @@ class ARObstacleController:
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
-        self.obstacles = {12 : 3, 24 : 2, 9: 4} # dict (marker -> mode)
+        self.obstacles = {24 : 2, 9 : 3, 12: 4} # dict (marker -> mode)
         self.rate = rospy.Rate(hz)
         self.current_state = State()
         self.current_pose = None
