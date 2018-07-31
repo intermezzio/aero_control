@@ -67,7 +67,8 @@ class ARObstacleController:
         self.finite_state = 0 
         self.markers = []
         self.vel_hist = [[],[],[],[]]
-        self.current_obstacle_seq = 0
+        self.current_obstacle_seq = None
+
         self.current_obstacle_tag = None
         self.t_marker_last_seen = None
         self.t_obstacle_start = None
@@ -118,9 +119,11 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
-		self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
-        	self.finite_state = 1
-		print(self.finite_state)
+
+        	for marker in self.markers:
+                    self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
+                self.finite_state = 1
+                print(self.finite_state)
                 return 
 
             
