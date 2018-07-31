@@ -23,7 +23,7 @@ NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED = .5 # [m/s]
 K_P_X = 1.0 # TODO: decide upon initial K_P_X
 K_P_Y = 1.0 # TODO: decide upon initial K_P_Y
-K_P_YAW = 1.0
+K_P_YAW = 0.1
 num_unit_vecs = 50
 _TIME_STEP = 0.1
 _PTS_AHEAD = 50
@@ -109,8 +109,7 @@ class LineTracker:
                     xs.append(x1)
                     ys.append(y1)
 
-                    #axes are switched LOL
-            yaw_angle = 0 - np.arctan(vy/vx)
+            yaw_angle = np.arctan(vy/vx)
 
 
 
@@ -154,7 +153,7 @@ class LineTracker:
     def p_control(self,x_err,y_err,yaw_angle):
         self.velocity_setpoint = TwistStamped()
         cmd_x = x_err*(1*K_P_X)
-        cmd_y = -(y_err*(-1*K_P_Y))
+        cmd_y = y_err*(-1*K_P_Y)
         if yaw_angle:
             cmd_yaw = yaw_angle*(-1*K_P_YAW)
             self.velocity_setpoint.twist.angular.z = cmd_yaw
