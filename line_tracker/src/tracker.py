@@ -94,7 +94,6 @@ class LineTracker:
             p_line_center_x = (px1+px2)/2
             p_line_center_y = (py1+py2)/2
 
-            r_line_unit = (vx,vy)
 
             m = vy/vx
             b = p_line_center_y - m*p_line_center_x
@@ -113,12 +112,6 @@ class LineTracker:
             yaw_angle = np.arctan(vy/vx)
 
 
-            if vy < 0: #axes are switched LOL
-                yaw_angle = -1*(0 - np.arctan(vx/vy))
-            if vy > 0:
-                yaw_angle = 0 - np.arctan(vx/vy)
-
-            print(np.arctan(vx/vy))
 
 
 
@@ -223,6 +216,7 @@ class LineTracker:
 
 
 if __name__ == "__main__":
+
     rospy.init_node("line_tracker") # create tracker node
     d = LineTracker() # create line-making object
     d.start_streaming_offboard_points() # basically start code

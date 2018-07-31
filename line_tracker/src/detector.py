@@ -74,7 +74,7 @@ class LineDetector:
             pt1 = (cols-1,righty)
             pt2 = (0,lefty)
             try:
-                regression = cv2.line(d,pt1,pt2,(0,255,0),20)
+                regression = cv2.line(d,pt1,pt2,(255,255,255),20)
             except OverflowError:
                 print 'Overflow!!!!'    
                 regression = cv2.line(d,(img_center_x,0),(img_center_x,rows),(255,255,255),5)
@@ -107,6 +107,8 @@ class LineDetector:
                     distances.append(dist)
                     xs.append(x1)
                     ys.append(y1)
+
+            print(np.arctan(vx[0]/vy[0]))
 
             if len(xs) > 0 and len(ys) > 0:
 
