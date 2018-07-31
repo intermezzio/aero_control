@@ -19,7 +19,7 @@ from copy import deepcopy
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = False # set to True to test on laptop
+NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED = .5 # [m/s]
 K_P_X = 1.0 # TODO: decide upon initial K_P_X
 K_P_Y = 1.0 # TODO: decide upon initial K_P_Y
@@ -110,9 +110,11 @@ class LineTracker:
                     ys.append(y1)
 
             if vy < 0: #axes are switched LOL
-                yaw_angle = -1*(90 - np.arctan(vx/vy))
+                yaw_angle = -1*(0 - np.arctan(vx/vy))
             if vy > 0:
-                yaw_angle = 90 - np.arctan(vx/vy)
+                yaw_angle = 0 - np.arctan(vx/vy)
+
+            print(np.arctan(vx/vy))
 
 
 
@@ -141,7 +143,9 @@ class LineTracker:
 
                 self.pub_error.publish(Vector3(x_err,y_err,0))
 
-            self.p_control(x_err,y_err,yaw_angle)
+
+                self.p_control(x_err,y_err,yaw_angle)
+
         # return x_err, y_err
 
 
