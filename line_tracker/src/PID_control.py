@@ -1,75 +1,94 @@
+import numpy as np
 class PIDController:
-    def __init__(self, kp=1, ki=0.1, kd=0.1, p=True, i=True, d=True, params=dict()):
-        self.ki = ki if i else 0
-        self.kd = kd if d else 0
-        self.kp = kp if p or (not d and not i) else 0
+    def __init__(self, kp=1, ki=0.1, kd=0.1, params=dict()):
+        """
+        Create a PID controller!
+        kp, ki, and kd are defaulted at 1
+        that's about it
 
-        self.errors = np.array(list())
-        self.allErr = 0
+        """
 
-        self.cmds = np.array(list())
+        self.ki = ki if ki else 0 # initialize ki, kd, and kp
+        self.kd = kd if kd else 0
+        self.kp = kp if kp or (not kd and not ki) else 0
+
+        self.errors = list() # list of past errors
+        self.allErr = 0 # sum of all errors
+
+        self.cmds = list() # list of past commands
+
+        self.derivAvg = 5
         return
 
-    def __add__(self, error):
+    def __add__(self, error): # add error with + sign
         self.errors.append(error)
         return
-    def __radd__(self, error):
+    def __radd__(self, error): # add error with + sign
         self.errors.append(error)
         return
 
-    def append(self, error):
-        print(error)
+    def append(self, error): # append error
+        # print(error)
         # print("hiii")
         self.__add__(error)
         return
 
-    def adjust(self, error=None):
-        if error != None:
+    def adjust(self, error=None): # give an error and get a new command
+        if error != None: # add error if inputted
             self.errors.append(error)
-        if len(self.errors) == 0:
+        elif len(self.errors) == 0: # add 0 to error if empty
             self.errors = [0]
-
-        adjusted = 0
+        # print "errors: %s"%self.errors
+        adjusted = 0 # running total of new command, kp ki and kd add to this
         if self.kp:
-            adjusted += self.p_control()
+            adjusted += self.p_control() # do p control
         if self.ki:
-            pass# adjusted += i_control()
+            adjusted += self.i_control() # do i control
         if self.kd:
-            pass# adjusted += d_control()
+            adjusted += self.d_control() # do d control
 
-        self.cmds.append(adjusted)
+        self.cmds += [adjusted] # add new cmd to list
         return adjusted
 
     def p_control(self):
         if not self.kp:
             return 0
         error = self.errors[-1]
-        newcmd = -error * self.kp
+        newcmd = -error * self.kp # formula for kp
         return newcmd
 
     def i_control(self):
-        if not self.ki or self.errors.shape[0] < 1:
-            return 0
+        # print "doing i control"
+        if not self.ki or len(self.errors) < 1:
+            return 0 # can't integrate empty lists
         # check for saturation
         error = self.errors[-1]
-        self.allErr += self.errors[-1]
-        newcmd = self.allErr * self.ki
+        self.allErr += error
+        newcmd = self.allErr * self.ki # multiply sum by ki
+        return newcmd
 
     def d_control(self):
-        if not self.kd or self.errors.shape[0] < 2:
+        # print "doing d control"
+        if not self.kd or len(self.errors) < 10:
             return 0
-        slope = self.errors[-1] - self.errors[-2]
-        newcmd = slope * self.kd
+        # print "d approved"
+        der = self.derivAvg
+        oldsum = sum(self.errors[-2*der:-der])/der # make sum of old errors
+        newsum = sum(self.errors[-der:])/der # make sum of new errors
+        slope = (newsum - oldsum)/der
+        newcmd = -slope * self.kd
         return newcmd
+
+    def printControl(self):
+        # print len(self.errors)
+        # print len(self.cmds)
+        return zip(self.errors, self.cmds)
 
 
 if __name__ == "__main__":
-    pid = PIDController()
-    pid.append(10)
-    print "\n\n\nwow\n\n\n" if pid else "\n\n\rfalsse\n\n\n"
+    pid = PIDController(kp=0.5, kd = 0.5)
+    # print "\n\n\nwow\n\n\n" if pid else "\n\n\rfalsse\n\n\n"
     # print pid.errors
-<<<<<<< HEAD
-=======
-
->>>>>>> 04203b8dc26f8ec4efa4c3d9bd446c8061a9f100
-    print pid.adjust()
+    for i in range(10):
+        pid.adjust(i - 3.)
+    print pid.printControl()
