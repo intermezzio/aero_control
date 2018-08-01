@@ -57,6 +57,7 @@ class LineTracker:
         #     pass  # Wait for connection
 
     def line_param_cb(self, line_params):
+	global WINDOW_HEIGHT, WINDOW_WIDTH
         mode = getattr(self.current_state, "mode", None) # drone state
         if mode not in (None, "MANUAL") or NO_ROBOT:
             # if in pos ctrl or offboard:
@@ -78,13 +79,26 @@ class LineTracker:
 
             # TODO-START: Create velocity controller based on above specs
 
-            img_center_x = 64 # get image data
-            img_center_y = 64
+            img_center_x = WINDOW_HEIGHT//2 # get image data
+            img_center_y = WINDOW_WIDTH//2
+
+	    # assign variables for original data
 
             x = line_params.x
             y = line_params.y
             vx = line_params.vx
             vy = line_params.vy
+
+	    # switch to proper coordinates
+
+	    x -= img_center_x
+	    y -= img_center_y
+	    y *= -1
+	    vx = vx
+	    vy *= -1
+
+	    if vx == 0:
+		vx = 0.01
 
             px1 = 127 # make 2 points on the line
             px2 = 0
@@ -94,20 +108,14 @@ class LineTracker:
             p_line_center_x = (px1+px2)/2
             p_line_center_y = (py1+py2)/2
 
+	    m = vy/vx
+	    b = y - m*x
 
-            m = vy/vx
-            b = p_line_center_y - m*p_line_center_x
+	    closeX = -b/(1+1/m)
+	    closeY = m*closeX + b
 
-            distances = [20000]
-            xs = []
-            ys = []
-            for x1 in range(0,px1): # finding cosest point > make efficient!
-                y1 = m*x1 + b
-                dist = np.sqrt((x1 - img_center_x)**2 + (y1 - img_center_y)**2)
-                if dist < distances[-1]:
-                    distances.append(dist)
-                    xs.append(x1)
-                    ys.append(y1)
+	    extX = closeX + num_unit_vecs * vx
+	    extY = closeY + num_unit_vecs * vy
 
             yaw_angle = np.arctan(vy/vx)
 
