@@ -43,7 +43,7 @@ class PIDController:
         if not self.kp:
             return 0
         error = self.errors[-1]
-        newcmd = error * self.kp
+        newcmd = -error * self.kp
         return newcmd
         # newError +=
 if __name__ == "__main__":
