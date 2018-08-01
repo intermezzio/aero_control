@@ -29,33 +29,25 @@ class PIDController:
 
         adjusted = 0
         if self.kp:
-            adjusted += p_control()
-        if self.ki:
+            adjusted += self.p_control()
+        # if self.ki:
             # adjusted += i_control()
-        if self.kd:
+        # if self.kd:
             # adjusted += d_control()
 
         self.cmds.append(adjusted)
         return adjusted
 
     def p_control(self):
-        if not kp:
+        if not self.kp:
             return 0
-        error = errors[-1]
-        newcmd = error * kp
+        error = self.errors[-1]
+        newcmd = error * self.kp
         return newcmd
         # newError +=
 if __name__ == "__main__":
-<<<<<<< HEAD
-    pid = PIDController(kp=0.75)
-    pid += 10
-    print bool(pid)
-    # print pid.errors
-    # print pid.adjust()
-=======
     pid = PIDController()
     pid.append(10)
     print "\n\n\nwow\n\n\n" if pid else "\n\n\rfalsse\n\n\n"
     # print pid.errors
     print pid.adjust()
->>>>>>> c0612f5daba0c422f75edb9f5c71c79194382604
