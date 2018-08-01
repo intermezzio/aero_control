@@ -1,5 +1,5 @@
 class PIDController:
-    def __init__(self, kp=1, ki=1, kd=1, p=True, i=True, d=True, params=dict()):
+    def __init__(self, kp=1, ki=0.1, kd=0.1, p=True, i=True, d=True, params=dict()):
         self.ki = ki if i else 0
         self.kd = kd if d else 0
         self.kp = kp if p or (not d and not i) else 0
@@ -51,7 +51,7 @@ class PIDController:
         if not self.ki or self.errors.shape[0] < 1:
             return 0
         # check for saturation
-        error = self.ki
+        error = self.errors[-1]
         self.allErr += self.errors[-1]
         newcmd = self.allErr * self.ki
 
