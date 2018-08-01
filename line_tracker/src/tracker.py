@@ -57,9 +57,9 @@ class LineTracker:
         #     pass  # Wait for connection
         # create PID controllers
 
-        self.controlX = PID(kp=0.75)
-        self.controlY = PID(kp=0.5)
-        self.controlYAW = PID(kp=0.25)
+        self.controlX = PID(kp=0.75, i=False, d=False)
+        self.controlY = PID(kp=0.5, i=False, d=False)
+        self.controlYAW = PID(kp=0.25, i=False, d=False)
 
     def line_param_cb(self, line_params):
         global WINDOW_HEIGHT, WINDOW_WIDTH
@@ -112,11 +112,10 @@ class LineTracker:
             m = vy/vx
             b = y - m*x
 
-            
-            if m == 0:
-                m = 0.0000001
-
-            closeX = -b/(1+1/m)
+            slopediff = (1+1/m)
+            if slopediff == 0:
+                slopediff = 0.01
+            closeX = -b/slopediff
             closeY = m*closeX + b
 
             if vx < 0: # change direction of vector if it's going the wrong way

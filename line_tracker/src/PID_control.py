@@ -4,8 +4,10 @@ class PIDController:
         self.kd = kd if d else 0
         self.kp = kp if p or (not d and not i) else 0
 
-        self.errors = list()
-        self.cmds = list()
+        self.errors = np.array(list())
+        self.allErr = 0
+
+        self.cmds = np.array(list())
         return
 
     def __add__(self, error):
@@ -30,10 +32,9 @@ class PIDController:
         adjusted = 0
         if self.kp:
             adjusted += self.p_control()
-
-        # if self.ki:
+        if self.ki:
             # adjusted += i_control()
-        # if self.kd:
+        if self.kd:
             # adjusted += d_control()
 
         self.cmds.append(adjusted)
@@ -43,13 +44,28 @@ class PIDController:
         if not self.kp:
             return 0
         error = self.errors[-1]
-        newcmd = error * self.kp
+        newcmd = -error * self.kp
         return newcmd
-        # newError +=
+
+    def i_control(self):
+        if not self.ki or self.errors.shape[0] < 1:
+            return 0
+        # check for saturation
+        error = self.ki
+        self.allErr += self.errors[-1]
+        newcmd = self.allErr * self.ki
+
+    def d_control(self):
+        if not self.kd or self.errors.shape[0] < 2:
+            return 0
+        slope = self.errors[-1] - self.errors[-2]
+        newcmd = slope * self.kd
+        return newcmd
+
+
 if __name__ == "__main__":
     pid = PIDController()
     pid.append(10)
     print "\n\n\nwow\n\n\n" if pid else "\n\n\rfalsse\n\n\n"
     # print pid.errors
-
     print pid.adjust()
