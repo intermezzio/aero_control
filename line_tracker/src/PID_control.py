@@ -30,6 +30,7 @@ class PIDController:
         adjusted = 0
         if self.kp:
             adjusted += self.p_control()
+
         # if self.ki:
             # adjusted += i_control()
         # if self.kd:
@@ -50,4 +51,5 @@ if __name__ == "__main__":
     pid.append(10)
     print "\n\n\nwow\n\n\n" if pid else "\n\n\rfalsse\n\n\n"
     # print pid.errors
+
     print pid.adjust()

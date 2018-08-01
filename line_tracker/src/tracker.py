@@ -112,6 +112,10 @@ class LineTracker:
             m = vy/vx
             b = y - m*x
 
+            
+            if m == 0:
+                m = 0.0000001
+
             closeX = -b/(1+1/m)
             closeY = m*closeX + b
 
