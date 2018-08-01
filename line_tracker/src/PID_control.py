@@ -30,9 +30,9 @@ class PIDController:
         adjusted = 0
         if self.kp:
             adjusted += self.p_control()
-        if self.ki:
+        #if self.ki:
             # adjusted += i_control()
-        if self.kd:
+        #if self.kd:
             # adjusted += d_control()
 
         self.cmds.append(adjusted)
