@@ -23,7 +23,7 @@ NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 K_P_X = 60.0 # TODO: decide upon initial K_P_X
 K_P_Y = 60.0 # TODO: decide upon initial K_P_Y
-K_P_YAW = 10.0
+K_P_YAW = .25
 num_unit_vecs = 50
 _TIME_STEP = 0.1
 _PTS_AHEAD = 50
@@ -57,6 +57,7 @@ class LineTracker:
         #     pass  # Wait for connection
 
     def line_param_cb(self, line_params):
+        global WINDOW_HEIGHT, WINDOW_WIDTH
         mode = getattr(self.current_state, "mode", None) # drone state
         if mode not in (None, "MANUAL") or NO_ROBOT:
             # if in pos ctrl or offboard:
@@ -78,11 +79,12 @@ class LineTracker:
 
             # TODO-START: Create velocity controller based on above specs
 
-            # img_center_x = 64 # get image data
-            # img_center_y = 64
 
             img_center_x = WINDOW_HEIGHT//2 # get image data
             img_center_y = WINDOW_WIDTH//2
+
+            # assign variables for original data
+
 
             x = line_params.x
             y = line_params.y
@@ -99,70 +101,31 @@ class LineTracker:
             vy *= -1
 
             if vx == 0:
-                vx = 0.0001
-
-
-            if vx < 0:
-                vx *= -1
-                vy *= -1
-
-            # px1 = 127 # make 2 points on the line
-            # px2 = 0
-            # py1 = int(((128-x)*vy/vx)+y)
-            # py2 = int((-x*vy/vx) + y)
-
-            # p_line_center_x = (px1+px2)/2
-            # p_line_center_y = (py1+py2)/2
-
-
-            # m = vy/vx
-            # b = p_line_center_y - m*p_line_center_x
+                vx = 0.01
 
 
             m = vy/vx
             b = y - m*x
 
-
-
             closeX = -b/(1+1/m)
             closeY = m*closeX + b
 
-            extX = closeX + num_unit_vecs * vx
-            extY = closeY + num_unit_vecs * vy
+            if vx < 0: # change direction of vector if it's going the wrong way
+                vx *= -1
+                vy *= -1
 
-            # distances = [20000]
-            # xs = []
-            # ys = []
-            # for x1 in range(0,px1): # finding cosest point > make efficient!
-            #     y1 = m*x1 + b
-            #     dist = np.sqrt((x1 - img_center_x)**2 + (y1 - img_center_y)**2)
-            #     if dist < distances[-1]:
-            #         distances.append(dist)
-            #         xs.append(x1)
-            #         ys.append(y1)
+            extX = closeX + num_unit_vecs * vx # new target x coord
+            extY = closeY + num_unit_vecs * vy # new target y coord
 
-            yaw_angle = -np.arctan(vy/vx)
+            yaw_error = -np.arctan(vy/vx) # yaw angle error
 
-            # if len(xs) > 0 and len(ys) > 0:
+            x_error = x - extX
+            y_error = y - extY
 
-            #     p_line_closest_center = (xs[-1],ys[-1])
-            #     p_line_closest_center_x = xs[-1]
-            #     p_line_closest_center_y = ys[-1]
-
-            #     p_target = (vx+p_line_closest_center_x,vy+p_line_closest_center_y)
-            #     p_target_x = num_unit_vecs*vx+p_line_closest_center_x
-            #     p_target_y = num_unit_vecs*vy+p_line_closest_center_y
-
-                # r_to_target_x,r_to_target_y = (img_center_x + p_target_x, img_center_y + p_target_y) #<----------------------------use these for velocities
-
-            x_err = (-1*img_center_x + extX)
-            y_err = (-1*img_center_y + extY)
+            self.pub_error.publish(Vector3(x_error,y_error,0))
 
 
-            self.pub_error.publish(Vector3(x_err,y_err,0))
-
-
-            self.p_control(x_err,y_err,yaw_angle,m)
+            self.p_control(x_error,y_error,yaw_error)
 
         # return x_err, y_err
 
@@ -171,14 +134,13 @@ class LineTracker:
         self.__v += acc_cmd*dt
         self.__x += self.__v*dt
 
-    def p_control(self,x_err,y_err,yaw_angle,m):
-        self.velocity_setpoint = TwistStamped()
-        cmd_x = -x_err*K_P_X
-        cmd_y = -y_err*K_P_Y
-        if yaw_angle:
-            cmd_yaw = yaw_angle*(-1*K_P_YAW)
-            self.velocity_setpoint.twist.angular.z = cmd_yaw
+    def p_control(self,x_err,y_err,yaw_err):
+        self.velocity_setpoint = TwistStamped() # create p controlled commands
+        cmd_x = -x_err*(K_P_X)
+        cmd_y = -y_err*(K_P_Y)
+        cmd_yaw = -yaw_err*(K_P_YAW)
 
+        self.velocity_setpoint.twist.angular.z = cmd_yaw # execute vel commands
 
         self.velocity_setpoint.twist.linear.x = cmd_x
         self.velocity_setpoint.twist.linear.y = cmd_y

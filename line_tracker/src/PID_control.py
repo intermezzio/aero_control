@@ -7,7 +7,11 @@ class PIDController:
         self.errors = list()
         self.cmds = list()
         return
+
     def __add__(self, error):
+        self.errors.append(error)
+        return
+    def __radd__(self, error):
         self.errors.append(error)
         return
 
@@ -20,15 +24,33 @@ class PIDController:
     def adjust(self, error=None):
         if error != None:
             self.errors.append(error)
+        if len(self.errors) == 0:
+            self.errors = [0]
 
         adjusted = 0
-        adjusted += - self.kp * self.errors[-1]
+
+
+        self.cmds += adjusted
         return adjusted
 
+    def p_control(self):
+        if not kp:
+            return 0
+        error = errors[-1]
+        newcmd = error * kp
+        return newcmd
         # newError +=
 if __name__ == "__main__":
+<<<<<<< HEAD
     pid = PIDController(kp=0.75)
     pid += 10
     print bool(pid)
     # print pid.errors
     # print pid.adjust()
+=======
+    pid = PIDController()
+    pid.append(10)
+    print "\n\n\nwow\n\n\n" if pid else "\n\n\rfalsse\n\n\n"
+    # print pid.errors
+    print pid.adjust()
+>>>>>>> c0612f5daba0c422f75edb9f5c71c79194382604
