@@ -12,6 +12,8 @@ class PIDController:
         return
 
     def append(self, error):
+        print(error)
+        # print("hiii")
         self.__add__(error)
         return
 
@@ -28,5 +30,5 @@ if __name__ == "__main__":
     pid = PIDController(kp=0.75)
     pid += 10
     print bool(pid)
-    print pid.errors
-    print pid.adjust()
+    # print pid.errors
+    # print pid.adjust()
