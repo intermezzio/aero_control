@@ -26,9 +26,14 @@ class PIDController:
             self.errors = [0]
 
         adjusted = 0
+        if self.kp:
+            adjusted += p_control()
+        if self.ki:
+            # adjusted += i_control()
+        if self.kd:
+            # adjusted += d_control()
 
-
-        self.cmds += adjusted
+        self.cmds.append(adjusted)
         return adjusted
 
     def p_control(self):

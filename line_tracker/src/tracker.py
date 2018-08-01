@@ -14,7 +14,7 @@ import mavros
 from mavros_msgs.msg import State
 from cv_bridge import CvBridge, CvBridgeError
 from copy import deepcopy
-
+from PID_control import PIDController as PID
 
 
 WINDOW_HEIGHT = 128
@@ -55,6 +55,11 @@ class LineTracker:
 
         # while not rospy.is_shutdown() and self.current_state == None:
         #     pass  # Wait for connection
+        # create PID controllers
+
+        self.controlX = PID(kp=0.75)
+        self.controlY = PID(kp=0.5)
+        self.controlYAW = PID(kp=0.25)
 
     def line_param_cb(self, line_params):
     global WINDOW_HEIGHT, WINDOW_WIDTH
@@ -155,7 +160,7 @@ class LineTracker:
             self.pub_error.publish(Vector3(x_error,y_error,0))
 
 
-            self.p_control(x_error,y_error,yaw_error)
+            self.control(x_error,y_error,yaw_error)
 
         # return x_err, y_err
 
@@ -164,11 +169,13 @@ class LineTracker:
         self.__v += acc_cmd*dt
         self.__x += self.__v*dt
 
-    def p_control(self,x_err,y_err,yaw_err):
+    def control(self,x_err,y_err,yaw_err):
         self.velocity_setpoint = TwistStamped() # create p controlled commands
-        cmd_x = -x_err*(K_P_X)
-        cmd_y = -y_err*(K_P_Y)
-        cmd_yaw = -yaw_err*(K_P_YAW)
+
+
+        cmd_x = self.controlX.adjust(x_err)
+        cmd_y = self.controlY.adjust(y_err)
+        cmd_yaw = self.controlYAW.adjust(yaw_err)
 
         self.velocity_setpoint.twist.angular.z = cmd_yaw # execute vel commands
 
