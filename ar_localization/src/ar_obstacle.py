@@ -145,7 +145,6 @@ class ARObstacleController:
 
         elif self.finite_state == 1:
             self.fly_to_obstacle()
-	    	print("hiiiiiiiiiii")
         elif self.finite_state == 2:
             rospy.logerr("avoiding ring")
             #self.current_obstacle_tag = 24
@@ -178,7 +177,6 @@ class ARObstacleController:
 
     def fly_to_obstacle(self): # once an AR tag is detected, fly to that obstacle to prepare for avoidance
         marker_list = [marker for marker in self.markers if marker.id  in self.obstacles]
-		print("helloooooo")
         if len(marker_list) < 1: return
         target_marker = min(marker_list, \
             key=lambda marker: marker.pose.pose.position.x)
@@ -204,15 +202,15 @@ class ARObstacleController:
         yaw_error = _YAW_DES - curr_yaw
 
 
-		tw_err = Twist()
-		tw_err.linear.x = x_error
-		tw_err.linear.y = y_error
-		tw_err.linear.z = z_error
-		tw_err.angular.z = yaw_error
-		print(x_error,y_error,z_error,yaw_error)
+	tw_err = Twist()
+	tw_err.linear.x = x_error
+	tw_err.linear.y = y_error
+	tw_err.linear.z = z_error
+	tw_err.angular.z = yaw_error
+	print(x_error,y_error,z_error,yaw_error)
 
 
-		self.pub_error.publish(tw_err)
+	self.pub_error.publish(tw_err)
 
 
  # publish commands in a twist message
@@ -250,8 +248,8 @@ class ARObstacleController:
         # raise Exception("ring avoid times!!")
         if td.total_seconds() < t_up:
             # Add to vel hist here!!
-            dist_ring_up = 3
-            vel_ring_up = self.local_vel_sp.twist.linear.x = dist_ring_up/t_up
+           
+            vel_ring_up = self.local_vel_sp.twist.linear.z = 2
             self.vel_hist[2].insert(0,vel_ring_up)
             rospy.loginfo("ring avoid: going up!")
 
@@ -259,7 +257,7 @@ class ARObstacleController:
             self.clear_history(z=True)
             # Add to vel_hist here!!
             dist_ring_forward = 5
-            vel_ring_forward = self.local_vel_sp.twist.linear.x = dist_ring_forward/t_forward
+            vel_ring_forward = self.local_vel_sp.twist.linear.x = 2
             self.vel_hist[0].insert(0,vel_ring_forward)
             rospy.loginfo("ring avoid: going forward!")
 
@@ -283,7 +281,7 @@ class ARObstacleController:
         if td.total_seconds() < t_up:
             # add to vel_hist here!! (insert at zero)
             dist_hurdle_up = 3
-            vel_hurdle_up = self.local_vel_sp.twist.linear.x = dist_hurdle_up/t_up
+            vel_hurdle_up = self.local_vel_sp.twist.linear.z = 2
             self.vel_hist[2].insert(0,vel_hurdle_up)
             if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
 
@@ -291,7 +289,7 @@ class ARObstacleController:
             self.clear_history(z=True)
             # add to vel_hist here!! (insert at zero)
             dist_hurdle_forward = 2
-            vel_hurdle_forward = self.local_vel_sp.twist.linear.x = dist_hurdle_forward/t_forward
+            vel_hurdle_forward = self.local_vel_sp.twist.linear.x = 2
             self.vel_hist[0].insert(0,vel_hurdle_forward)
             if _DEBUG: rospy.loginfo("hurdle avoid: going forward!")
 
@@ -310,15 +308,15 @@ class ARObstacleController:
         t_forward = 3
         if td.total_seconds() < 0.5:
             # add to vel_hist here (insert at zero)
-            dist_gate_down = 3
-            vel_gate_down = self.local_vel_sp.twist.linear.x = dist_gate_down/t_down
+            
+            vel_gate_down = self.local_vel_sp.twist.linear.z = 2
             self.vel_hist[2].insert(0,vel_gate_down)            
             if _DEBUG: rospy.loginfo("gate avoid: going down!")
         elif td.total_seconds() < 7 and td.total_seconds() > 0.5:
             self.clear_history(z=True)
             # add to vel_hist here (insert at zero)
-            dist_gate_forward = 3
-            vel_gate_forward = dist_gate_forward/t_forward
+            
+            vel_gate_forward = 2
             self.vel_hist[0].insert(0,dist_gate_forward)
             if _DEBUG: rospy.loginfo("gate avoid: going forward")
         else:
