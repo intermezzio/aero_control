@@ -29,7 +29,7 @@ class PIDController:
 
         adjusted = 0
         if self.kp:
-            adjusted += p_control()
+            adjusted += self.p_control()
         if self.ki:
             # adjusted += i_control()
         if self.kd:
@@ -39,10 +39,10 @@ class PIDController:
         return adjusted
 
     def p_control(self):
-        if not kp:
+        if not self.kp:
             return 0
-        error = errors[-1]
-        newcmd = error * kp
+        error = self.errors[-1]
+        newcmd = error * self.kp
         return newcmd
         # newError +=
 if __name__ == "__main__":
