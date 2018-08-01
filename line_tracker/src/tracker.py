@@ -112,7 +112,10 @@ class LineTracker:
             m = vy/vx
             b = y - m*x
 
-            closeX = -b/(1+1/m)
+            slopediff = (1+1/m)
+            if slopediff == 0:
+                slopediff = 0.01
+            closeX = -b/slopediff
             closeY = m*closeX + b
 
             if vx < 0: # change direction of vector if it's going the wrong way
