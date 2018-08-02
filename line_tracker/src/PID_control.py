@@ -8,9 +8,9 @@ class PIDController:
 
         """
 
-        self.ki = ki if ki else 0 # initialize ki, kd, and kp
-        self.kd = kd if kd else 0
-        self.kp = kp if kp or (not kd and not ki) else 0
+        self.ki = ki # initialize ki, kd, and kp
+        self.kd = kd
+        self.kp = kp
 
         self.errors = list() # list of past errors
         self.allErr = 0 # sum of all errors
@@ -41,14 +41,14 @@ class PIDController:
         # print "errors: %s"%self.errors
         adjusted = 0 # running total of new command, kp ki and kd add to this
         if self.kp:
-            adjusted += self.p_control() # do p control
+            p = self.p_control() # do p control
         if self.ki:
-            adjusted += self.i_control() # do i control
+            i = self.i_control() # do i control
         if self.kd:
-            adjusted += self.d_control() # do d control
+            d = self.d_control() # do d control
 
-        self.cmds += [adjusted] # add new cmd to list
-        return adjusted
+        self.cmds.append( (p,i,d,p+i+d) ) # add new cmd to list
+        return p+i+d
 
     def p_control(self):
         if not self.kp:
@@ -91,4 +91,5 @@ if __name__ == "__main__":
     # print pid.errors
     for i in range(10):
         pid.adjust(i - 3.)
-    print pid.printControl()
+    for i in pid.printControl():
+        print i
