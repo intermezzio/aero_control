@@ -102,7 +102,7 @@ class ARObstacleController:
 
 
                 self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
-                if marker.id % 2 == 0:
+                if self.current_obstacle_tag % 2 == 0:
                     self.finite_state = 4
                 else:
                     self.finite_state = 3
@@ -162,7 +162,10 @@ class ARObstacleController:
             vel_hurdle_up = self.local_vel_sp.twist.linear.z = dist_hurdle_up/t_up
             self.vel_hist[2].insert(0,vel_hurdle_up)
             if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
-            rospy.loginfo(current_vel)
+	    print(td.total_seconds())
+	    if td.total_seconds() > t_up:
+		break
+            #rospy.loginfo(current_vel)
 
         else:
             self.clear_history(x=True, z=True)
@@ -182,7 +185,10 @@ class ARObstacleController:
             vel_gate_down = self.local_vel_sp.twist.linear.z = -dist_gate_down/t_down
             self.vel_hist[2].insert(0,vel_gate_down)            
             if _DEBUG: rospy.loginfo("gate avoid: going down!")
-            rospy.loginfo(current_vel)
+            #rospy.loginfo(current_vel)
+	    print(td.total_seconds())
+	    if td.total_seconds() > t_down:
+		break
         else:
             self.clear_history(x=True, z=True)
             self.t_obstacle_start = None
