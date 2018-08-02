@@ -19,11 +19,11 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = True # set to True to test on laptop
+NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 K_P_X = 60.0 # TODO: decide upon initial K_P_X
 K_P_Y = 60.0 # TODO: decide upon initial K_P_Y
-K_P_YAW = .25
+K_P_YAW = .5
 num_unit_vecs = 50
 _TIME_STEP = 0.1
 _PTS_AHEAD = 50
@@ -112,6 +112,9 @@ class LineTracker:
             m = vy/vx
             b = y - m*x
 
+            if m == 0:
+                m = 0.001
+
             slopediff = (1+1/m)
             if slopediff == 0:
                 slopediff = 0.01
@@ -149,6 +152,7 @@ class LineTracker:
         cmd_x = self.controlX.adjust(x_err)
         cmd_y = self.controlY.adjust(y_err)
         cmd_yaw = self.controlYAW.adjust(yaw_err)
+	print("hiiiiii")
 
         self.velocity_setpoint.twist.angular.z = cmd_yaw # execute vel commands
 

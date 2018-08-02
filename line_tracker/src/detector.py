@@ -84,26 +84,27 @@ class LineDetector:
 
         ##||||||||||||||||||||||||||||||||||||||||||||||||||##
         ##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV## I think this will work for tracker.py
-            px1 = cols-1
-            px2 = 0
-            py1 = righty
-            py2 = lefty
+            #px1 = cols-1
+            #px2 = 0
+            #py1 = righty
+            #py2 = lefty
 
-            p_line_center_x = (px1+px2)/2
-            p_line_center_y = (py1+py2)/2
+            #p_line_center_x = (px1+px2)/2
+            #p_line_center_y = (py1+py2)/2
 
-            r_line_unit = (vx[0],vy[0])
+            #r_line_unit = (vx[0],vy[0])
 
-            m = vy/vx
-            b = p_line_center_y - m*p_line_center_x
+            #m = vy/vx
+           # b = p_line_center_y - m*p_line_center_x
 
-            distances = [20000]
-            xs = []
-            ys = []
-            for x1 in range(0,d.shape[0]):
-                y1 = m*x1 + b
-                dist = np.sqrt((x1 - img_center_x)**2 + (y1 - img_center_y)**2)
-                if dist < distances[-1]:
+            #distances = [20000]
+            #xs = []
+            #ys = []
+            #for x1 in range(0,d.shape[0]):
+                #y1 = m*x1 + b
+                #dist = np.sqrt((x1 - img_center_x)**2 + (y1 - img_center_y)**2)
+                #if dist < distances[-1]:
+            '''
                     distances.append(dist)
                     xs.append(x1)
                     ys.append(y1)
@@ -130,7 +131,7 @@ class LineDetector:
                 new_line = cv2.line(d,(img_center_x,img_center_y),(p_line_closest_center_x,p_line_closest_center_y),(255,255,255),10)
 
 
-        # print(p_line_closest_center,p_target,x_error,y_error)
+        # print(p_line_closest_center,p_target,x_error,y_error)'''
 
         
 
