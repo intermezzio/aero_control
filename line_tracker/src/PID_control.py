@@ -8,9 +8,9 @@ class PIDController:
 
         """
 
-        self.ki = ki if ki else 0 # initialize ki, kd, and kp
-        self.kd = kd if kd else 0
-        self.kp = kp if kp or (not kd and not ki) else 0
+        self.ki = ki # initialize ki, kd, and kp
+        self.kd = kd
+        self.kp = kp
 
         self.errors = list() # list of past errors
         self.allErr = 0 # sum of all errors
