@@ -1,6 +1,7 @@
 import numpy as np
 class PIDController:
-    def __init__(self, kp=1, ki=0.0, kd=0.0, params=dict()):
+    fRate = .1
+    def __init__(self, kp=1, ki=0.0, kd=0.0, group=5, frameRate = None):
         """
         Create a PID controller!
         kp, ki, and kd are defaulted at 1
@@ -16,7 +17,10 @@ class PIDController:
 
         self.cmds = list() # list of past commands
 
-        self.derivAvg = 5
+        self.derivAvg = group
+
+        if frameRate != None:
+            PIDController.fRate = frameRate # frame rate for the error
         return
 
     def __add__(self, error): # add error with + sign
