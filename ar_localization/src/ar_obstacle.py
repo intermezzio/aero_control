@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#from datetime import datetime
+from datetime import datetime
 import time
 import rospy
 import time
@@ -178,7 +178,7 @@ class ARObstacleController:
 ###########################################################################################################################
         t_up = 1
         t_end = time.time() + t_up
-        
+
         if time.time() < t_end:
             # add to vel_hist here (insert at zero)
             dist_gate_down = -0.5
