@@ -130,7 +130,9 @@ class ARObstacleController:
 
         if _DEBUG: rospy.loginfo("vel cmd: x: " + "%.05f" % vel.twist.linear.x + " y: " + "%.05f" % vel.twist.linear.y + " z: " + "%.05f" % vel.twist.linear.z + " yaw: " + "%.05f" % vel.twist.angular.z)
 
-        z_vel = self.local_vel_sp.twist.linear.z
+        self.local_vel_sp = TwistStamped()
+
+        self.local_vel_sp.twist.linear.z = z_vel
         self.vel_hist[2].insert(0,z_vel)
         return
 
@@ -262,7 +264,7 @@ class ARObstacleController:
     def start_streaming_offboard_vel(self):
         def run_streaming():
             self.offboard_vel_streaming = True
-            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
+            while (not rospy.is_shutdown()) and self.current_state.mode != 'OFFBOARD':
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
@@ -271,7 +273,7 @@ class ARObstacleController:
                 rospy.Rate(60).sleep()
 
         # Publish at the desired rate
-            while (not rospy.is_shutdown()) and self.offboard_vel_streaming == "OFFBOARD":
+            while (not rospy.is_shutdown()) and self.offboard_vel_streaming:
 
                 self.update_finite_state()
                 vel = TwistStamped()
