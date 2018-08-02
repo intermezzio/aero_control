@@ -111,13 +111,13 @@ class ARObstacleController:
             self.vel_hist[3].insert(0,0.0)
             return
         elif self.finite_state == 3:
-            rospy.logerr("avoiding hurdle")
+            rospy.loginfo("avoiding hurdle")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos < 0.75:
                 rospy.loginfo("FLY UP")
         elif self.finite_state == 4:
-            rospy.logerr("avoiding gate")
+            rospy.loginfo("avoiding gate")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos > -0.75:
