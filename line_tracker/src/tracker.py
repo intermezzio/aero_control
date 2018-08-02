@@ -55,11 +55,11 @@ class LineTracker:
 
         # while not rospy.is_shutdown() and self.current_state == None:
         #     pass  # Wait for connection
-
         # create PID controllers
-        self.controlX = PID(kp=0.75, ki=0, kd=0)
-        self.controlY = PID(kp=0.5, ki=0, kd=0)
-        self.controlYAW = PID(kp=0.25, ki=0, kd=0)
+
+        self.controlX = PID(kp=0.5)
+        self.controlY = PID(kp=0.5)
+        self.controlYAW = PID(kp=0.5)
 
     def line_param_cb(self, line_params):
         global WINDOW_HEIGHT, WINDOW_WIDTH
@@ -112,13 +112,13 @@ class LineTracker:
             m = vy/vx
             b = y - m*x
 
+            
             if m == 0:
-                m = 0.001
+                m = 0.00001
+	    if m == -1:
+		m = -1.1
 
-            slopediff = (1+1/m)
-            if slopediff == 0:
-                slopediff = 0.01
-            closeX = -b/slopediff
+            closeX = -b/(1+1/m)
             closeY = m*closeX + b
 
             if vx < 0: # change direction of vector if it's going the wrong way
