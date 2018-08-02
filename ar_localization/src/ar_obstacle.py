@@ -149,7 +149,7 @@ class ARObstacleController:
         if _DEBUG: rospy.loginfo("vel cmd: x: " + "%.05f" % vel.twist.linear.x + " y: " + "%.05f" % vel.twist.linear.y + " z: " + "%.05f" % vel.twist.linear.z + " yaw: " + "%.05f" % vel.twist.angular.z)
 
         self.local_vel_sp.twist.linear.z = z_vel
-        self.vel_hist[2].insert(0,vel_hurdle_up)
+        self.vel_hist[2].insert(0,z_vel)
         return
 
     def generate_vel(self): # assesses course of action using finite state
