@@ -122,7 +122,7 @@ class ARObstacleController:
 ###########################################################################################################################
 
 
-                self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id]
+                self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
                 if self.current_obstacle_tag % 2 == 0:
                 	print("tag is odd")
                     self.finite_state = 3
