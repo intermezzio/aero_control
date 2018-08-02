@@ -60,7 +60,7 @@ class LineTracker:
 
         self.controlX = PID(kp=0.5, ki=0, kd=0)
         self.controlY = PID(kp=0.5, ki=0, kd=0)
-        self.controlYAW = PID(kp=1.0, ki=0, kd=)
+        self.controlYAW = PID(kp=1.0, ki=0, kd=0)
 
 
     def line_param_cb(self, line_params):
