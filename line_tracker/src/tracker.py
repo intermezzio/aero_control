@@ -38,10 +38,10 @@ class LineTracker:
         mavros.set_namespace()
         self.bridge = CvBridge()
 
-        self.pub_local_velocity_setpoint = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1) # send velocity
+        # self.pub_local_velocity_setpoint = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1) # send velocity
         self.sub_line_param = rospy.Subscriber("/line/param", Line, self.line_param_cb) # get camera data from this object
         self.pub_error = rospy.Publisher("/line/error", Vector3, queue_size=1) # send error with this object
-
+        self.line_vel = rospy.Publisher("/line_vel", TwistStamped, queue_size=1)
 
 
         # Variables dealing with publishing setpoint
@@ -196,7 +196,7 @@ class LineTracker:
                         velocity_setpoint_limited.twist.linear.z *= MAX_SPEED / speed
 
                     # Publish limited setpoint
-                    self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited)
+                    self.line_vel.publish(velocity_setpoint_limited)
                     # self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited.twist.angular.z)
                     rospy.loginfo(velocity_setpoint_limited)
                 self.rate.sleep()
