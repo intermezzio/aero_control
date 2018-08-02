@@ -244,7 +244,8 @@ class ARObstacleController:
                 rospy.Rate(60).sleep()
 
         # Publish at the desired rate
-            while (not rospy.is_shutdown()) and self.offboard_vel_streaming:
+            while (not rospy.is_shutdown()) and self.offboard_vel_streaming != "OFFBOARD":
+
                 self.update_finite_state()
                 vel = TwistStamped()
                 self.generate_vel()

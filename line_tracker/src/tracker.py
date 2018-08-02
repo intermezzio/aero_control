@@ -19,7 +19,7 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = True # set to True to test on laptop
+NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 # K_P_X = 60.0 # TODO: decide upon initial K_P_X
 # K_P_Y = 60.0 # TODO: decide upon initial K_P_Y
@@ -57,9 +57,11 @@ class LineTracker:
         #     pass  # Wait for connection
         # create PID controllers
 
-        self.controlX = PID(kp=0.01, ki=0, kd=0)
-        self.controlY = PID(kp=0.01, ki=0, kd=0)
-        self.controlYAW = PID(kp=1, ki=0, kd=0)
+
+        self.controlX = PID(kp=0.5, ki=0, kd=0)
+        self.controlY = PID(kp=0.5, ki=0, kd=0)
+        self.controlYAW = PID(kp=1.0, ki=0, kd=)
+
 
     def line_param_cb(self, line_params):
         global WINDOW_HEIGHT, WINDOW_WIDTH
@@ -114,9 +116,10 @@ class LineTracker:
 
             
             if m == 0:
-                m = 0.0000001
+                m = 0.00001
             if m == -1:
-                m = -0.000001
+                m = -0.0001
+
 
             closeX = -b/(1+1/m)
             closeY = m*closeX + b

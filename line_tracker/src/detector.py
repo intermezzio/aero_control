@@ -11,7 +11,7 @@ from copy import deepcopy
 from aero_control.msg import Line
 import sys
 
-DEBUG = True
+DEBUG = False
 
 class LineDetector:
     def __init__(self):
@@ -67,19 +67,22 @@ class LineDetector:
             p_frame_center = (img_center_x,img_center_y)
 
             [vx,vy,x,y] = cv2.fitLine(max_contours, cv2.DIST_L2,0,0.01,0.01)
-        
-            lefty = int((-x[0]*vy[0]/vx[0]) + y[0])
-            righty = int(((cols-x)[0]*vy[0]/vx)[0]+y[0])
-            print lefty, righty,vx[0],vy[0],x[0],y[0]
-            pt1 = (cols-1,righty)
-            pt2 = (0,lefty)
-            try:
-                regression = cv2.line(d,pt1,pt2,(255,255,255),20)
-            except OverflowError:
-                print 'Overflow!!!!'    
-                regression = cv2.line(d,(img_center_x,0),(img_center_x,rows),(255,255,255),5)
-            x_axis = cv2.line(d,(0,img_center_y),(cols,img_center_y),(255,255,255),5)
-            y_axis = cv2.line(d,(img_center_x,0),(img_center_x,rows),(255,255,255),5)
+        	
+
+	    #lefty = int((-x*vy/vx) + y)
+     	    #righty = int(((cols-x)*vy/vx)+y)
+
+            #pt1 = (cols-1,righty)
+            #pt2 = (0,lefty)
+
+            #try:
+                #regression = cv2.line(d,pt1,pt2,(255,255,255),20)
+     	    	#regression = cv2.line(img,(cols-1,righty),(0,lefty),(0,255,0),2)
+            #except OverflowError:
+                #print 'Overflow!!!!'    
+                #regression = cv2.line(d,(img_center_x,0),(img_center_x,rows),(255,255,255),5)
+            #x_axis = cv2.line(d,(0,img_center_y),(cols,img_center_y),(255,255,255),5)
+            #y_axis = cv2.line(d,(img_center_x,0),(img_center_x,rows),(255,255,255),5)
 
 
         ##||||||||||||||||||||||||||||||||||||||||||||||||||##
