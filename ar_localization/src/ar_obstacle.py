@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from datetime import datetime
+#from datetime import datetime
+import time
 import rospy
 import time
 import threading
@@ -147,16 +148,17 @@ class ARObstacleController:
 
 
     def avoid_hurdle(self): # commands vel such that hurdle can be avoided open-loop
-        td = datetime.now()-self.t_obstacle_start
+        
 
 ###########################################################################################################################
 # TODO: decide how long / at what vel to go up/forward to avoid hurdle
 ###########################################################################################################################
         t_up = 1
+        t_end = time.time() + t_up
         #t_forward = 1.5
 
         # raise Exception("hurdle avoid times!")
-        if td.total_seconds() < t_up:
+        if time.time() < t_end:
             # add to vel_hist here!! (insert at zero)
             dist_hurdle_up = 0.5
             vel_hurdle_up = self.local_vel_sp.twist.linear.z = dist_hurdle_up/t_up
@@ -170,13 +172,14 @@ class ARObstacleController:
             self.update_finite_state(force=True)
 
     def avoid_gate(self): # commands vel such that gate can be avoided open-loop
-        td = datetime.now()-self.t_obstacle_start
 
 ###########################################################################################################################
 # TODO: decide how long / at what vel to go down/forward to avoid gate
 ###########################################################################################################################
-        t_down = 1
-        if td.total_seconds() < t_down:
+        t_up = 1
+        t_end = time.time() + t_up
+        
+        if time.time() < t_end:
             # add to vel_hist here (insert at zero)
             dist_gate_down = -0.5
             vel_gate_down = self.local_vel_sp.twist.linear.z = -dist_gate_down/t_down
