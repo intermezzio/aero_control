@@ -14,30 +14,7 @@ from std_msgs.msg import String
 
 import mavros
 from mavros_msgs.msg import State
-# Distance constants
-###########################################################################################################################
-# TODO: decide on points at which you want to hover in front of obstacles before flying through
-###########################################################################################################################
-_DIST_TO_OBST = {24:[-1.0, 0.0, 0.0, 0.0],9:[-1.0, 0.0, 0.0, 0.0], 12:[-1.5, 0.0, -0.5, 0.0]} 
 
-# raise Exception("Decide on how far away from the tag you want to be!!")
-
-###########################################################################################################################
-# TODO: add desired sequence of obstacles, should match course
-###########################################################################################################################
-_OBST_SEQ = [24] 
-
-_YAW_DES = -np.pi/2 # radians
-
-###########################################################################################################################
-# TODO: decide on K_P values
-###########################################################################################################################
-# P(ID) constants
-_K_P_X = 0.75
-_K_P_Y = 0.75
-_K_P_Z = 0.75
-
-_K_P_YAW = 0.1
 
 _DEBUG = False
 
@@ -52,23 +29,6 @@ class ARObstacleController:
         self.pub_error = rospy.Publisher("/obs_error", Twist, queue_size=1) # set data type to publish to error
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
-
-        
-        #Dictionary of Even or Odd numbers
-        self.obstacles = {Odd : 3, Even: 4} # dict (marker -> mode)
-
-
-        #Function to see if the marker.id is even or odd
-        if marker.id % 2 == 0:
-            self.obstacle[marker.id] = 4
-            #Even
-            #Mode 4 = under
-
-        else:
-            self.obstacle[marker.id] = 3
-            #Odd
-            #Mode 3 = Over
-
 
         self.rate = rospy.Rate(hz)
         self.current_state = State()
@@ -133,22 +93,23 @@ class ARObstacleController:
             self.finite_state = mode
 
         
-        if any(marker.id in self.obstacles for marker in self.markers) and self.finite_state == 0:
-
+        if len(self.markers) > 0 and self.finite_state == 0:
 ###########################################################################################################################
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
 
 
                 self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
-                self.finite_state = self.obstacles[self.current_obstacle_tag]
-                print("OBSTACLE SEEN")
-                print(self.finite_state)
-                return 
+                if marker.id % 2 == 0:
+                    self.finite_state = 4
+                else:
+                    self.finite_state = 3
+                
+                
 
             
     def generate_vel(self): # assesses course of action using finite state
-        rospy.loginfo("INSIDE GENERATE VEL FUNCTION")
+
         if self.finite_state == 0:
 ###########################################################################################################################
 # TODO: fill in velocity commands for finite state 0
@@ -158,19 +119,6 @@ class ARObstacleController:
             self.vel_hist[1].insert(0,0.0)
             self.vel_hist[2].insert(0,0.0)
             self.vel_hist[3].insert(0,0.0)
-
-
-            # raise Exception("Fill in Hover commands!")
-
-        elif self.finite_state == 1:
-            self.fly_to_obstacle()
-        elif self.finite_state == 2:
-            rospy.logerr("avoiding ring")
-            #self.current_obstacle_tag = 24
-            if self.t_obstacle_start == None:
-                self.clear_history(wipe=True) 
-                self.t_obstacle_start = datetime.now()
-            self.avoid_ring()
 
         elif self.finite_state == 3:
             rospy.logerr("avoiding hurdle")
@@ -183,6 +131,7 @@ class ARObstacleController:
 
         elif self.finite_state == 4:
             #self.current_obstacle_tag = 9
+            rospy.logerr("avoiding gate")
             if self.t_obstacle_start == None:
                 self.clear_history(wipe=True) 
                 self.t_obstacle_start = datetime.now()
@@ -194,102 +143,6 @@ class ARObstacleController:
 
         if _DEBUG: rospy.loginfo("vel cmd: x: " + "%.05f" % vel.twist.linear.x + " y: " + "%.05f" % vel.twist.linear.y + " z: " + "%.05f" % vel.twist.linear.z + " yaw: " + "%.05f" % vel.twist.angular.z)
 
-    def fly_to_obstacle(self): # once an AR tag is detected, fly to that obstacle to prepare for avoidance
-        marker_list = [marker for marker in self.markers if marker.id  in self.obstacles]
-        if len(marker_list) < 1: return
-        target_marker = min(marker_list, \
-            key=lambda marker: marker.pose.pose.position.x)
-	
-        if target_marker is None: 
-            self.update_finite_state()
-            print("no obstacles found!")
-            return
-
-        if target_marker.id != _OBST_SEQ[self.current_obstacle_seq]:
-            rospy.logerr("wrong obstacle detected!! quitting for safety")
-            return
-
-        curr_yaw = self.get_yaw(target_marker.pose.pose.orientation)
-###########################################################################################################################
-# TODO: calculate errors from desired pose/current pose
-###########################################################################################################################
-
-
-        x_error = _DIST_TO_OBST[target_marker.id][0] - target_marker.pose.pose.position.x 
-        y_error = _DIST_TO_OBST[target_marker.id][1] - target_marker.pose.pose.position.y
-        z_error = _DIST_TO_OBST[target_marker.id][2] - target_marker.pose.pose.position.z
-        yaw_error = _YAW_DES - curr_yaw
-
-
-	tw_err = Twist()
-	tw_err.linear.x = x_error
-	tw_err.linear.y = y_error
-	tw_err.linear.z = z_error
-	tw_err.angular.z = yaw_error
-	print(x_error,y_error,z_error,yaw_error)
-
-
-	self.pub_error.publish(tw_err)
-
-
- # publish commands in a twist message
-        
-        # raise Exception("calculate errors and delete this!!")
-
-##########################################################################################################################
-		#desired - actual
-
-
-        if _DEBUG: rospy.loginfo("error: x: %.04f y: %.04f z: %.04f yaw %.04f" % (x_error, y_error, z_error, yaw_error))
-
-        if abs(x_error) < 0.1 and abs(y_error) < 0.1 and abs(z_error) < 0.1: # we can start flying thru
-	    print("in the right spot to fly")
-            # above thresholds (0.1 for all currently) are modifiable!!
-            self.update_finite_state(self.obstacles[target_marker.id])
-            self.current_obstacle_seq+= 1 if self.current_obstacle_seq < len(_OBST_SEQ) else 0
-            return
-	
-	print("going to obstacle")
-        self.vel_hist[0].insert(0,x_error*-_K_P_X)
-        self.vel_hist[1].insert(0,y_error*_K_P_Y)
-        self.vel_hist[2].insert(0,z_error*_K_P_Z)
-        self.vel_hist[3].insert(0,yaw_error*_K_P_YAW)
-
-    def avoid_ring(self): # commands vel such that ring can be avoided open-loop
-        
-        td = datetime.now()-self.t_obstacle_start
-	   print("AVOID RING")
-###########################################################################################################################
-# TODO: decide how long / at what vel to go up/forward to avoid ring
-###########################################################################################################################
-
-        t_up = 1.5
-        t_forward = 2
-        # raise Exception("ring avoid times!!")
-        if td.total_seconds() < t_up:
-            # Add to vel hist here!!
-
-            print("Avoid Ring")
-            vel_ring_up = self.local_vel_sp.twist.linear.z = .5
-            self.vel_hist[2].insert(0,vel_ring_up)
-            rospy.loginfo("ring avoid: going up!")
-            rospy.loginfo(current_vel)
-
-        elif td.total_seconds() < t_forward and td.total_seconds() > t_up:
-            self.clear_history(z=True)
-            # Add to vel_hist here!!
-            dist_ring_forward = 5
-            vel_ring_forward = self.local_vel_sp.twist.linear.x = 1
-            self.vel_hist[0].insert(0,vel_ring_forward)
-            rospy.loginfo("ring avoid: going forward!")
-            rospy.loginfo(current_vel)
-
-        else:
-            self.clear_history(x=True, z=True)
-            self.t_obstacle_start = None
-            self.update_finite_state(force=True)
-
-
 
     def avoid_hurdle(self): # commands vel such that hurdle can be avoided open-loop
         td = datetime.now()-self.t_obstacle_start
@@ -298,24 +151,25 @@ class ARObstacleController:
 # TODO: decide how long / at what vel to go up/forward to avoid hurdle
 ###########################################################################################################################
         t_up = 1
-        t_forward = 1.5
+        #t_forward = 1.5
 
         # raise Exception("hurdle avoid times!")
         if td.total_seconds() < t_up:
             # add to vel_hist here!! (insert at zero)
-            vel_hurdle_up = self.local_vel_sp.twist.linear.z = .5
+            dist_hurdle_up = 0.5
+            vel_hurdle_up = self.local_vel_sp.twist.linear.z = dist_hurdle_up/t_up
             self.vel_hist[2].insert(0,vel_hurdle_up)
             if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
             rospy.loginfo(current_vel)
 
-        elif td.total_seconds() < t_forward and td.total_seconds() > t_up:
-            self.clear_history(z=True)
-            # add to vel_hist here!! (insert at zero)
-            dist_hurdle_forward = 2
-            vel_hurdle_forward = self.local_vel_sp.twist.linear.x = 1
-            self.vel_hist[0].insert(0,vel_hurdle_forward)
-            if _DEBUG: rospy.loginfo("hurdle avoid: going forward!")
-            rospy.loginfo(current_vel)
+        # elif td.total_seconds() < t_forward and td.total_seconds() > t_up:
+        #     self.clear_history(z=True)
+        #     # add to vel_hist here!! (insert at zero)
+        #     dist_hurdle_forward = 2
+        #     vel_hurdle_forward = self.local_vel_sp.twist.linear.x = 1
+        #     self.vel_hist[0].insert(0,vel_hurdle_forward)
+        #     if _DEBUG: rospy.loginfo("hurdle avoid: going forward!")
+        #     rospy.loginfo(current_vel)
 
         else:
             self.clear_history(x=True, z=True)
@@ -329,24 +183,13 @@ class ARObstacleController:
 # TODO: decide how long / at what vel to go down/forward to avoid gate
 ###########################################################################################################################
         t_down = 1
-        t_forward = 1.5
-        if td.total_seconds() < 0.5:
+        if td.total_seconds() < t_down:
             # add to vel_hist here (insert at zero)
-            
-            vel_gate_down = self.local_vel_sp.twist.linear.z = -.5
+            dist_gate_down = -0.5
+            vel_gate_down = self.local_vel_sp.twist.linear.z = -dist_gate_down/t_down
             self.vel_hist[2].insert(0,vel_gate_down)            
             if _DEBUG: rospy.loginfo("gate avoid: going down!")
             rospy.loginfo(current_vel)
-
-        elif td.total_seconds() < 7 and td.total_seconds() > 0.5:
-            self.clear_history(z=True)
-            # add to vel_hist here (insert at zero)
-            
-            vel_gate_forward = 1
-            self.vel_hist[0].insert(0,dist_gate_forward)
-            if _DEBUG: rospy.loginfo("gate avoid: going forward")
-            rospy.loginfo(current_vel)
-
         else:
             self.clear_history(x=True, z=True)
             self.t_obstacle_start = None
@@ -376,12 +219,6 @@ class ARObstacleController:
         self.local_vel_sp.twist.linear.z = z_vel
         self.local_vel_sp.twist.angular.z = yaw_vel
 
-    def get_yaw(self,quat_msg): # converts orientation quaternion to euler and gets yaw
-        q_a_wenu = [quat_msg.x,quat_msg.y,quat_msg.z,quat_msg.w]
-
-        return tf.transformations.euler_from_quaternion(q_a_wenu)[2] # yaw
-
-
     def clear_history(self,x=False, y=False, z=False, yaw=False, wipe=False): # clears vel hist (helpful at transitions)
         if wipe:
             self.vel_hist = [[],[],[],[]]
@@ -395,11 +232,7 @@ class ARObstacleController:
         if yaw:
             self.vel_hist[3] = [0 for i in self.vel_hist[3]]
 
-#     def convert_vel(self, vel_msg): # vel_msg is a TwistStamped()
-# ############################################################################################################################
-# # TODO: Convert 'bu' velocity to 'lenu' velocity
-# ###########################################################################################################################
-#         return vel_msg
+
 
 ###########################################################################################################################
 # DO NOT MODIFY BELOW THIS COMMENT
@@ -408,14 +241,12 @@ class ARObstacleController:
     def start_streaming_offboard_vel(self):
         def run_streaming():
             self.offboard_vel_streaming = True
-	    print(self.current_state.mode)
-            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
+        print(self.current_state.mode)
+            while not rospy.is_shutdown() and self.current_state.mode == 'OFFBOARD':
         
         # Publish a "don't move" velocity command
-
                 velocity_message = TwistStamped()
                 self.local_vel_sp_pub.publish(velocity_message)
-
                 rospy.loginfo('Waiting to enter offboard mode')
                 rospy.Rate(60).sleep()
 
