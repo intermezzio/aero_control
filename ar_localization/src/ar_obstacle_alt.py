@@ -53,19 +53,19 @@ class ARObstacleController:
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
         #self.obstacles = {24 : 2, 9 : 3, 12: 4} # dict (marker -> mode)
-        self.obstacles = {Odd : 3, Even: 4} # dict (marker -> mode)
+        #self.obstacles = {Odd : 3, Even: 4} # dict (marker -> mode)
 
 
         #Function to see if the marker.id is even or odd
-        if marker.id % 2 == 0:
-            self.obstacle[marker.id] = 4
-            #Even
-            #Mode 4 = under
+        # if marker.id % 2 == 0:
+        #     self.obstacle[marker.id] = 4
+        #     #Even
+        #     #Mode 4 = under
 
-        else:
-            self.obstacle[marker.id] = 3
-            #Odd
-            #Mode 3 = Over
+        # else:
+        #     self.obstacle[marker.id] = 3
+        #     #Odd
+        #     #Mode 3 = Over
 
         self.rate = rospy.Rate(hz)
         self.current_state = State()
@@ -130,17 +130,18 @@ class ARObstacleController:
             self.finite_state = mode
 
         
-        if any(marker.id in self.obstacles for marker in self.markers) and self.finite_state == 0:
+        if len(self.markers) > 0 and self.finite_state == 0:
 ###########################################################################################################################
 # TODO: filter your detections for the best marker you can see (think about useful metrics here!)
 ###########################################################################################################################
 
 
                 self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
-                self.finite_state = self.obstacles[self.current_obstacle_tag]
-                print("OBSTACLE SEEN")
-                print(self.finite_state)
-                return 
+                if marker.id % 2 == 0:
+		            self.finite_state = 4
+		        else:
+		            self.finite_state = 3
+                
                 
 
             
