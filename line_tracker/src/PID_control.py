@@ -39,14 +39,11 @@ class PIDController:
             self.errors = [0]
         # print "errors: %s"%self.errors
         adjusted = 0 # running total of new command, kp ki and kd add to this
-        if self.kp:
-            adjusted += self.p_control() # do p control
-        if self.ki:
-            adjusted += self.i_control() # do i control
-        if self.kd:
-            adjusted += self.d_control() # do d control
-
-        self.cmds += [adjusted] # add new cmd to list
+        p = self.p_control() # do p control
+        i = self.i_control() # do i control
+        d = self.d_control() # do d control
+        adjusted = p+i+d
+        self.cmds.append( (p,i,d, adjusted) ) # add new cmd to list
         return adjusted
 
     def p_control(self):
