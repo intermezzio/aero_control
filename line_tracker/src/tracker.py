@@ -19,11 +19,11 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = False # set to True to test on laptop
+NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
-K_P_X = 60.0 # TODO: decide upon initial K_P_X
-K_P_Y = 60.0 # TODO: decide upon initial K_P_Y
-K_P_YAW = .5
+# K_P_X = 60.0 # TODO: decide upon initial K_P_X
+# K_P_Y = 60.0 # TODO: decide upon initial K_P_Y
+# K_P_YAW = .25
 num_unit_vecs = 50
 _TIME_STEP = 0.1
 _PTS_AHEAD = 50
@@ -55,8 +55,8 @@ class LineTracker:
 
         # while not rospy.is_shutdown() and self.current_state == None:
         #     pass  # Wait for connection
-
         # create PID controllers
+
         self.controlX = PID(kp=0.75, ki=0, kd=0)
         self.controlY = PID(kp=0.5, ki=0, kd=0)
         self.controlYAW = PID(kp=1, ki=0, kd=0)
@@ -100,8 +100,8 @@ class LineTracker:
 
             x -= img_center_x
             y -= img_center_y
-
             y *= -1
+            
             vx = vx
             vy *= -1
 
@@ -112,13 +112,13 @@ class LineTracker:
             m = vy/vx
             b = y - m*x
 
+            
             if m == 0:
-                m = 0.001
+                m = 0.0000001
+            if m == -1:
+                m = -0.000001
 
-            slopediff = (1+1/m)
-            if slopediff == 0:
-                slopediff = 0.01
-            closeX = -b/slopediff
+            closeX = -b/(1+1/m)
             closeY = m*closeX + b
 
             if vx < 0: # change direction of vector if it's going the wrong way
@@ -152,7 +152,6 @@ class LineTracker:
         cmd_x = self.controlX.adjust(x_err)
         cmd_y = self.controlY.adjust(y_err)
         cmd_yaw = self.controlYAW.adjust(yaw_err)
-	print("hiiiiii")
 
         self.velocity_setpoint.twist.angular.z = cmd_yaw # execute vel commands
 
