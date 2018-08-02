@@ -164,15 +164,6 @@ class ARObstacleController:
             if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
             rospy.loginfo(current_vel)
 
-        # elif td.total_seconds() < t_forward and td.total_seconds() > t_up:
-        #     self.clear_history(z=True)
-        #     # add to vel_hist here!! (insert at zero)
-        #     dist_hurdle_forward = 2
-        #     vel_hurdle_forward = self.local_vel_sp.twist.linear.x = 1
-        #     self.vel_hist[0].insert(0,vel_hurdle_forward)
-        #     if _DEBUG: rospy.loginfo("hurdle avoid: going forward!")
-        #     rospy.loginfo(current_vel)
-
         else:
             self.clear_history(x=True, z=True)
             self.t_obstacle_start = None
@@ -243,7 +234,6 @@ class ARObstacleController:
     def start_streaming_offboard_vel(self):
         def run_streaming():
             self.offboard_vel_streaming = True
-
             while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
         
         # Publish a "don't move" velocity command
