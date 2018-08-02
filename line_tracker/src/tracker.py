@@ -21,9 +21,9 @@ WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
 NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
-K_P_X = 60.0 # TODO: decide upon initial K_P_X
-K_P_Y = 60.0 # TODO: decide upon initial K_P_Y
-K_P_YAW = .5
+# K_P_X = 60.0 # TODO: decide upon initial K_P_X
+# K_P_Y = 60.0 # TODO: decide upon initial K_P_Y
+# K_P_YAW = .25
 num_unit_vecs = 50
 _TIME_STEP = 0.1
 _PTS_AHEAD = 50
@@ -57,9 +57,11 @@ class LineTracker:
         #     pass  # Wait for connection
         # create PID controllers
 
-        self.controlX = PID(kp=0.5)
-        self.controlY = PID(kp=0.5)
-        self.controlYAW = PID(kp=0.5)
+
+        self.controlX = PID(kp=0.5, ki=0, kd=0)
+        self.controlY = PID(kp=0.5, ki=0, kd=0)
+        self.controlYAW = PID(kp=1.0, ki=0, kd=)
+
 
     def line_param_cb(self, line_params):
         global WINDOW_HEIGHT, WINDOW_WIDTH
@@ -100,8 +102,8 @@ class LineTracker:
 
             x -= img_center_x
             y -= img_center_y
-
             y *= -1
+            
             vx = vx
             vy *= -1
 
@@ -115,8 +117,9 @@ class LineTracker:
             
             if m == 0:
                 m = 0.00001
-	    if m == -1:
-		m = -1.1
+            if m == -1:
+                m = -0.0001
+
 
             closeX = -b/(1+1/m)
             closeY = m*closeX + b
@@ -152,7 +155,6 @@ class LineTracker:
         cmd_x = self.controlX.adjust(x_err)
         cmd_y = self.controlY.adjust(y_err)
         cmd_yaw = self.controlYAW.adjust(yaw_err)
-	print("hiiiiii")
 
         self.velocity_setpoint.twist.angular.z = cmd_yaw # execute vel commands
 

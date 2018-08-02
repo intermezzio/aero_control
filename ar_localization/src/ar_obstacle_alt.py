@@ -101,9 +101,9 @@ class ARObstacleController:
 
                 self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
                 if marker.id % 2 == 0:
-                    self.finite_state = 4
-                else:
-                    self.finite_state = 3
+		            self.finite_state = 4
+		        else:
+		            self.finite_state = 3
                 
                 
 
@@ -242,7 +242,7 @@ class ARObstacleController:
         def run_streaming():
             self.offboard_vel_streaming = True
 	    print(self.current_state.mode)
-            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
+            while not rospy.is_shutdown() and self.current_state.mode == 'OFFBOARD':
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
@@ -251,8 +251,7 @@ class ARObstacleController:
                 rospy.Rate(60).sleep()
 
         # Publish at the desired rate
-            while (not rospy.is_shutdown()) and self.offboard_vel_streaming != "OFFBOARD":
-
+            while (not rospy.is_shutdown()) and self.offboard_vel_streaming:
                 self.update_finite_state()
                 vel = TwistStamped()
                 self.generate_vel()
