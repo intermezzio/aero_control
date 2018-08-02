@@ -1,6 +1,6 @@
 import numpy as np
 class PIDController:
-    def __init__(self, kp=1, ki=0.1, kd=0.1, params=dict()):
+    def __init__(self, kp=1, ki=0.0, kd=0.0, params=dict()):
         """
         Create a PID controller!
         kp, ki, and kd are defaulted at 1
@@ -40,15 +40,12 @@ class PIDController:
             self.errors = [0]
         # print "errors: %s"%self.errors
         adjusted = 0 # running total of new command, kp ki and kd add to this
-        if self.kp:
-            p = self.p_control() # do p control
-        if self.ki:
-            i = self.i_control() # do i control
-        if self.kd:
-            d = self.d_control() # do d control
-
-        self.cmds.append( (p,i,d,p+i+d) ) # add new cmd to list
-        return p+i+d
+        p = self.p_control() # do p control
+        i = self.i_control() # do i control
+        d = self.d_control() # do d control
+        adjusted = p+i+d
+        self.cmds.append( (p,i,d, adjusted) ) # add new cmd to list
+        return adjusted
 
     def p_control(self):
         if not self.kp:
