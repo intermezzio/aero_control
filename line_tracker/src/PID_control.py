@@ -1,6 +1,6 @@
 import numpy as np
 class PIDController:
-    def __init__(self, kp=1, ki=0.1, kd=0.1, params=dict()):
+    def __init__(self, kp=1, ki=0.0, kd=0.0, params=dict()):
         """
         Create a PID controller!
         kp, ki, and kd are defaulted at 1
