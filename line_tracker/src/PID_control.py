@@ -57,6 +57,7 @@ class PIDController:
         smoothed = self.smoothCmd(adjusted)
         self.cmds.append( (p,i,d, smoothed) ) # add new cmd to list
         self.iterations += 1
+        print "step: %d cmd: %.2f"%(self.iterations, smoothed)
         return smoothed
 
     def p_control(self):
@@ -122,12 +123,21 @@ class PIDController:
         # calculate the amount of sign changes
         return changes
 
-    def smoothCmd(self, curr, r=0.25, prev=min(self.iterations, 20)):
-        cmds = self.cmds[::-1]
-        newcmd = curr + sum((lambda i,x: x * r ** i)(i,x) for i,x in enumerate(cmds))
+    def smoothCmd(self, curr, r=0.25, prev=None):
+        if prev == None:
+            prev=min(self.iterations, 5)
+        if prev < 5:
+            return curr
+        print "smoothing: r=%f and curr=%f"%(r, curr)
+        cmds = self.cmds[-prev::-1]
+        offset = map(lambda (i,x): (x[-1]) * ( r ** float(i+1)), enumerate(cmds))
+        offsetSum = sum(offset)
+        print "offset: %f"%(offsetSum)
+        newcmd = curr + offsetSum
         # use a geometric series to do the follwoing:
         # cmd + 1/4 * cmd[-1] + 1/16 * cmd[-2] ... etc
         newcmd /= ((1-r**len(cmds)) / (1-r)) # finite geometric seq
+        print "newcmd: %f"%(newcmd)
         return newcmd
 
     def printControl(self):
@@ -144,7 +154,7 @@ if __name__ == "__main__":
         pid.adjust(i - 2.5)
     for i in range(5):
         pid.adjust(2.5 - i)
-
+    '''
     for i in range(5):
         pid.adjust(i - 2.5)
     for i in range(5):
@@ -159,9 +169,9 @@ if __name__ == "__main__":
         pid.adjust(i - 2.5)
     for i in range(5):
         pid.adjust(2.5 - i)
+    '''
+    #log = pid.printControl()
+    #for i, l in enumerate(log):
+    #    print "%d: %s %s"%(i,l[0], l[-1][-1])
 
-    log = pid.printControl()
-    for i, l in enumerate(log):
-        print "%d: %s %s"%(i,l[0], l[-1][-1])
-
-    pid.ziegler_nichols_tuning()
+    # pid.ziegler_nichols_tuning()
