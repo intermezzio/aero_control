@@ -9,9 +9,9 @@ class PIDController:
         that's about it
         """
 
-        self.ki = ki if ki else 0 # initialize ki, kd, and kp
-        self.kd = kd if kd else 0
-        self.kp = kp if kp or (not kd and not ki) else 0
+        self.ki = ki # initialize ki, kd, and kp
+        self.kd = kd
+        self.kp = kp
 
         self.errors = list() # list of past errors
         self.allErr = 0 # sum of all errors
@@ -54,9 +54,10 @@ class PIDController:
         i = self.i_control() # do i control
         d = self.d_control() # do d control
         adjusted = p+i+d
-        self.cmds.append( (p,i,d, adjusted) ) # add new cmd to list
+        smoothed = self.smoothCmd(adjusted)
+        self.cmds.append( (p,i,d, smoothed) ) # add new cmd to list
         self.iterations += 1
-        return adjusted
+        return smoothed
 
     def p_control(self):
         if not self.kp:
@@ -120,6 +121,14 @@ class PIDController:
         changes = len(list(itertools.groupby(x, lambda x: x > 0))) + 1
         # calculate the amount of sign changes
         return changes
+
+    def smoothCmd(self, curr, r=0.25, prev=min(self.iterations, 20)):
+        cmds = self.cmds[::-1]
+        newcmd = curr + sum((lambda i,x: x * r ** i)(i,x) for i,x in enumerate(cmds))
+        # use a geometric series to do the follwoing:
+        # cmd + 1/4 * cmd[-1] + 1/16 * cmd[-2] ... etc
+        newcmd /= ((1-r**len(cmds)) / (1-r)) # finite geometric seq
+        return newcmd
 
     def printControl(self):
         # print len(self.errors)
