@@ -1,1 +1,1 @@
-Vector3 linear z_vel
+float64 z_vel

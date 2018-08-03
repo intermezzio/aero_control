@@ -1,3 +1,3 @@
-Vector3 linear x_vel
-Vector3 linear y_vel
-Vector3 angular yaw_vel
+float64 x_vel
+float64 y_vel
+float64 yaw_vel

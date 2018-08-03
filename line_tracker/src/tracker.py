@@ -194,11 +194,11 @@ class LineTracker:
 
                     # Publish limited setpoint
                     msg = Line_Det()
-                    msg.x_vel = velocity_setpoint.twist.linear.x
-                    msg.y_vel = velocity_setpoint.twist.linear.y
-                    msg.yaw_vel = velocity_setpoint.twist.angular.z
+                    msg.x_vel = self.velocity_setpoint.twist.linear.x
+                    msg.y_vel = self.velocity_setpoint.twist.linear.y
+                    msg.yaw_vel = self.velocity_setpoint.twist.angular.z
 
-                    self.line_vel.publish(msg)
+                    self.line_vel.publish(velocity_setpoint_limited)
 
                     # self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited.twist.angular.z)
                     rospy.loginfo(velocity_setpoint_limited)

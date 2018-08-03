@@ -98,10 +98,13 @@ class ARObstacleController:
         self.current_obstacle_tag = self.current_obstacle_marker.id
         if self.current_obstacle_tag % 2 == 1:
             self.finite_state = 3
-            return
         else:
             self.finite_state = 4
-            return
+        
+	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.25:
+	    if self.finite_state != 1:
+		self.start_state_1 = time.now()
+	    self.finite_state = 1
 
     def get_vel(self):
         global _CLEARANCE
@@ -123,8 +126,15 @@ class ARObstacleController:
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos > -0.75:
                 rospy.loginfo("FLY DOWN")
+
+
+
+
+
         if abs(net_pos) < _THRESH:
             rospy.loginfo("We're in range!")
+	    # record x dist
+	    # change to new finite state
             z_vel = 0
         else:
             z_vel = _K_P_Z * net_pos
@@ -283,9 +293,8 @@ class ARObstacleController:
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
-                msg = Ar_ob()
-                msg.z_vel = vel.twist.linear.z
-                self.local_vel_sp_pub.publish(msg)
+                
+                self.local_vel_sp_pub.publish(vel)
                 self.rate.sleep()
 
         self_offboard_vel_streaming_thread = threading.Thread(target=run_streaming)

@@ -19,6 +19,7 @@ class Integrator:
 
     def ar_cb(self, msg):
         self.ar_vel = msg
+	rospy.loginfo(self.ar_vel.twist.linear.z)
 
     def line_cb(self, msg):
         self.line_vel = msg
@@ -29,6 +30,7 @@ class Integrator:
         vel.twist.linear.y = self.line_vel.twist.linear.y
         vel.twist.linear.z = self.ar_vel.twist.linear.z
         vel.twist.angular.z = self.line_vel.twist.angular.z
+	rospy.loginfo(vel)
         return vel
 
     def start_streaming_offboard_vel(self):
@@ -43,8 +45,8 @@ class Integrator:
 
             # Publish at the desired rate
             while (not rospy.is_shutdown()) and self.offboard_vel_streaming:
-                
-                self.local_vel_sp_pub.publish(self.merge_cmds()) # merge commands and publish
+                vel = self.merge_cmds()
+                self.local_vel_sp_pub.publish(vel) # merge commands and publish
                 self.rate.sleep()
 
         self_offboard_vel_streaming_thread = threading.Thread(target=run_streaming)
