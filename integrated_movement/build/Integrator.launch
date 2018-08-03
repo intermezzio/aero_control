@@ -16,7 +16,7 @@
   <!-- Launch tracker node -->
   <node pkg="aero_control" name="tracker" type="tracker.py"/>
 
-  <node pkg="aero_control" name="Integrator" type="Integrator.py"/>
+  <node pkg="aero_control" name="integrator" type="integrator.py"/>
   
   <!-- Launch mavros -->
   <arg name="fcu_url" default="tcp://127.0.0.1:5760" />

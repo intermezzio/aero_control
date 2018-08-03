@@ -60,6 +60,7 @@ class ARObstacleController:
         self.current_obstacle_seq = 0
 
         self.current_obstacle_tag = None
+        self.current_obstacle_marker = None
         self.t_marker_last_seen = None
         self.t_obstacle_start = None
 
@@ -113,7 +114,10 @@ class ARObstacleController:
 ###########################################################################################################################
 
 
-                self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.z).id
+                self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
+
+                self.current_obstacle_tag = self.current_obstacle_marker.id
+
                 if self.current_obstacle_tag % 2 == 0:
                     self.finite_state = 4
                 else:
@@ -129,11 +133,11 @@ class ARObstacleController:
             return
         elif self.finite_state == 3:
             rospy.logerr("avoiding hurdle")
-            curr_pos = self.current_obstacle_tag.pose.pose.position.z # position of current tag
+            curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
         elif self.finite_state == 4:
             rospy.logerr("avoiding gate")
-            curr_pos = self.current_obstacle_tag.pose.pose.position.z # position of current tag
+            curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
 
         if abs(net_pos) < _THRESH:
