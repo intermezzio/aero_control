@@ -19,7 +19,7 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = False # set to True to test on laptop
+NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 # K_P_X = 60.0 # TODO: decide upon initial K_P_X
 # K_P_Y = 60.0 # TODO: decide upon initial K_P_Y

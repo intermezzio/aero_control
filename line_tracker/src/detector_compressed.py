@@ -1,24 +1,15 @@
 #!/usr/bin/env python
 
-# Python libs
 import sys, time
-# numpy and scipy
 import numpy as np
 from scipy.ndimage import filters
-
-# OpenCV
 import cv2
 from aero_control.msg import Line
 from copy import deepcopy
 from std_msgs.msg import String
 from cv_bridge import CvBridge, CvBridgeError
-
-
-# Ros libraries
 import roslib
 import rospy
-
-# Ros Messages
 from sensor_msgs.msg import CompressedImage, Image 
 
 
@@ -42,7 +33,6 @@ class LineDetector:
 
 
         #### direct conversion to CV2 ####
-        # arr = self.bridge.imgmsg_to_cv2(img,"8UC1")
         np_arr = np.fromstring(img.data, np.uint8)
         d = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
         # d = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
@@ -66,10 +56,6 @@ class LineDetector:
 
             max_contours = max(contours, key = lambda x: cv2.contourArea(x))
 
-            # rows,cols = d.shape[:2]
-            # img_center_x, img_center_y = rows/2, cols/2
-            # p_frame_center = (img_center_x,img_center_y)
-
             [vx,vy,x,y] = cv2.fitLine(max_contours, cv2.DIST_L2,0,0.01,0.01)
 
             lefty = int((-x*vy/vx) + y)
@@ -81,7 +67,6 @@ class LineDetector:
             regression = cv2.line(copy3,pt1,pt2,(0,255,0),2)
             regression = cv2.line(d,pt1,pt2,(0,255,0),2)
 
-
             # TODO-START: return x, y, vx, and vy in that order
             self.image_pub.publish(self.bridge.cv2_to_imgmsg(copy3, "8UC1"))
             self.image_pub.publish(self.bridge.cv2_to_imgmsg(d, "8UC1"))
@@ -89,7 +74,7 @@ class LineDetector:
             return x,y,vx,vy
 
         else:
-            print(d)
+            pass
 
         # TODO-END
 
