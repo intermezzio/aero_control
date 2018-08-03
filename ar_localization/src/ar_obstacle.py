@@ -85,45 +85,23 @@ class ARObstacleController:
 
 
     def update_finite_state(self, mode=0, force=False): # updates current phase of avoidance 
-
         if force:
             self.finite_state = mode
             return
 
+        if len(self.markers) == 0:
+            self.finite_state = 0
+            return
 
-        if self.t_marker_last_seen is not None and self.finite_state < 2:
-            self.td = datetime.now() - self.t_marker_last_seen
-            if self.td.total_seconds() > 1: 
-###########################################################################################################################
-# TODO: Decide which finite state to enter when you've lost the AR tags
-###########################################################################################################################
+        self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
+        self.current_obstacle_tag = self.current_obstacle_marker.id
+        if self.current_obstacle_tag % 2 == 1:
+            self.finite_state = 3
+            return
+        else:
+            self.finite_state = 4
+            return
 
-                mode = 0
-                # raise Exception("Correct the finite state here!")
-
-                self.finite_state = mode
-                return
-
-        if mode == 0:
-            self.finite_state = mode
-
-        
-        if len(self.markers) > 0 and self.finite_state == 0:
-###########################################################################################################################
-# TODO: filter your detections for the best marker you can see (think about useful metrics here!)
-###########################################################################################################################
-
-
-                self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
-
-                self.current_obstacle_tag = self.current_obstacle_marker.id
-
-                if self.current_obstacle_tag % 2 == 0:
-                    self.finite_state = 4
-                else:
-                    self.finite_state = 3
-                
-                
     def get_vel(self):
         global _CLEARANCE
         if self.finite_state == 0:
@@ -136,13 +114,13 @@ class ARObstacleController:
             rospy.logerr("avoiding hurdle")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
-            if curr_pos < 0.75:
+            if -curr_pos < 0.75:
                 rospy.loginfo("FLY UP")
         elif self.finite_state == 4:
             rospy.logerr("avoiding gate")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
-            if curr_pos > -0.75:
+            if -curr_pos > -0.75:
                 rospy.loginfo("FLY DOWN")
         if abs(net_pos) < _THRESH:
             rospy.loginfo("We're in range!")
