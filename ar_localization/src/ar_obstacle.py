@@ -10,21 +10,22 @@ from tf.transformations import *
 from geometry_msgs.msg import Twist, PoseStamped, TwistStamped, PoseArray, Vector3
 from ar_track_alvar_msgs.msg import AlvarMarkers, AlvarMarker
 from std_msgs.msg import String
-from aero_control.msg import Ar_ob
 
 
 
 import mavros
 from mavros_msgs.msg import State
 
-
+_DEFAULT_HEIGHT = 1.0
 _DEBUG = False
 
 _INTEGRATED = True
 
-_K_P_Z = 1
+MAX_SPEED =  0.5# [m/s]
 
-_CLEARANCE = 1
+_K_P_Z = .25
+
+_CLEARANCE = 0.5
 
 _THRESH = 0.25
 
@@ -90,10 +91,6 @@ class ARObstacleController:
             self.finite_state = mode
             return
 
-        if len(self.markers) == 0:
-            self.finite_state = 0
-            return
-
         self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
         self.current_obstacle_tag = self.current_obstacle_marker.id
         if self.current_obstacle_tag % 2 == 1:
@@ -109,18 +106,29 @@ class ARObstacleController:
     def get_vel(self):
         global _CLEARANCE
         if self.finite_state == 0:
-            self.vel_hist[0].insert(0,0.0)
-            self.vel_hist[1].insert(0,0.0)
-            self.vel_hist[2].insert(0,0.0)
-            self.vel_hist[3].insert(0,0.0)
+
+
+            if self.current_obstacle_marker != None and self.current_pose.pose.position.z != 1.0:
+                Error = (1.0 - self.current_pose.pose.position.z)
+                if Error < 0:
+                    amount_down = Error / 2
+                    z_vel = (amount_down)
+                    #Velocity should be negative
+                if Error > 0: 
+                    amount_up = Error / 2
+                    z_vel = (amount_up)
+                    #Velocity should be positiv
+
+
+	        #self.local_vel_sp.twist.linear.z = 0
             return
-        elif self.finite_state == 3:
+        elif self.finite_state == 4:
             rospy.loginfo("avoiding hurdle")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos < 0.75:
                 rospy.loginfo("FLY UP")
-        elif self.finite_state == 4:
+        elif self.finite_state == 3:
             rospy.loginfo("avoiding gate")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
@@ -293,8 +301,11 @@ class ARObstacleController:
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
-                
-                self.local_vel_sp_pub.publish(vel)
+
+                if (vel is not None):
+                    vel.twist.linear.z = min(0.5, vel.twist.linear.z)
+
+                    self.line_vel.publish(vel)
                 self.rate.sleep()
 
         self_offboard_vel_streaming_thread = threading.Thread(target=run_streaming)
