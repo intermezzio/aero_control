@@ -10,6 +10,7 @@ from tf.transformations import *
 from geometry_msgs.msg import Twist, PoseStamped, TwistStamped, PoseArray, Vector3
 from ar_track_alvar_msgs.msg import AlvarMarkers, AlvarMarker
 from std_msgs.msg import String
+from aero_control.msg import Ar_ob
 
 
 
@@ -276,7 +277,6 @@ class ARObstacleController:
             self.vel_hist[3] = [0 for i in self.vel_hist[3]]
 
 
-
 ###########################################################################################################################
 # DO NOT MODIFY BELOW THIS COMMENT
 ###########################################################################################################################
@@ -303,7 +303,9 @@ class ARObstacleController:
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
-                self.local_vel_sp_pub.publish(vel)
+                msg = Ar_ob()
+                msg.z_vel = vel.twist.linear.z
+                self.local_vel_sp_pub.publish(msg)
                 self.rate.sleep()
 
         self_offboard_vel_streaming_thread = threading.Thread(target=run_streaming)

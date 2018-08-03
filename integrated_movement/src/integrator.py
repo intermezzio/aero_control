@@ -6,6 +6,7 @@ from geometry_msgs.msg import Twist, TwistStamped
 import threading
 import mavros
 from mavros_msgs.msg import State
+from aero_control.msg import Line_Det, Ar_ob
 
 class Integrator:
     def __init__(self):
@@ -23,7 +24,7 @@ class Integrator:
 	self.current_state = State()
 
     def state_cb(self,msg):
-	self.current_state = msg
+	    self.current_state = msg
 
     def ar_cb(self, msg): 
         self.ar_vel = msg
@@ -33,10 +34,10 @@ class Integrator:
 
     def merge_cmds(self):
         vel = TwistStamped()
-        vel.twist.linear.x = self.line_vel.twist.linear.x
-        vel.twist.linear.y = self.line_vel.twist.linear.y
-        vel.twist.linear.z = self.ar_vel.twist.linear.z
-        vel.twist.angular.z = self.line_vel.twist.angular.z
+        vel.twist.linear.x = self.line_vel.x_vel
+        vel.twist.linear.y = self.line_vel.y_vel
+        vel.twist.linear.z = self.ar_vel.z_vel
+        vel.twist.angular.z = self.line_vel.yaw_vel
         return vel
 
     def start_streaming_offboard_vel(self):
