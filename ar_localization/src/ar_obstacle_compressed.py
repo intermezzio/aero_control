@@ -5,11 +5,13 @@ import rospy
 import time
 import threading
 import numpy as np
+from sensor_msgs.msg import CompressedImage, Image
 import tf
 from tf.transformations import * 
 from geometry_msgs.msg import Twist, PoseStamped, TwistStamped, PoseArray, Vector3
 from ar_track_alvar_msgs.msg import AlvarMarkers, AlvarMarker
 from std_msgs.msg import String
+import cv2
 
 
 
@@ -19,7 +21,7 @@ from mavros_msgs.msg import State
 
 _DEBUG = False
 
-_INTEGRATED = True
+_INTEGRATED = False
 
 _K_P_Z = 1
 
@@ -31,6 +33,7 @@ class ARObstacleController:
     def __init__(self, hz=60):
         rospy.loginfo("ARObstacleController Started!")
         mavros.set_namespace()
+        self.feed_sub = rospy.Subscriber("/camera/rgb/image_rect_color/compressed", CompressedImage, self.image_cb)
         self.state_sub = rospy.Subscriber("/mavros/state", State, self.state_cb)
         self.local_pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.local_pose_cb)
         self.local_pose_sp_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
@@ -39,6 +42,8 @@ class ARObstacleController:
         else:
             self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
         self.pub_error = rospy.Publisher("/obs_error", Twist, queue_size=1) # set data type to publish to error
+
+        self.ar_vel = rospy.Publisher("/ar_vel", TwistStamped, queue_size=1)
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
@@ -71,6 +76,12 @@ class ARObstacleController:
         self.tl = tf.TransformListener()
 
         # self.z_control = PID()
+
+    def image_cb(self,img):
+        np_arr = np.fromstring(img.data, np.uint8)
+        msg = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+        return msg
+
 
     def state_cb(self, msg):
         self.current_state = msg
@@ -121,7 +132,6 @@ class ARObstacleController:
                 
                 
     def get_vel(self):
-        global _CLEARANCE
         if self.finite_state == 0:
             self.vel_hist[0].insert(0,0.0)
             self.vel_hist[1].insert(0,0.0)
@@ -132,24 +142,25 @@ class ARObstacleController:
             rospy.logerr("avoiding hurdle")
             curr_pos = self.current_obstacle_tag.pose.pose.position.z # position of current tag
             net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
-            if curr_pos < 0.75:
-                rospy.loginfo("FLY UP")
         elif self.finite_state == 4:
             rospy.logerr("avoiding gate")
             curr_pos = self.current_obstacle_tag.pose.pose.position.z # position of current tag
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
-            if curr_pos > -0.75:
-                rospy.loginfo("FLY DOWN")
+
         if abs(net_pos) < _THRESH:
             rospy.loginfo("We're in range!")
             z_vel = 0
         else:
             z_vel = _K_P_Z * net_pos
+        if 0 < net_pos < .75:
+            rospy.loginfo("FLY UP")
+        elif -0.75 < net_pos < 0:
+            rospy.loginfo("FLY_DOWN")
+
 
         if _DEBUG: rospy.loginfo("vel cmd: x: " + "%.05f" % vel.twist.linear.x + " y: " + "%.05f" % vel.twist.linear.y + " z: " + "%.05f" % vel.twist.linear.z + " yaw: " + "%.05f" % vel.twist.angular.z)
 
         self.local_vel_sp.twist.linear.z = z_vel
-        self.vel_hist[2].insert(0,vel_hurdle_up)
         return
 
     def generate_vel(self): # assesses course of action using finite state
@@ -280,11 +291,12 @@ class ARObstacleController:
     def start_streaming_offboard_vel(self):
         def run_streaming():
             self.offboard_vel_streaming = True
-            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
+            while not rospy.is_shutdown() and self.current_state.mode == 'OFFBOARD':
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
-                self.local_vel_sp_pub.publish(velocity_message)
+                #self.local_vel_sp_pub.publish(velocity_message)
+                self.ar_vel.publish(velocity_message)
                 rospy.loginfo('Waiting to enter offboard mode')
                 rospy.Rate(60).sleep()
 
@@ -299,7 +311,8 @@ class ARObstacleController:
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
-                self.local_vel_sp_pub.publish(vel)
+                #self.local_vel_sp_pub.publish(vel)
+                self.ar_vel.publish(vel)
                 self.rate.sleep()
 
         self_offboard_vel_streaming_thread = threading.Thread(target=run_streaming)
