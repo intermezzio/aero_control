@@ -19,6 +19,14 @@ from mavros_msgs.msg import State
 
 _DEBUG = False
 
+_INTEGRATED = True
+
+_K_P_Z = 1
+
+_CLEARANCE = 1
+
+_THRESH = 0.25
+
 class ARObstacleController:
     def __init__(self, hz=60):
         rospy.loginfo("ARObstacleController Started!")
@@ -26,7 +34,10 @@ class ARObstacleController:
         self.state_sub = rospy.Subscriber("/mavros/state", State, self.state_cb)
         self.local_pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.local_pose_cb)
         self.local_pose_sp_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
-        #self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
+        if _INTEGRATED:
+            self.local_vel_sp_pub = rospy.Publisher("/ar_vel", TwistStamped, queue_size=1)
+        else:
+            self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
         self.pub_error = rospy.Publisher("/obs_error", Twist, queue_size=1) # set data type to publish to error
 
         self.ar_vel = rospy.Publisher("/ar_vel", TwistStamped, queue_size=1)
@@ -60,6 +71,8 @@ class ARObstacleController:
         self.offboard_vel_streaming = False
 
         self.tl = tf.TransformListener()
+
+        # self.z_control = PID()
 
     def state_cb(self, msg):
         self.current_state = msg
@@ -102,15 +115,45 @@ class ARObstacleController:
 ###########################################################################################################################
 
 
-                self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
+                self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.z).id
                 if self.current_obstacle_tag % 2 == 0:
                     self.finite_state = 4
                 else:
                     self.finite_state = 3
                 
                 
+    def get_vel(self):
+        if self.finite_state == 0:
+            self.vel_hist[0].insert(0,0.0)
+            self.vel_hist[1].insert(0,0.0)
+            self.vel_hist[2].insert(0,0.0)
+            self.vel_hist[3].insert(0,0.0)
+            return
+        elif self.finite_state == 3:
+            rospy.logerr("avoiding hurdle")
+            curr_pos = self.current_obstacle_tag.pose.pose.position.z # position of current tag
+            net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
+        elif self.finite_state == 4:
+            rospy.logerr("avoiding gate")
+            curr_pos = self.current_obstacle_tag.pose.pose.position.z # position of current tag
+            net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
 
-            
+        if abs(net_pos) < _THRESH:
+            rospy.loginfo("We're in range!")
+            z_vel = 0
+        else:
+            z_vel = _K_P_Z * net_pos
+        if 0 < net_pos < .75:
+            rospy.loginfo("FLY UP")
+        elif -0.75 < net_pos < 0:
+            rospy.loginfo("FLY_DOWN")
+
+
+        if _DEBUG: rospy.loginfo("vel cmd: x: " + "%.05f" % vel.twist.linear.x + " y: " + "%.05f" % vel.twist.linear.y + " z: " + "%.05f" % vel.twist.linear.z + " yaw: " + "%.05f" % vel.twist.angular.z)
+
+        self.local_vel_sp.twist.linear.z = z_vel
+        return
+
     def generate_vel(self): # assesses course of action using finite state
 
         if self.finite_state == 0:
@@ -153,6 +196,7 @@ class ARObstacleController:
 ###########################################################################################################################
 # TODO: decide how long / at what vel to go up/forward to avoid hurdle
 ###########################################################################################################################
+        dist_above = 1 # target 1m above hurdle
         t_up = 1
         t_end = time.time() + t_up
         #t_forward = 1.5
@@ -252,7 +296,7 @@ class ARObstacleController:
 
                 self.update_finite_state()
                 vel = TwistStamped()
-                self.generate_vel()
+                self.get_vel()
             # create a vel setpoint based on 1the vel setpoint member variable
                 vel = self.local_vel_sp
            
