@@ -1,6 +1,8 @@
-import numpy as np
+import itertools
 class PIDController:
-    def __init__(self, kp=1, ki=0.0, kd=0.0, params=dict()):
+    freq = .1
+    osc_period = 1
+    def __init__(self, kp=1, ki=0.0, kd=0.0, group=5, timeStep=None):
         """
         Create a PID controller!
         kp, ki, and kd are defaulted at 1
@@ -16,7 +18,16 @@ class PIDController:
 
         self.cmds = list() # list of past commands
 
-        self.derivAvg = 5
+        self.derivAvg = group
+        if timeStep != None:
+            PIDController.freq = timeStep
+        self.iterations = 0
+
+        self.tuneStatus = 0 # how far it's tuned:
+        # 0: no p, i, or d
+        # 1: p only
+        # 2: p, i
+        # 3: p, i, d
         return
 
     def __add__(self, error): # add error with + sign
@@ -44,6 +55,7 @@ class PIDController:
         d = self.d_control() # do d control
         adjusted = p+i+d
         self.cmds.append( (p,i,d, adjusted) ) # add new cmd to list
+        self.iterations += 1
         return adjusted
 
     def p_control(self):
@@ -59,7 +71,7 @@ class PIDController:
             return 0 # can't integrate empty lists
         # check for saturation
         error = self.errors[-1]
-        self.allErr += error
+        self.allErr += error * freq
         newcmd = self.allErr * self.ki # multiply sum by ki
         return newcmd
 
@@ -75,6 +87,40 @@ class PIDController:
         newcmd = -slope * self.kd
         return newcmd
 
+    def ziegler_nichols_tuning(self):
+        print "Open znt"
+        if self.iterations < 20 or self.iterations * PIDController.freq < 2:
+            print "--skip"
+            return
+        print "Starting tuning session"
+        if self.tuneStatus == 0: # if tuning p
+            print "Tuning Kp, Kp = %f"%self.kp
+            # calculate time to recover
+            recoveries = self.recoverTime()
+            # if time is too large increase p
+
+        elif self.tuneStatus == 1:
+            print "Tuning Ki, Ki = %f"%self.ki
+            oscills = oscillations() # count oscillations to see if converging
+            #if oscills
+        return
+
+    def recoverTime(self):
+        errors = self.errors
+        recoveries = list(itertools.groupby(errors, lambda x: x > 0))
+        print len(recoveries)
+        print len(list(recoveries[0][1]))
+        #lengths = [sum(i for i in x[1]) for x in recoveries]
+        #print lengths
+        return
+
+    def oscillations(self, prev=20):
+        # calculate sign changes in the last few elements
+        testdata = self.errors[-prev:] # prev data to test for patterns
+        changes = len(list(itertools.groupby(x, lambda x: x > 0))) + 1
+        # calculate the amount of sign changes
+        return changes
+
     def printControl(self):
         # print len(self.errors)
         # print len(self.cmds)
@@ -82,9 +128,31 @@ class PIDController:
 
 
 if __name__ == "__main__":
-    pid = PIDController(kp=0.5, kd = 0.5)
+    pid = PIDController(kp=0.5, ki=0, kd=0)
     # print "\n\n\nwow\n\n\n" if pid else "\n\n\rfalsse\n\n\n"
     # print pid.errors
-    for i in range(10):
-        pid.adjust(i - 3.)
-    print pid.printControl()
+    for i in range(5):
+        pid.adjust(i - 2.5)
+    for i in range(5):
+        pid.adjust(2.5 - i)
+
+    for i in range(5):
+        pid.adjust(i - 2.5)
+    for i in range(5):
+        pid.adjust(2.5 - i)
+
+    for i in range(5):
+        pid.adjust(i - 2.5)
+    for i in range(5):
+        pid.adjust(2.5 - i)
+
+    for i in range(5):
+        pid.adjust(i - 2.5)
+    for i in range(5):
+        pid.adjust(2.5 - i)
+
+    log = pid.printControl()
+    for i, l in enumerate(log):
+        print "%d: %s %s"%(i,l[0], l[-1][-1])
+
+    pid.ziegler_nichols_tuning()
