@@ -286,7 +286,7 @@ class ARObstacleController:
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
-                #self.local_vel_sp_pub.publish(velocity_message)
+                self.local_vel_sp_pub.publish(velocity_message)
                 self.ar_vel.publish(velocity_message)
                 rospy.loginfo('Waiting to enter offboard mode')
                 rospy.Rate(60).sleep()
@@ -302,7 +302,7 @@ class ARObstacleController:
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
-                #self.local_vel_sp_pub.publish(vel)
+                self.local_vel_sp_pub.publish(vel)
                 self.ar_vel.publish(vel)
                 self.rate.sleep()
 
