@@ -90,25 +90,25 @@ class ARObstacleController:
         if force:
             self.finite_state = mode
             return
+        if self.current_obstacle_marker == None:
+            self.finite_state = 0
 
         self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
         self.current_obstacle_tag = self.current_obstacle_marker.id
         if self.current_obstacle_tag % 2 == 1:
-            self.finite_state = 3
-        else:
             self.finite_state = 4
+        else:
+            self.finite_state = 3
         
-	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.25:
-	    if self.finite_state != 1:
-		self.start_state_1 = time.now()
-	    self.finite_state = 1
+    	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.25:
+    	    if self.finite_state != 1:
+    		self.start_state_1 = time.now()
+    	    self.finite_state = 1
 
     def get_vel(self):
         global _CLEARANCE
         if self.finite_state == 0:
-
-
-            if self.current_obstacle_marker != None and self.current_pose.pose.position.z != 1.0:
+            if self.current_pose.pose.position.z != 1.0:
                 Error = (1.0 - self.current_pose.pose.position.z)
                 if Error < 0:
                     amount_down = Error / 2
@@ -117,10 +117,7 @@ class ARObstacleController:
                 if Error > 0: 
                     amount_up = Error / 2
                     z_vel = (amount_up)
-                    #Velocity should be positiv
-
-
-	        #self.local_vel_sp.twist.linear.z = 0
+                    #Velocity should be positive
             return
         elif self.finite_state == 4:
             rospy.loginfo("avoiding hurdle")
@@ -134,10 +131,6 @@ class ARObstacleController:
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos > -0.75:
                 rospy.loginfo("FLY DOWN")
-
-
-
-
 
         if abs(net_pos) < _THRESH:
             rospy.loginfo("We're in range!")
@@ -154,89 +147,6 @@ class ARObstacleController:
         self.local_vel_sp.twist.linear.z = z_vel
         self.vel_hist[2].insert(0,z_vel)
         return
-
-    def generate_vel(self): # assesses course of action using finite state
-
-        if self.finite_state == 0:
-###########################################################################################################################
-# TODO: fill in velocity commands for finite state 0
-###########################################################################################################################
-
-            self.vel_hist[0].insert(0,0.0)
-            self.vel_hist[1].insert(0,0.0)
-            self.vel_hist[2].insert(0,0.0)
-            self.vel_hist[3].insert(0,0.0)
-
-        elif self.finite_state == 3:
-            rospy.logerr("avoiding hurdle")
-            #self.current_obstacle_tag = 20
-            if self.t_obstacle_start == None:
-                self.clear_history(wipe=True) 
-                self.t_obstacle_start = datetime.now()
-
-            self.avoid_hurdle()
-
-        elif self.finite_state == 4:
-            #self.current_obstacle_tag = 9
-            rospy.logerr("avoiding gate")
-            if self.t_obstacle_start == None:
-                self.clear_history(wipe=True) 
-                self.t_obstacle_start = datetime.now()
-            self.avoid_gate()
-
-        self.smooth_vel()
-
-        vel = self.local_vel_sp
-
-        if _DEBUG: rospy.loginfo("vel cmd: x: " + "%.05f" % vel.twist.linear.x + " y: " + "%.05f" % vel.twist.linear.y + " z: " + "%.05f" % vel.twist.linear.z + " yaw: " + "%.05f" % vel.twist.angular.z)
-
-
-    def avoid_hurdle(self): # commands vel such that hurdle can be avoided open-loop
-        
-
-###########################################################################################################################
-# TODO: decide how long / at what vel to go up/forward to avoid hurdle
-###########################################################################################################################
-        dist_above = 1 # target 1m above hurdle
-        t_up = 1
-        t_end = time.time() + t_up
-        #t_forward = 1.5
-
-        # raise Exception("hurdle avoid times!")
-        if time.time() < t_end:
-            # add to vel_hist here!! (insert at zero)
-            dist_hurdle_up = 0.5
-            vel_hurdle_up = self.local_vel_sp.twist.linear.z = dist_hurdle_up/t_up
-            self.vel_hist[2].insert(0,vel_hurdle_up)
-            if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
-            #print(td.total_seconds())
-
-        else:
-            self.clear_history(x=True, z=True)
-            self.t_obstacle_start = None
-            self.update_finite_state(force=True)
-
-    def avoid_gate(self): # commands vel such that gate can be avoided open-loop
-
-###########################################################################################################################
-# TODO: decide how long / at what vel to go down/forward to avoid gate
-###########################################################################################################################
-        t_down = 1
-        t_end = time.time() + t_down
-
-        if time.time() < t_end:
-            # add to vel_hist here (insert at zero)
-            dist_gate_down = -0.5
-            vel_gate_down = self.local_vel_sp.twist.linear.z = -dist_gate_down/t_down
-            self.vel_hist[2].insert(0,vel_gate_down)            
-            if _DEBUG: rospy.loginfo("gate avoid: going down!")
-            #rospy.loginfo(current_vel)
-            #print(td.total_seconds())
-        else:
-            self.clear_history(x=True, z=True)
-            self.t_obstacle_start = None
-            self.update_finite_state(force=True)
-
 
     def smooth_vel(self): # running average to produce smoother movements 
         for i in range(len(self.vel_hist)-1):
