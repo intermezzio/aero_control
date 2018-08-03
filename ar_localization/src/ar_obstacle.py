@@ -111,13 +111,13 @@ class ARObstacleController:
             self.vel_hist[3].insert(0,0.0)
             return
         elif self.finite_state == 3:
-            rospy.logerr("avoiding hurdle")
+            rospy.loginfo("avoiding hurdle")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos < 0.75:
                 rospy.loginfo("FLY UP")
         elif self.finite_state == 4:
-            rospy.logerr("avoiding gate")
+            rospy.loginfo("avoiding gate")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos > -0.75:
@@ -262,7 +262,7 @@ class ARObstacleController:
     def start_streaming_offboard_vel(self):
         def run_streaming():
             self.offboard_vel_streaming = True
-            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
+            while (not rospy.is_shutdown()) and self.current_state.mode != 'OFFBOARD':
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
@@ -271,7 +271,7 @@ class ARObstacleController:
                 rospy.Rate(60).sleep()
 
         # Publish at the desired rate
-            while (not rospy.is_shutdown()) and self.offboard_vel_streaming == "OFFBOARD":
+            while (not rospy.is_shutdown()) and self.offboard_vel_streaming:
 
                 self.update_finite_state()
                 vel = TwistStamped()
