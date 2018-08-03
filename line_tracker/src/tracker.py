@@ -8,7 +8,7 @@ import numpy as np
 from geometry_msgs.msg import TwistStamped, PoseStamped, Quaternion, Point, Vector3
 from sensor_msgs.msg import Image
 from tf.transformations import quaternion_from_euler, quaternion_matrix
-from aero_control.msg import Line, Line_Det
+from aero_control.msg import Line
 import cv2
 import mavros
 from mavros_msgs.msg import State
@@ -193,10 +193,6 @@ class LineTracker:
                         velocity_setpoint_limited.twist.linear.z *= MAX_SPEED / speed
 
                     # Publish limited setpoint
-                    msg = Line_Det()
-                    msg.x_vel = self.velocity_setpoint.twist.linear.x
-                    msg.y_vel = self.velocity_setpoint.twist.linear.y
-                    msg.yaw_vel = self.velocity_setpoint.twist.angular.z
 
                     self.line_vel.publish(velocity_setpoint_limited)
 

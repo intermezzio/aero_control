@@ -10,7 +10,6 @@ from tf.transformations import *
 from geometry_msgs.msg import Twist, PoseStamped, TwistStamped, PoseArray, Vector3
 from ar_track_alvar_msgs.msg import AlvarMarkers, AlvarMarker
 from std_msgs.msg import String
-from aero_control.msg import Ar_ob
 
 
 
