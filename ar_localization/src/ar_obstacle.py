@@ -108,8 +108,8 @@ class ARObstacleController:
     def get_vel(self):
         global _CLEARANCE
         if self.finite_state == 0:
-            if self.current_pose.pose.position.z != 1.0:
-                Error = (1.0 - self.current_pose.pose.position.z)
+            if self.current_pose.pose.position.z != _DEFAULT_HEIGHT:
+                Error = (_DEFAULT_HEIGHT - self.current_pose.pose.position.z)
                 if Error < 0:
                     amount_down = Error / 2
                     z_vel = (amount_down)
