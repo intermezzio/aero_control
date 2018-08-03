@@ -10,6 +10,7 @@ from tf.transformations import *
 from geometry_msgs.msg import Twist, PoseStamped, TwistStamped, PoseArray, Vector3
 from ar_track_alvar_msgs.msg import AlvarMarkers, AlvarMarker
 from std_msgs.msg import String
+from aero_control.msg import Ar_ob
 
 
 
@@ -97,10 +98,13 @@ class ARObstacleController:
         self.current_obstacle_tag = self.current_obstacle_marker.id
         if self.current_obstacle_tag % 2 == 1:
             self.finite_state = 3
-            return
         else:
             self.finite_state = 4
-            return
+        
+	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.25:
+	    if self.finite_state != 1:
+		self.start_state_1 = time.now()
+	    self.finite_state = 1
 
     def get_vel(self):
         global _CLEARANCE
@@ -122,8 +126,15 @@ class ARObstacleController:
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos > -0.75:
                 rospy.loginfo("FLY DOWN")
+
+
+
+
+
         if abs(net_pos) < _THRESH:
             rospy.loginfo("We're in range!")
+	    # record x dist
+	    # change to new finite state
             z_vel = 0
         else:
             z_vel = _K_P_Z * net_pos
@@ -256,7 +267,6 @@ class ARObstacleController:
             self.vel_hist[3] = [0 for i in self.vel_hist[3]]
 
 
-
 ###########################################################################################################################
 # DO NOT MODIFY BELOW THIS COMMENT
 ###########################################################################################################################
@@ -283,6 +293,7 @@ class ARObstacleController:
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
+                
                 self.local_vel_sp_pub.publish(vel)
                 self.rate.sleep()
 

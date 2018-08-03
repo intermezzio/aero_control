@@ -51,7 +51,6 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
     FILES
     Line.msg
-    Stretch2_Trans.msg
  )
 
 ## Generate services in the 'srv' folder

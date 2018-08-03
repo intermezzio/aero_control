@@ -6,6 +6,7 @@ from geometry_msgs.msg import Twist, TwistStamped
 import threading
 import mavros
 from mavros_msgs.msg import State
+from aero_control.msg import Line_Det, Ar_ob
 
 class Integrator:
     def __init__(self):
@@ -15,13 +16,14 @@ class Integrator:
         self.ar_vel = None
         self.line_vel = None
 
-        self.state_sub = rospy.Subscriber("/mavros/State", State, self.state_cb)
+        self.state_sub = rospy.Subscriber("/mavros/state", State, self.state_cb)
 
         self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size = 1)
         self.obst_cmds = rospy.Subscriber("/ar_vel", TwistStamped, self.ar_cb)
         self.line_cmds = rospy.Subscriber("/line_vel", TwistStamped, self.line_cb)
         self.current_state = State()
 
+	self.rate = rospy.Rate(60)
     def state_cb(self,msg):
         self.current_state = msg
 
@@ -33,10 +35,13 @@ class Integrator:
 
     def merge_cmds(self):
         vel = TwistStamped()
-        vel.twist.linear.x = self.line_vel.twist.linear.x
-        vel.twist.linear.y = self.line_vel.twist.linear.y
-        vel.twist.linear.z = self.ar_vel.twist.linear.z
-        vel.twist.angular.z = self.line_vel.twist.angular.z
+        if self.line_vel is not None:
+		vel.twist.linear.x = self.line_vel.twist.linear.x
+        	vel.twist.linear.y = self.line_vel.twist.linear.y
+              	vel.twist.angular.z = self.line_vel.twist.angular.z
+        if self.ar_vel is not None:
+                vel.twist.linear.z = self.ar_vel.twist.linear.z
+
         return vel
 
     def start_streaming_offboard_vel(self):
