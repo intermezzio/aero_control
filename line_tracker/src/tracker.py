@@ -55,9 +55,9 @@ class LineTracker:
         # create PID controllers
 
 
-        self.controlX = PID(kp=0.5, ki=0, kd=0)
-        self.controlY = PID(kp=0.5, ki=0, kd=0)
-        self.controlYAW = PID(kp=1.0, ki=0, kd=0)
+        self.controlX = PID(kp=0.75, ki=0, kd=0)
+        self.controlY = PID(kp=1.0, ki=0, kd=0.2)
+        self.controlYAW = PID(kp=1.25, ki=0, kd=0.3)
 
 
     def line_param_cb(self, line_params):

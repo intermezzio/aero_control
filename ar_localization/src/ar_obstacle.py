@@ -22,9 +22,9 @@ _DEBUG = False
 
 _INTEGRATED = True
 
-_K_P_Z = 1
+_K_P_Z = .25
 
-_CLEARANCE = 1
+_CLEARANCE = 0.5
 
 _THRESH = 0.25
 
@@ -113,14 +113,15 @@ class ARObstacleController:
             self.vel_hist[1].insert(0,0.0)
             self.vel_hist[2].insert(0,0.0)
             self.vel_hist[3].insert(0,0.0)
+	    self.local_vel_sp.twist.linear.z = 0
             return
-        elif self.finite_state == 3:
+        elif self.finite_state == 4:
             rospy.loginfo("avoiding hurdle")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos < 0.75:
                 rospy.loginfo("FLY UP")
-        elif self.finite_state == 4:
+        elif self.finite_state == 3:
             rospy.loginfo("avoiding gate")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
