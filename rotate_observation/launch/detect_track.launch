@@ -1,0 +1,33 @@
+<!-- Line Tracker: Launch file for mavros, detector, and tracker-->
+<launch>
+
+  <!-- Set Mavros reference frame -->
+  <node pkg="rosservice" type="rosservice" name="global_loc" args="call --wait /mavros/setpoint_velocity/mav_frame 8"/>
+
+  <!-- Launch mavros -->
+  <arg name="fcu_url" default="tcp://127.0.0.1:5760" />
+  <arg name="gcs_url" default="" />
+  <arg name="tgt_system" default="1" />
+  <arg name="tgt_component" default="1" />
+  <arg name="log_output" default="screen" />
+  <arg name="fcu_protocol" default="v2.0" />
+  <arg name="respawn_mavros" default="false" />
+
+  <include file="$(find mavros)/launch/node.launch">
+          <arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+          <arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+          <arg name="fcu_url" value="$(arg fcu_url)" />
+          <arg name="gcs_url" value="$(arg gcs_url)" />
+          <arg name="tgt_system" value="$(arg tgt_system)" />
+          <arg name="tgt_component" value="$(arg tgt_component)" />
+          <arg name="log_output" value="$(arg log_output)" />
+          <arg name="fcu_protocol" value="$(arg fcu_protocol)" />
+          <arg name="respawn_mavros" default="$(arg respawn_mavros)" />
+  </include>
+
+  <!-- Launch detector node -->
+  <node pkg="aero_control" name="detector" type="detector.py"/>
+
+  <!-- Launch tracker node -->
+  <node pkg="aero_control" name="tracker" type="tracker.py"/>
+</launch>

@@ -19,7 +19,7 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = False # set to True to test on laptop
+NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 num_unit_vecs = 50
 _TIME_STEP = 0.1
@@ -55,9 +55,9 @@ class LineTracker:
         # create PID controllers
 
 
-        self.controlX = PID(kp=0.75, ki=0, kd=0)
-        self.controlY = PID(kp=1.0, ki=0, kd=0.2)
-        self.controlYAW = PID(kp=1.25, ki=0, kd=0.3)
+        self.controlX = PID(kp=0.5, ki=0, kd=0)
+        self.controlY = PID(kp=0.5, ki=0, kd=0)
+        # self.controlYAW = PID(kp=1.0, ki=0, kd=0)
 
 
     def line_param_cb(self, line_params):
@@ -128,7 +128,7 @@ class LineTracker:
             extX = closeX + num_unit_vecs * vx # new target x coord
             extY = closeY + num_unit_vecs * vy # new target y coord
 
-            yaw_error = -np.arctan(vy/vx) # yaw angle error
+            # yaw_error = -np.arctan(vy/vx) # yaw angle error
 
             x_error = x - extX
             y_error = y - extY
@@ -136,7 +136,7 @@ class LineTracker:
             self.pub_error.publish(Vector3(x_error,y_error,0))
 
 
-            self.control(x_error,y_error,yaw_error)
+            self.control(x_error,y_error)
 
         # return x_err, y_err
 
@@ -145,16 +145,14 @@ class LineTracker:
         self.__v += acc_cmd*dt
         self.__x += self.__v*dt
 
-    def control(self,x_err,y_err,yaw_err):
+    def control(self,x_err,y_err):
         self.velocity_setpoint = TwistStamped() # create p controlled commands
 
 
         cmd_x = self.controlX.adjust(x_err)
         cmd_y = self.controlY.adjust(y_err)
-        cmd_yaw = self.controlYAW.adjust(yaw_err)
 
-        self.velocity_setpoint.twist.angular.z = cmd_yaw # execute vel commands
-
+        # execute vel commands
         self.velocity_setpoint.twist.linear.x = cmd_x
         self.velocity_setpoint.twist.linear.y = cmd_y
         self.velocity_setpoint.twist.linear.z = 0
@@ -185,15 +183,15 @@ class LineTracker:
                     # limit speed for safety
                     velocity_setpoint_limited = deepcopy(self.velocity_setpoint)
                     speed = np.linalg.norm([velocity_setpoint_limited.twist.linear.x,
-                                            velocity_setpoint_limited.twist.linear.y])
+                                            velocity_setpoint_limited.twist.linear.y,
+                                            velocity_setpoint_limited.twist.linear.z])
                     if speed > MAX_SPEED:
                         velocity_setpoint_limited.twist.linear.x *= MAX_SPEED / speed
                         velocity_setpoint_limited.twist.linear.y *= MAX_SPEED / speed
+                        velocity_setpoint_limited.twist.linear.z *= MAX_SPEED / speed
 
                     # Publish limited setpoint
-
                     self.line_vel.publish(velocity_setpoint_limited)
-
                     # self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited.twist.angular.z)
                     rospy.loginfo(velocity_setpoint_limited)
                 self.rate.sleep()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from datetime import datetime
+import time
 import rospy
 import time
 import threading
@@ -15,8 +16,18 @@ from std_msgs.msg import String
 import mavros
 from mavros_msgs.msg import State
 
-
+_DEFAULT_HEIGHT = 1.0
 _DEBUG = False
+
+_INTEGRATED = True
+
+MAX_SPEED =  0.5# [m/s]
+
+_K_P_Z = .25
+
+_CLEARANCE = 0.5
+
+_THRESH = 0.5
 
 class ARObstacleController:
     def __init__(self, hz=60):
@@ -25,10 +36,11 @@ class ARObstacleController:
         self.state_sub = rospy.Subscriber("/mavros/state", State, self.state_cb)
         self.local_pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.local_pose_cb)
         self.local_pose_sp_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
-        self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
+        if _INTEGRATED:
+            self.local_vel_sp_pub = rospy.Publisher("/ar_vel", TwistStamped, queue_size=1)
+        else:
+            self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
         self.pub_error = rospy.Publisher("/obs_error", Twist, queue_size=1) # set data type to publish to error
-
-        #self.ar_vel = rospy.Publisher("/ar_vel", TwistStamped, queue_size=1)
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
@@ -50,6 +62,7 @@ class ARObstacleController:
         self.current_obstacle_seq = 0
 
         self.current_obstacle_tag = None
+        self.current_obstacle_marker = None
         self.t_marker_last_seen = None
         self.t_obstacle_start = None
 
@@ -59,6 +72,8 @@ class ARObstacleController:
         self.offboard_vel_streaming = False
 
         self.tl = tf.TransformListener()
+
+        # self.z_control = PID()
 
     def state_cb(self, msg):
         self.current_state = msg
@@ -72,122 +87,67 @@ class ARObstacleController:
 
 
     def update_finite_state(self, mode=0, force=False): # updates current phase of avoidance 
-
         if force:
             self.finite_state = mode
             return
+        if self.current_obstacle_marker == None:
+            self.finite_state = 0
 
-
-        if self.t_marker_last_seen is not None and self.finite_state < 2:
-            self.td = datetime.now() - self.t_marker_last_seen
-            if self.td.total_seconds() > 1: 
-###########################################################################################################################
-# TODO: Decide which finite state to enter when you've lost the AR tags
-###########################################################################################################################
-
-                mode = 0
-                # raise Exception("Correct the finite state here!")
-
-                self.finite_state = mode
-                return
-
-        if mode == 0:
-            self.finite_state = mode
-
+        self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
+        self.current_obstacle_tag = self.current_obstacle_marker.id
+        if current_obstacle_marker.pose.pose.position.x < 0.5:
+            if self.current_obstacle_tag % 2 == 1: 
+                self.finite_state = 4
+            else:
+                self.finite_state = 3
         
-        if len(self.markers) > 0 and self.finite_state == 0:
-###########################################################################################################################
-# TODO: filter your detections for the best marker you can see (think about useful metrics here!)
-###########################################################################################################################
+    	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.5:
+    	    if self.finite_state != 1:
+    		self.start_state_1 = time.now()
+    	    self.finite_state = 1
 
-
-                self.current_obstacle_tag = min(self.markers, key=lambda marker: marker.pose.pose.position.x).id
-                if marker.id % 2 == 0:
-                    self.finite_state = 4
-                else:
-                    self.finite_state = 3
-                
-                
-
-            
-    def generate_vel(self): # assesses course of action using finite state
-
+    def get_vel(self):
+        global _CLEARANCE
         if self.finite_state == 0:
-###########################################################################################################################
-# TODO: fill in velocity commands for finite state 0
-###########################################################################################################################
-
-            self.vel_hist[0].insert(0,0.0)
-            self.vel_hist[1].insert(0,0.0)
-            self.vel_hist[2].insert(0,0.0)
-            self.vel_hist[3].insert(0,0.0)
-
-        elif self.finite_state == 3:
-            rospy.logerr("avoiding hurdle")
-            #self.current_obstacle_tag = 20
-            if self.t_obstacle_start == None:
-                self.clear_history(wipe=True) 
-                self.t_obstacle_start = datetime.now()
-
-            self.avoid_hurdle()
-
+            if self.current_pose.pose.position.z != _DEFAULT_HEIGHT:
+                Error = (_DEFAULT_HEIGHT - self.current_pose.pose.position.z)
+                if Error < 0:
+                    amount_down = Error / 2
+                    z_vel = (amount_down)
+                    #Velocity should be negative
+                if Error > 0: 
+                    amount_up = Error / 2
+                    z_vel = (amount_up)
+                    #Velocity should be positive
+            return
         elif self.finite_state == 4:
-            #self.current_obstacle_tag = 9
-            rospy.logerr("avoiding gate")
-            if self.t_obstacle_start == None:
-                self.clear_history(wipe=True) 
-                self.t_obstacle_start = datetime.now()
-            self.avoid_gate()
+            rospy.loginfo("avoiding hurdle")
+            curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
+            net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
+            if -curr_pos < 0.75:
+                rospy.loginfo("FLY UP")
+        elif self.finite_state == 3:
+            rospy.loginfo("avoiding gate")
+            curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
+            net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
+            if -curr_pos > -0.75:
+                rospy.loginfo("FLY DOWN")
 
-        self.smooth_vel()
-
-        vel = self.local_vel_sp
+        if abs(net_pos) < _THRESH:
+            rospy.loginfo("We're in range!")
+	    # record x dist
+	    # change to new finite state
+            z_vel = 0
+        else:
+            z_vel = _K_P_Z * net_pos
 
         if _DEBUG: rospy.loginfo("vel cmd: x: " + "%.05f" % vel.twist.linear.x + " y: " + "%.05f" % vel.twist.linear.y + " z: " + "%.05f" % vel.twist.linear.z + " yaw: " + "%.05f" % vel.twist.angular.z)
 
+        self.local_vel_sp = TwistStamped()
 
-    def avoid_hurdle(self): # commands vel such that hurdle can be avoided open-loop
-        td = datetime.now()-self.t_obstacle_start
-
-###########################################################################################################################
-# TODO: decide how long / at what vel to go up/forward to avoid hurdle
-###########################################################################################################################
-        t_up = 1
-        #t_forward = 1.5
-
-        # raise Exception("hurdle avoid times!")
-        if td.total_seconds() < t_up:
-            # add to vel_hist here!! (insert at zero)
-            dist_hurdle_up = 0.5
-            vel_hurdle_up = self.local_vel_sp.twist.linear.z = dist_hurdle_up/t_up
-            self.vel_hist[2].insert(0,vel_hurdle_up)
-            if _DEBUG: rospy.loginfo("hurdle avoid: going up!")
-            rospy.loginfo(current_vel)
-
-        else:
-            self.clear_history(x=True, z=True)
-            self.t_obstacle_start = None
-            self.update_finite_state(force=True)
-
-    def avoid_gate(self): # commands vel such that gate can be avoided open-loop
-        td = datetime.now()-self.t_obstacle_start
-
-###########################################################################################################################
-# TODO: decide how long / at what vel to go down/forward to avoid gate
-###########################################################################################################################
-        t_down = 1
-        if td.total_seconds() < t_down:
-            # add to vel_hist here (insert at zero)
-            dist_gate_down = -0.5
-            vel_gate_down = self.local_vel_sp.twist.linear.z = -dist_gate_down/t_down
-            self.vel_hist[2].insert(0,vel_gate_down)            
-            if _DEBUG: rospy.loginfo("gate avoid: going down!")
-            rospy.loginfo(current_vel)
-        else:
-            self.clear_history(x=True, z=True)
-            self.t_obstacle_start = None
-            self.update_finite_state(force=True)
-
+        self.local_vel_sp.twist.linear.z = z_vel
+        self.vel_hist[2].insert(0,z_vel)
+        return
 
     def smooth_vel(self): # running average to produce smoother movements 
         for i in range(len(self.vel_hist)-1):
@@ -226,7 +186,6 @@ class ARObstacleController:
             self.vel_hist[3] = [0 for i in self.vel_hist[3]]
 
 
-
 ###########################################################################################################################
 # DO NOT MODIFY BELOW THIS COMMENT
 ###########################################################################################################################
@@ -234,28 +193,30 @@ class ARObstacleController:
     def start_streaming_offboard_vel(self):
         def run_streaming():
             self.offboard_vel_streaming = True
-            while not rospy.is_shutdown() and self.current_state.mode != 'OFFBOARD':
+            while (not rospy.is_shutdown()) and self.current_state.mode != 'OFFBOARD':
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
                 self.local_vel_sp_pub.publish(velocity_message)
-                #self.ar_vel.publish(velocity_message)
                 rospy.loginfo('Waiting to enter offboard mode')
                 rospy.Rate(60).sleep()
 
         # Publish at the desired rate
-            while (not rospy.is_shutdown()) and self.offboard_vel_streaming != "OFFBOARD":
+            while (not rospy.is_shutdown()) and self.offboard_vel_streaming:
 
                 self.update_finite_state()
                 vel = TwistStamped()
-                self.generate_vel()
+                self.get_vel()
             # create a vel setpoint based on 1the vel setpoint member variable
                 vel = self.local_vel_sp
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
-                self.local_vel_sp_pub.publish(vel)
-                #self.ar_vel.publish(vel)
+
+                if (vel is not None):
+                    vel.twist.linear.z = min(0.5, vel.twist.linear.z)
+
+                    self.line_vel.publish(vel)
                 self.rate.sleep()
 
         self_offboard_vel_streaming_thread = threading.Thread(target=run_streaming)
