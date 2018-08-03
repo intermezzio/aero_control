@@ -92,26 +92,27 @@ class ARObstacleController:
 	#print("start finite state")
 
         if len(self.markers) == 0:
-	    print("hellooooooo")
+	    	print("hellooooooo")
             self.finite_state = 0
-	    return
-	elif len(self.markers) > 0:
-		print("goddddddddddddbbyyyyyyyee")
+	    	return
+		elif len(self.markers) > 0:
+			print("goddddddddddddbbyyyyyyyee")
         	self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
         	self.current_obstacle_tag = self.current_obstacle_marker.id
-        	if self.current_obstacle_marker.pose.pose.position.x < 0.5:
-            		if self.current_obstacle_tag % 2 == 1: 
-                		self.finite_state = 4
+        	if self.current_obstacle_marker.pose.pose.position.x < 1.0:
+
+            	if self.current_obstacle_tag % 2 == 1: 
+                	self.finite_state = 4
 				return
             		else:
                 		self.finite_state = 3
 				print("HURDLE")
 				return
         
-    	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.5:
-    	    if self.finite_state != 1:
-    		self.start_state_1 = time.now()
-    	    self.finite_state = 1
+    	#if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.5:
+    	    #if self.finite_state != 1:
+    		#self.start_state_1 = time.now()  
+    	    #self.finite_state = 1
 	#print(self.finite_state)
 
     def get_vel(self):
@@ -137,12 +138,16 @@ class ARObstacleController:
             net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos < 0.75:
                 rospy.loginfo("FLY UP")
+            time.sleep(3)
+           	z_vel = self.finite_state = 0
         elif self.finite_state == 3:
             rospy.loginfo("avoiding gate")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
             if -curr_pos > -0.75:
                 rospy.loginfo("FLY DOWN")
+           	time.sleep(3)
+            z_vel = self.finite_state = 0
 
         if abs(net_pos) < _THRESH:
             rospy.loginfo("We're in range!")
