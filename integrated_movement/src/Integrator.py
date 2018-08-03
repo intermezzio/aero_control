@@ -10,9 +10,18 @@ class Integrator:
         rospy.loginfo("Integrator started")
         mavros.set_namespace()
 
+        self.ar_vel = None
+        self.line_vel = None
+
         self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size = 1)
         self.obst_cmds = rospy.Subscriber("/ar_vel", TwistStamped, self.ar_cb)
         self.line_cmds = rospy.Subscriber("/line_vel", TwistStamped, self.line_cb)
+
+    def ar_cb(self, msg):
+        self.ar_vel = msg
+
+    def line_cb(self, msg):
+        self.line_vel = msg
 
     def merge_cmds(self):
         vel = TwistStamped()
