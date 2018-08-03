@@ -26,10 +26,10 @@ class ARObstacleController:
         self.state_sub = rospy.Subscriber("/mavros/state", State, self.state_cb)
         self.local_pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.local_pose_cb)
         self.local_pose_sp_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
-        self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
+        #self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
         self.pub_error = rospy.Publisher("/obs_error", Twist, queue_size=1) # set data type to publish to error
 
-        #self.ar_vel = rospy.Publisher("/ar_vel", TwistStamped, queue_size=1)
+        self.ar_vel = rospy.Publisher("/ar_vel", TwistStamped, queue_size=1)
 
         self.ar_pose_sub = rospy.Subscriber("/ar_aero_pose", AlvarMarkers, self.ar_pose_cb)
 
@@ -242,8 +242,8 @@ class ARObstacleController:
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
-                self.local_vel_sp_pub.publish(velocity_message)
-                #self.ar_vel.publish(velocity_message)
+                #self.local_vel_sp_pub.publish(velocity_message)
+                self.ar_vel.publish(velocity_message)
                 rospy.loginfo('Waiting to enter offboard mode')
                 rospy.Rate(60).sleep()
 
@@ -258,8 +258,8 @@ class ARObstacleController:
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
-                self.local_vel_sp_pub.publish(vel)
-                #self.ar_vel.publish(vel)
+                #self.local_vel_sp_pub.publish(vel)
+                self.ar_vel.publish(vel)
                 self.rate.sleep()
 
         self_offboard_vel_streaming_thread = threading.Thread(target=run_streaming)
