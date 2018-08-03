@@ -1,0 +1,8 @@
+<!-- Line Tracker: Launch file for mavros, detector, and tracker-->
+<launch>
+  <!-- Launch detector node -->
+  <node pkg="aero_control" name="detector" type="detector.py"/>
+
+  <!-- Launch tracker node -->
+  <node pkg="aero_control" name="listener" type="listener.py"/>
+</launch>
