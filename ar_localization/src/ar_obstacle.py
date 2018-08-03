@@ -27,7 +27,7 @@ _K_P_Z = .25
 
 _CLEARANCE = 0.5
 
-_THRESH = 0.25
+_THRESH = 0.5
 
 class ARObstacleController:
     def __init__(self, hz=60):
@@ -95,12 +95,13 @@ class ARObstacleController:
 
         self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
         self.current_obstacle_tag = self.current_obstacle_marker.id
-        if self.current_obstacle_tag % 2 == 1:
-            self.finite_state = 4
-        else:
-            self.finite_state = 3
+        if current_obstacle_marker.pose.pose.position.x < 0.5:
+            if self.current_obstacle_tag % 2 == 1: 
+                self.finite_state = 4
+            else:
+                self.finite_state = 3
         
-    	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.25:
+    	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.5:
     	    if self.finite_state != 1:
     		self.start_state_1 = time.now()
     	    self.finite_state = 1
