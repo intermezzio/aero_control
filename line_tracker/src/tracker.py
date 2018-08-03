@@ -185,7 +185,7 @@ class LineTracker:
                     # limit speed for safety
                     velocity_setpoint_limited = deepcopy(self.velocity_setpoint)
                     speed = np.linalg.norm([velocity_setpoint_limited.twist.linear.x,
-                                            velocity_setpoint_limited.twist.linear.y)
+                                            velocity_setpoint_limited.twist.linear.y])
                     if speed > MAX_SPEED:
                         velocity_setpoint_limited.twist.linear.x *= MAX_SPEED / speed
                         velocity_setpoint_limited.twist.linear.y *= MAX_SPEED / speed
