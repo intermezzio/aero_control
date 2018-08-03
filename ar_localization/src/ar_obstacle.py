@@ -6,6 +6,7 @@ import time
 import threading
 import numpy as np
 import tf
+from aero_control.msg import Ar_ob
 from tf.transformations import * 
 from geometry_msgs.msg import Twist, PoseStamped, TwistStamped, PoseArray, Vector3
 from ar_track_alvar_msgs.msg import AlvarMarkers, AlvarMarker
@@ -86,40 +87,49 @@ class ARObstacleController:
         self.update_finite_state()
 
 
+
     def update_finite_state(self, mode=0, force=False): # updates current phase of avoidance 
+	print("start finite state")
         if force:
             self.finite_state = mode
             return
         if self.current_obstacle_marker == None:
             self.finite_state = 0
-
-        self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
-        self.current_obstacle_tag = self.current_obstacle_marker.id
-        if current_obstacle_marker.pose.pose.position.x < 0.5:
-            if self.current_obstacle_tag % 2 == 1: 
-                self.finite_state = 4
-            else:
-                self.finite_state = 3
+	    return
+	else:
+        	self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
+        	self.current_obstacle_tag = self.current_obstacle_marker.id
+        	if self.current_obstacle_marker.pose.pose.position.x < 0.5:
+            		if self.current_obstacle_tag % 2 == 1: 
+                		self.finite_state = 4
+				return
+            		else:
+                		self.finite_state = 3
+				return
         
     	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.5:
     	    if self.finite_state != 1:
     		self.start_state_1 = time.now()
     	    self.finite_state = 1
+	print(self.finite_state)
 
     def get_vel(self):
         global _CLEARANCE
         if self.finite_state == 0:
+	    print("no marker lol")
             if self.current_pose.pose.position.z != _DEFAULT_HEIGHT:
                 Error = (_DEFAULT_HEIGHT - self.current_pose.pose.position.z)
                 if Error < 0:
                     amount_down = Error / 2
                     z_vel = (amount_down)
                     #Velocity should be negative
+		    return
                 if Error > 0: 
                     amount_up = Error / 2
                     z_vel = (amount_up)
                     #Velocity should be positive
-            return
+	    	    self.local_vel_sp.twist.linear.z = z_vel
+		    return
         elif self.finite_state == 4:
             rospy.loginfo("avoiding hurdle")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
@@ -205,10 +215,9 @@ class ARObstacleController:
             while (not rospy.is_shutdown()) and self.offboard_vel_streaming:
 
                 self.update_finite_state()
-                vel = TwistStamped()
                 self.get_vel()
             # create a vel setpoint based on 1the vel setpoint member variable
-                vel = self.local_vel_sp
+              	vel = self.local_vel_sp
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
@@ -216,7 +225,7 @@ class ARObstacleController:
                 if (vel is not None):
                     vel.twist.linear.z = min(0.5, vel.twist.linear.z)
 
-                    self.line_vel.publish(vel)
+                    self.local_vel_sp_pub.publish(vel)
                 self.rate.sleep()
 
         self_offboard_vel_streaming_thread = threading.Thread(target=run_streaming)
