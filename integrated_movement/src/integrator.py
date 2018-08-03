@@ -6,7 +6,6 @@ from geometry_msgs.msg import Twist, TwistStamped
 import threading
 import mavros
 from mavros_msgs.msg import State
-from aero_control.msg import Line_Det, Ar_ob
 
 class Integrator:
     def __init__(self):
@@ -23,7 +22,7 @@ class Integrator:
         self.line_cmds = rospy.Subscriber("/line_vel", TwistStamped, self.line_cb)
         self.current_state = State()
 
-	self.rate = rospy.Rate(60)
+        self.rate = rospy.Rate(60)
     def state_cb(self,msg):
         self.current_state = msg
 
