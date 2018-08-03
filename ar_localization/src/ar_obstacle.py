@@ -17,7 +17,7 @@ from aero_control.msg import Ar_ob
 import mavros
 from mavros_msgs.msg import State
 
-
+_DEFAULT_HEIGHT = 1.0
 _DEBUG = False
 
 _INTEGRATED = True
@@ -90,10 +90,6 @@ class ARObstacleController:
             self.finite_state = mode
             return
 
-        if len(self.markers) == 0:
-            self.finite_state = 0
-            return
-
         self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
         self.current_obstacle_tag = self.current_obstacle_marker.id
         if self.current_obstacle_tag % 2 == 1:
@@ -109,11 +105,21 @@ class ARObstacleController:
     def get_vel(self):
         global _CLEARANCE
         if self.finite_state == 0:
-            self.vel_hist[0].insert(0,0.0)
-            self.vel_hist[1].insert(0,0.0)
-            self.vel_hist[2].insert(0,0.0)
-            self.vel_hist[3].insert(0,0.0)
-	    self.local_vel_sp.twist.linear.z = 0
+
+
+            if self.current_obstacle_marker != None and self.current_pose.pose.position.z != 1.0:
+                Error = (1.0 - self.current_pose.pose.position.z)
+                if Error < 0:
+                    amount_down = Error / 2
+                    z_vel = (amount_down)
+                    #Velocity should be negative
+                if Error > 0: 
+                    amount_up = Error / 2
+                    z_vel = (amount_up)
+                    #Velocity should be positiv
+
+
+	        #self.local_vel_sp.twist.linear.z = 0
             return
         elif self.finite_state == 4:
             rospy.loginfo("avoiding hurdle")
