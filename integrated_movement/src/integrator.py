@@ -15,15 +15,15 @@ class Integrator:
         self.ar_vel = None
         self.line_vel = None
 
-	self.state_sub = rospy.Subscriber("/mavros/State", State, self.state_cb)
+        self.state_sub = rospy.Subscriber("/mavros/State", State, self.state_cb)
 
         self.local_vel_sp_pub = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size = 1)
         self.obst_cmds = rospy.Subscriber("/ar_vel", TwistStamped, self.ar_cb)
         self.line_cmds = rospy.Subscriber("/line_vel", TwistStamped, self.line_cb)
-	self.current_state = State()
+        self.current_state = State()
 
     def state_cb(self,msg):
-	self.current_state = msg
+        self.current_state = msg
 
     def ar_cb(self, msg): 
         self.ar_vel = msg
