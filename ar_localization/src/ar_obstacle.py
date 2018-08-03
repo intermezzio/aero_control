@@ -125,6 +125,7 @@ class ARObstacleController:
                 
                 
     def get_vel(self):
+        global _CLEARANCE
         if self.finite_state == 0:
             self.vel_hist[0].insert(0,0.0)
             self.vel_hist[1].insert(0,0.0)
@@ -135,25 +136,24 @@ class ARObstacleController:
             rospy.logerr("avoiding hurdle")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
+            if curr_pos < 0.75:
+                rospy.loginfo("FLY UP")
         elif self.finite_state == 4:
             rospy.logerr("avoiding gate")
             curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
             net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
-
+            if curr_pos > -0.75:
+                rospy.loginfo("FLY DOWN")
         if abs(net_pos) < _THRESH:
             rospy.loginfo("We're in range!")
             z_vel = 0
         else:
             z_vel = _K_P_Z * net_pos
-        if 0 < net_pos < .75:
-            rospy.loginfo("FLY UP")
-        elif -0.75 < net_pos < 0:
-            rospy.loginfo("FLY_DOWN")
-
 
         if _DEBUG: rospy.loginfo("vel cmd: x: " + "%.05f" % vel.twist.linear.x + " y: " + "%.05f" % vel.twist.linear.y + " z: " + "%.05f" % vel.twist.linear.z + " yaw: " + "%.05f" % vel.twist.angular.z)
 
         self.local_vel_sp.twist.linear.z = z_vel
+        self.vel_hist[2].insert(0,z_vel)
         return
 
     def generate_vel(self): # assesses course of action using finite state
@@ -288,7 +288,6 @@ class ARObstacleController:
         
         # Publish a "don't move" velocity command
                 velocity_message = TwistStamped()
-                #self.local_vel_sp_pub.publish(velocity_message)
                 self.local_vel_sp_pub.publish(velocity_message)
                 rospy.loginfo('Waiting to enter offboard mode')
                 rospy.Rate(60).sleep()
@@ -304,7 +303,6 @@ class ARObstacleController:
            
             # Create a zero-velocity setpoint
             # vel = Twist()    
-                #self.local_vel_sp_pub.publish(vel)
                 self.local_vel_sp_pub.publish(vel)
                 self.rate.sleep()
 
