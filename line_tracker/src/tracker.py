@@ -19,7 +19,7 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = True # set to True to test on laptop
+NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 num_unit_vecs = 75
 _TIME_STEP = 0.1
@@ -42,7 +42,7 @@ class LineTracker:
 
 
         # Variables dealing with publishing setpoint
-        self.current_state = None
+        self.current_state = State()
         self.sub_state = rospy.Subscriber("/mavros/state", State, self.state_cb) # get drne state
         self.offboard_point_streaming = False
 
