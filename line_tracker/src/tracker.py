@@ -19,7 +19,7 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = False # set to True to test on laptop
+NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 num_unit_vecs = 75
 _TIME_STEP = 0.1
@@ -42,8 +42,8 @@ class LineTracker:
 
 
         # Variables dealing with publishing setpoint
-        self.sub_state = rospy.Subscriber("/mavros/state", State, self.state_cb) # get drne state
         self.current_state = None
+        self.sub_state = rospy.Subscriber("/mavros/state", State, self.state_cb) # get drne state
         self.offboard_point_streaming = False
 
         # Setpoint field expressed as the desired velocity of the body-down frame
@@ -58,6 +58,9 @@ class LineTracker:
         self.controlX = PID(kp=0.01, ki=0, kd=0,smooth=False)
         self.controlY = PID(kp=0.01, ki=0, kd=0.0,smooth=False)
         self.controlYAW = PID(kp=0.25, ki=0, kd=0.0,smooth=False)
+
+    def state_cb(self, msg):
+        self.current_state = msg
 
 
     def line_param_cb(self, line_params):
@@ -184,11 +187,12 @@ class LineTracker:
         """
         def run_streaming():
             self.offboard_point_streaming = True
-            while (not rospy.is_shutdown()) and self.current_state.mode != 'OFFBOARD':
-                velocity_mesage = TwistStamped()
-                self.line_vel.publish(velocity_message)
-                rospy.loginfo('Waiting to enter offboard mode')
-                rospy.Rate(60).sleep()
+            if NO_ROBOT == False:
+                while (not rospy.is_shutdown()) and self.current_state.mode != 'OFFBOARD':
+                    velocity_mesage = TwistStamped()
+                    self.line_vel.publish(velocity_message)
+                    rospy.loginfo('Waiting to enter offboard mode')
+                    rospy.Rate(60).sleep()
 
             while (not rospy.is_shutdown()) and self.offboard_point_streaming:
                 # Publish commands when on
