@@ -158,6 +158,8 @@ class LineTracker:
         self.velocity_setpoint.twist.linear.x = cmd_x
         self.velocity_setpoint.twist.linear.y = cmd_y
         self.velocity_setpoint.twist.linear.z = 0
+	
+
 
             # TODO-END
 
@@ -191,8 +193,9 @@ class LineTracker:
                         velocity_setpoint_limited.twist.linear.y *= MAX_SPEED / speed
 
                     # Publish limited setpoint
-
+		    print("HIIIIIIIIIIIIIIIIIIIIIIII")
                     self.line_vel.publish(velocity_setpoint_limited)
+	
 
                     # self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited.twist.angular.z)
                     rospy.loginfo(velocity_setpoint_limited)
