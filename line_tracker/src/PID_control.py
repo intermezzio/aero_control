@@ -148,7 +148,7 @@ class PIDController:
     def printControl(self):
         # print len(self.errors)
         # print len(self.cmds)
-        return zip(self.errors, self.cmds)'''
+        return zip(self.errors, self.cmds)
 
 
 if __name__ == "__main__":
