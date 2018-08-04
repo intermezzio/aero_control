@@ -134,11 +134,11 @@ class PIDController:
             return curr
         if r == None:
             r = self.r
-        print "smoothing: r=%f and curr=%f"%(r, curr)
+        #print "smoothing: r=%f and curr=%f"%(r, curr)
         cmds = self.cmds[-prev::-1]
         offset = map(lambda (i,x): (x[-1]) * ( r ** float(i+1)), enumerate(cmds))
         offsetSum = sum(offset)
-        print "offset: %f"%(offsetSum)
+        #print "offset: %f"%(offsetSum)
         newcmd = offsetSum / ((1-r**prev) / (1-r)) # finite geometric seq
         # use a geometric series to do the follwoing:
         # cmd + 1/4 * cmd[-1] + 1/16 * cmd[-2] ... etc

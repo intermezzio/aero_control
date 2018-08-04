@@ -19,7 +19,7 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = False # set to True to test on laptop
+NO_ROBOT = True # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 num_unit_vecs = 75
 _TIME_STEP = 0.1
@@ -55,9 +55,9 @@ class LineTracker:
         # create PID controllers
 
 
-        self.controlX = PID(kp=0.1, ki=0, kd=0)
-        self.controlY = PID(kp=0.1, ki=0, kd=0.0)
-        self.controlYAW = PID(kp=0.25, ki=0, kd=0.0)
+        self.controlX = PID(kp=0.001, ki=0, kd=0,smooth=False)
+        self.controlY = PID(kp=0.01, ki=0, kd=0.0,smooth=False)
+        self.controlYAW = PID(kp=0.25, ki=0, kd=0.0,smooth=False)
 
 
     def line_param_cb(self, line_params):
@@ -113,10 +113,11 @@ class LineTracker:
 
             
             if m == 0:
-                m = 0.00001
+                m = 0.1
+                print("im wrong")
             if m == -1:
-                m = -0.0001
-
+                m = -0.1
+                print("im wrong")
 
             closeX = -b/(1+1/m)
             closeY = m*closeX + b
@@ -153,6 +154,8 @@ class LineTracker:
         cmd_y = self.controlY.adjust(y_err)
         cmd_yaw = self.controlYAW.adjust(yaw_err)
 
+        if cmd_x == 0. and cmd_y == 0. and cmd_yaw == 0.:
+            print("all zeroes are being entered")
         self.velocity_setpoint.twist.angular.z = cmd_yaw # execute vel commands
 
         self.velocity_setpoint.twist.linear.x = cmd_x
@@ -191,9 +194,10 @@ class LineTracker:
                     if speed > MAX_SPEED:
                         velocity_setpoint_limited.twist.linear.x *= MAX_SPEED / speed
                         velocity_setpoint_limited.twist.linear.y *= MAX_SPEED / speed
+                        if velocity_setpoint_limited.twist.linear.z > MAX_SPEED:
+                            velocity_setpoint_limited.twist.linear.z = MAX_SPEED
 
-                    # Publish limited setpoint
-		    print("HIIIIIIIIIIIIIIIIIIIIIIII")
+                        # Publish limited setpoint
                     self.line_vel.publish(velocity_setpoint_limited)
 	
 
