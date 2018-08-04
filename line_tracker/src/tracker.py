@@ -184,6 +184,12 @@ class LineTracker:
         """
         def run_streaming():
             self.offboard_point_streaming = True
+            while (not rospy.is_shutdown()) and self.current_state.mode != 'OFFBOARD':
+                velocity_mesage = TwistStamped()
+                self.line_vel.publish(velocity_message)
+                rospy.loginfo('Waiting to enter offboard mode')
+                rospy.Rate(60).sleep()
+
             while (not rospy.is_shutdown()) and self.offboard_point_streaming:
                 # Publish commands when on
                 if (self.velocity_setpoint is not None):
