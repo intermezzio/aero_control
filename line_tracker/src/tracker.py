@@ -19,7 +19,7 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = True # set to True to test on laptop
+NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 num_unit_vecs = 75
 _TIME_STEP = 0.1
@@ -55,7 +55,7 @@ class LineTracker:
         # create PID controllers
 
 
-        self.controlX = PID(kp=0.001, ki=0, kd=0,smooth=False)
+        self.controlX = PID(kp=0.01, ki=0, kd=0,smooth=False)
         self.controlY = PID(kp=0.01, ki=0, kd=0.0,smooth=False)
         self.controlYAW = PID(kp=0.25, ki=0, kd=0.0,smooth=False)
 
@@ -204,7 +204,7 @@ class LineTracker:
                             velocity_setpoint_limited.twist.linear.z = MAX_SPEED
 
                         # Publish limited setpoint
-                    self.line_vel.publish(velocity_setpoint_limited)
+                        self.line_vel.publish(velocity_setpoint_limited)
 	
 
                     # self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited.twist.angular.z)
