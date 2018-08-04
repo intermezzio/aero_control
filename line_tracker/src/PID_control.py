@@ -2,7 +2,7 @@ import itertools
 class PIDController:
     freq = .1
     osc_period = 1
-    def __init__(self, kp=1, ki=0.0, kd=0.0, group=5, timeStep=None):
+    def __init__(self, kp=1, ki=0.0, kd=0.0, group=5, r=0.33, smooth=True, timeStep=None):
         """
         Create a PID controller!
         kp, ki, and kd are defaulted at 1
@@ -28,6 +28,9 @@ class PIDController:
         # 1: p only
         # 2: p, i
         # 3: p, i, d
+
+        self.smooth = smooth
+        self.r = r
         return
 
     def __add__(self, error): # add error with + sign
@@ -54,11 +57,12 @@ class PIDController:
         i = self.i_control() # do i control
         d = self.d_control() # do d control
         adjusted = p+i+d
-        smoothed = self.smoothCmd(adjusted)
+        if self.smooth:
+            adjusted = self.smoothCmd(adjusted)
         self.cmds.append( (p,i,d, adjusted) ) # add new cmd to list
         self.iterations += 1
-        # print "step: %d cmd: %.2f"%(self.iterations, smoothed)
-        return smoothed
+        print "step: %d cmd: %.2f"%(self.iterations, adjusted)
+        return adjusted
 
     def p_control(self):
         if not self.kp:
@@ -123,23 +127,24 @@ class PIDController:
         # calculate the amount of sign changes
         return changes
 
-    def smoothCmd(self, curr, r=0.25, prev=None):
+    def smoothCmd(self, curr, r=None, prev=None):
         if prev == None:
             prev=min(self.iterations, 5)
-        if prev < 5:
+        if prev < 2:
             return curr
+        if r == None:
+            r = self.r
         print "smoothing: r=%f and curr=%f"%(r, curr)
         cmds = self.cmds[-prev::-1]
         offset = map(lambda (i,x): (x[-1]) * ( r ** float(i+1)), enumerate(cmds))
         offsetSum = sum(offset)
         print "offset: %f"%(offsetSum)
-        newcmd = curr + offsetSum
+        newcmd = offsetSum / ((1-r**prev) / (1-r)) # finite geometric seq
         # use a geometric series to do the follwoing:
         # cmd + 1/4 * cmd[-1] + 1/16 * cmd[-2] ... etc
-        newcmd /= ((1-r**len(cmds)) / (1-r)) # finite geometric seq
         print "newcmd: %f"%(newcmd)
         return newcmd
-    '''
+    
     def printControl(self):
         # print len(self.errors)
         # print len(self.cmds)
@@ -169,9 +174,9 @@ if __name__ == "__main__":
         pid.adjust(i - 2.5)
     for i in range(5):
         pid.adjust(2.5 - i)
-    '''
+    
     #log = pid.printControl()
     #for i, l in enumerate(log):
     #    print "%d: %s %s"%(i,l[0], l[-1][-1])
-
+    '''
     # pid.ziegler_nichols_tuning()
