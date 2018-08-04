@@ -89,29 +89,30 @@ class ARObstacleController:
 
 
     def update_finite_state(self, mode=0, force=False): # updates current phase of avoidance 
-	print("start finite state")
-        if force:
-            self.finite_state = mode
-            return
-        if self.current_obstacle_marker == None:
+	#print("start finite state")
+
+        if len(self.markers) == 0:
+	    print("hellooooooo")
             self.finite_state = 0
 	    return
-	else:
+	elif len(self.markers) > 0:
+		print("goddddddddddddbbyyyyyyyee")
         	self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
         	self.current_obstacle_tag = self.current_obstacle_marker.id
-        	if self.current_obstacle_marker.pose.pose.position.x < 0.5:
+        	if self.current_obstacle_marker.pose.pose.position.x < 1.0:
             		if self.current_obstacle_tag % 2 == 1: 
                 		self.finite_state = 4
 				return
             		else:
                 		self.finite_state = 3
+				print("HURDLE")
 				return
         
     	if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.5:
     	    if self.finite_state != 1:
     		self.start_state_1 = time.now()
     	    self.finite_state = 1
-	print(self.finite_state)
+	#print(self.finite_state)
 
     def get_vel(self):
         global _CLEARANCE
