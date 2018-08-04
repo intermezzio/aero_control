@@ -21,7 +21,7 @@ WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
 NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
-num_unit_vecs = 50
+num_unit_vecs = 75
 _TIME_STEP = 0.1
 _PTS_AHEAD = 50
 class LineTracker:
@@ -55,9 +55,9 @@ class LineTracker:
         # create PID controllers
 
 
-        self.controlX = PID(kp=0.75, ki=0, kd=0)
-        self.controlY = PID(kp=1.0, ki=0, kd=0.2)
-        self.controlYAW = PID(kp=1.25, ki=0, kd=0.3)
+        self.controlX = PID(kp=0.1, ki=0, kd=0)
+        self.controlY = PID(kp=0.1, ki=0, kd=0.0)
+        self.controlYAW = PID(kp=0.25, ki=0, kd=0.0)
 
 
     def line_param_cb(self, line_params):
@@ -158,6 +158,8 @@ class LineTracker:
         self.velocity_setpoint.twist.linear.x = cmd_x
         self.velocity_setpoint.twist.linear.y = cmd_y
         self.velocity_setpoint.twist.linear.z = 0
+	
+
 
             # TODO-END
 
@@ -191,8 +193,9 @@ class LineTracker:
                         velocity_setpoint_limited.twist.linear.y *= MAX_SPEED / speed
 
                     # Publish limited setpoint
-
+		    print("HIIIIIIIIIIIIIIIIIIIIIIII")
                     self.line_vel.publish(velocity_setpoint_limited)
+	
 
                     # self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited.twist.angular.z)
                     rospy.loginfo(velocity_setpoint_limited)
