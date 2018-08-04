@@ -17,7 +17,7 @@ from std_msgs.msg import String
 import mavros
 from mavros_msgs.msg import State
 
-_DEFAULT_HEIGHT = 1.0
+_DEFAULT_HEIGHT = 0.7
 _DEBUG = False
 
 _INTEGRATED = True
@@ -26,7 +26,7 @@ MAX_SPEED =  0.5# [m/s]
 
 _K_P_Z = .25
 
-_CLEARANCE = 0.5
+_CLEARANCE = 1.0
 
 _THRESH = 0.5
 
@@ -99,7 +99,7 @@ class ARObstacleController:
 		print("goddddddddddddbbyyyyyyyee")
         	self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
         	self.current_obstacle_tag = self.current_obstacle_marker.id
-        	if self.current_obstacle_marker.pose.pose.position.x < 1.0:
+        	if self.current_obstacle_marker.pose.pose.position.x < 0.5:
             		if self.current_obstacle_tag % 2 == 1: 
                 		self.finite_state = 4
 				return
