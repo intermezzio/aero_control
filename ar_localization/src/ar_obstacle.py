@@ -93,8 +93,9 @@ class ARObstacleController:
 		if len(self.markers) == 0:
 			print("hellooooooo")
 			self.finite_state = 0
+
 			return
-		elif self.finite_state != 0 and len(self.markers) > 0:
+		elif len(self.markers) > 0:
 			print("goddddddddddddbbyyyyyyyee")
 			self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
 			self.current_obstacle_tag = self.current_obstacle_marker.id
@@ -118,6 +119,7 @@ class ARObstacleController:
 		global _CLEARANCE
 		if self.finite_state == 0:
 			print("no marker lol")
+			z_vel = 0
 			if self.current_pose.pose.position.z != _DEFAULT_HEIGHT:
 				Error = (_DEFAULT_HEIGHT - self.current_pose.pose.position.z)
 				if Error < 0:
