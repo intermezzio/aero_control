@@ -141,6 +141,7 @@ class ARObstacleController:
 				rospy.loginfo("FLY UP")
 			# time.sleep(1)
 			self.finite_state = 0
+			self.markers = []
 		elif self.finite_state == 3:
 			rospy.loginfo("avoiding gate")
 			curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
@@ -149,6 +150,7 @@ class ARObstacleController:
 				rospy.loginfo("FLY DOWN")
 			# time.sleep(1)
 			self.finite_state = 0
+			self.markers = []
 
 		if abs(net_pos) < _THRESH:
 			rospy.loginfo("We're in range!")
