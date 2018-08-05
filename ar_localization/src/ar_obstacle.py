@@ -108,6 +108,8 @@ class ARObstacleController:
 					self.finite_state = 3
 					print("HURDLE")
 					return
+			self.markers = []
+
 		
 		#if self.local_pose_sp == 0 and self.current_obstacle_marker.pose.pose.position.x < 0.5:
 			#if self.finite_state != 1:
@@ -119,7 +121,6 @@ class ARObstacleController:
 		global _CLEARANCE
 		if self.finite_state == 0:
 			print("no marker lol")
-			z_vel = 0
 			if self.current_pose.pose.position.z != _DEFAULT_HEIGHT:
 				Error = (_DEFAULT_HEIGHT - self.current_pose.pose.position.z)
 				if Error < 0:
@@ -140,7 +141,7 @@ class ARObstacleController:
 			if -curr_pos < 0.75:
 				rospy.loginfo("FLY UP")
 			time.sleep(3)
-			z_vel = self.finite_state = 0
+			#z_vel = self.finite_state = 0
 		elif self.finite_state == 3:
 			rospy.loginfo("avoiding gate")
 			curr_pos = self.current_obstacle_marker.pose.pose.position.z # position of current tag
@@ -148,7 +149,7 @@ class ARObstacleController:
 			if -curr_pos > -0.75:
 				rospy.loginfo("FLY DOWN")
 			time.sleep(3)
-			z_vel = self.finite_state = 0
+			#z_vel = self.finite_state = 0
 
 		if abs(net_pos) < _THRESH:
 			rospy.loginfo("We're in range!")
