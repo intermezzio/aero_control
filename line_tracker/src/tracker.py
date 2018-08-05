@@ -208,7 +208,7 @@ class LineTracker:
                             velocity_setpoint_limited.twist.linear.z = MAX_SPEED
 
                             # Publish limited setpoint
-                        self.line_vel.publish(velocity_setpoint_limited)
+                    self.line_vel.publish(velocity_setpoint_limited)
 	
 
                     # self.pub_local_velocity_setpoint.publish(velocity_setpoint_limited.twist.angular.z)
