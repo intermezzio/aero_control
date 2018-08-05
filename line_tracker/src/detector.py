@@ -48,7 +48,7 @@ class LineDetector:
         upper = 255
         lower = 255
 
-        k_dim = 5
+        k_dim = 3
         kernel = np.ones((k_dim,k_dim),np.uint8)
 
         d = deepcopy(cv_image) #preserves raw images, but requires more time and processing power    
@@ -56,7 +56,7 @@ class LineDetector:
         d = cv2.morphologyEx(d,cv2.MORPH_CLOSE,kernel)
         # d = cv2.resize(d, (0,0), fx=10, fy=10)
 # 
-        ret,thresh = cv2.threshold(d,0,255,0)
+        ret,thresh = cv2.threshold(d,245,255,cv2.THRESH_BINARY)
         im2,contours,hierarchy = cv2.findContours(thresh, 1, 2)#adds the pixels in the threshold to the list of possible contours
         
         if len(contours) > 0:
@@ -67,8 +67,7 @@ class LineDetector:
             p_frame_center = (img_center_x,img_center_y)
 
             [vx,vy,x,y] = cv2.fitLine(max_contours, cv2.DIST_L2,0,0.01,0.01)
-        	
-
+            if vx[0] < 0.00001: vx = 0.00001
 	    #lefty = int((-x*vy/vx) + y)
      	    #righty = int(((cols-x)*vy/vx)+y)
 
@@ -147,9 +146,12 @@ class LineDetector:
                  # delete ths line and add your code if you want debug images
 
                 try:
-                    self.img_view.publish(self.bridge.cv2_to_imgmsg(d, "8UC1"))
-                    pass
-
+                    lefty = int((-x*vy/vx) + y)
+		    righty = int(((cols-x)*vy/vx)+y)
+		    img_color = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+		    cv2.line(img_color,(cols-1,righty),(0,lefty),(255,0,0),2)
+		    self.img_view.publish(self.bridge.cv2_to_imgmsg(img_color, "rgb8"))
+                    
                 except CvBridgeError as e:
                     print(e)
                 # TODO-OPTIONAL-END
