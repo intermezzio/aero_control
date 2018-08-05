@@ -68,7 +68,7 @@ class PIDController:
         if not self.kp:
             return 0
         error = self.errors[-1]
-        newcmd = -error * self.kp # formula for kp
+        newcmd = error * self.kp # formula for kp
         return newcmd
 
     def i_control(self):

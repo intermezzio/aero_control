@@ -48,7 +48,7 @@ class LineTracker:
 
         # Setpoint field expressed as the desired velocity of the body-down frame
         #  with respect to the world frame parameterized in the body-down frame
-        self.velocity_setpoint = None # desired velocity
+        self.velocity_setpoint = TwistStamped() # desired velocity
 
         # while not rospy.is_shutdown() and self.current_state == None:
         #     pass  # Wait for connection
@@ -56,8 +56,8 @@ class LineTracker:
 
 
         self.controlX = PID(kp=0.01, ki=0, kd=0,smooth=False)
-        self.controlY = PID(kp=0.01, ki=0, kd=0.0,smooth=False)
-        self.controlYAW = PID(kp=0.25, ki=0, kd=0.0,smooth=False)
+        self.controlY = PID(kp=0.001, ki=0, kd=0.0,smooth=False)
+        self.controlYAW = PID(kp=0.05, ki=0, kd=0.0,smooth=False)
 
     def state_cb(self, msg):
         self.current_state = msg
@@ -101,8 +101,8 @@ class LineTracker:
             # switch to proper coordinates
 
             x -= img_center_x
-            y -= img_center_y
-            y *= -1
+            y = -(y - img_center_y)
+            
             
             vx = vx
             vy *= -1
@@ -132,10 +132,10 @@ class LineTracker:
             extX = closeX + num_unit_vecs * vx # new target x coord
             extY = closeY + num_unit_vecs * vy # new target y coord
 
-            yaw_error = -np.arctan(vy/vx) # yaw angle error
+            yaw_error = np.arctan(vy/vx) # yaw angle error
 
-            x_error = x - extX
-            y_error = y - extY
+            x_error = extX - x
+            y_error = extY - y
 
             self.pub_error.publish(Vector3(x_error,y_error,0))
 
@@ -150,9 +150,7 @@ class LineTracker:
         self.__x += self.__v*dt
 
     def control(self,x_err,y_err,yaw_err):
-        self.velocity_setpoint = TwistStamped() # create p controlled commands
-
-
+        
         cmd_x = self.controlX.adjust(x_err)
         cmd_y = self.controlY.adjust(y_err)
         cmd_yaw = self.controlYAW.adjust(yaw_err)
@@ -204,8 +202,8 @@ class LineTracker:
                     if speed > MAX_SPEED:
                         velocity_setpoint_limited.twist.linear.x *= MAX_SPEED / speed
                         velocity_setpoint_limited.twist.linear.y *= MAX_SPEED / speed
-                        if velocity_setpoint_limited.twist.linear.z > MAX_SPEED:
-                            velocity_setpoint_limited.twist.linear.z = MAX_SPEED
+                    if velocity_setpoint_limited.twist.linear.z > MAX_SPEED:
+                        velocity_setpoint_limited.twist.linear.z = MAX_SPEED
 
                             # Publish limited setpoint
                     self.line_vel.publish(velocity_setpoint_limited)
