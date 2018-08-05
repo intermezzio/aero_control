@@ -166,6 +166,7 @@ class ARObstacleController:
 
 		self.local_vel_sp.twist.linear.z = z_vel
 		self.vel_hist[2].insert(0,z_vel)
+		time.sleep(2)
 		return
 
 	def smooth_vel(self): # running average to produce smoother movements 
