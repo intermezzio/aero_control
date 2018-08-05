@@ -140,7 +140,7 @@ class ARObstacleController:
 			net_pos = _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
 			if -curr_pos < 0.75:
 				rospy.loginfo("FLY UP")
-			time.sleep(1)
+			# time.sleep(1)
 			self.finite_state = 0
 		elif self.finite_state == 3:
 			rospy.loginfo("avoiding gate")
@@ -148,7 +148,7 @@ class ARObstacleController:
 			net_pos = - _CLEARANCE - curr_pos # how far we need to go: _CLEARANCE meters above
 			if -curr_pos > -0.75:
 				rospy.loginfo("FLY DOWN")
-			time.sleep(1)
+			# time.sleep(1)
 			self.finite_state = 0
 
 		if abs(net_pos) < _THRESH:
