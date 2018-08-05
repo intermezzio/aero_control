@@ -94,7 +94,7 @@ class ARObstacleController:
 			print("hellooooooo")
 			self.finite_state = 0
 			return
-		elif self.finite_state != 0:
+		elif self.finite_state != 0 and len(self.markers) > 0:
 			print("goddddddddddddbbyyyyyyyee")
 			self.current_obstacle_marker = min(self.markers, key=lambda marker: marker.pose.pose.position.z)
 			self.current_obstacle_tag = self.current_obstacle_marker.id
