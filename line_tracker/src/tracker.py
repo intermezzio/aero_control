@@ -19,7 +19,7 @@ from PID_control import PIDController as PID
 
 WINDOW_HEIGHT = 128
 WINDOW_WIDTH = 128
-NO_ROBOT = True # set to True to test on laptop
+NO_ROBOT = False # set to True to test on laptop
 MAX_SPEED =  0.5# [m/s]
 num_unit_vecs = 75
 _TIME_STEP = 0.1
@@ -187,9 +187,9 @@ class LineTracker:
         """
         def run_streaming():
             self.offboard_point_streaming = True
-            if NO_ROBOT == True:
+            if NO_ROBOT == False:
                 while (not rospy.is_shutdown()) and self.current_state.mode != 'OFFBOARD':
-                    velocity_mesage = TwistStamped()
+                    velocity_message = TwistStamped()
                     self.line_vel.publish(velocity_message)
                     rospy.loginfo('Waiting to enter offboard mode')
                     rospy.Rate(60).sleep()
