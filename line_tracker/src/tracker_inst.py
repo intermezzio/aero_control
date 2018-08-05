@@ -7,7 +7,7 @@ import threading
 import numpy as np
 from geometry_msgs.msg import TwistStamped, PoseStamped, Quaternion, Point, Vector3
 from sensor_msgs.msg import Image
-from aero_control_staffonly.msg import Line
+from aero_control.msg import Line
 import cv2
 import mavros
 from mavros_msgs.msg import State

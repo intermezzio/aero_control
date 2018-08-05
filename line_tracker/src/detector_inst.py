@@ -5,7 +5,7 @@ import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
-from aero_control_staffonly.msg import Line
+from aero_control.msg import Line
 import sys
 
 led_low = 254
