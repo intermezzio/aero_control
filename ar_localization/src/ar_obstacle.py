@@ -127,7 +127,6 @@ class ARObstacleController:
 					amount_down = Error / 2
 					z_vel = (amount_down)
 					#Velocity should be negative
-					return
 				if Error > 0: 
 					amount_up = Error / 2
 					z_vel = (amount_up)
@@ -155,9 +154,9 @@ class ARObstacleController:
 			rospy.loginfo("We're in range!")
 		# record x dist
 		# change to new finite state
-			z_vel = 0
-		else:
 			z_vel = _K_P_Z * net_pos
+		else:
+			z_vel = 0
 
 		if _DEBUG: rospy.loginfo("vel cmd: x: " + "%.05f" % vel.twist.linear.x + " y: " + "%.05f" % vel.twist.linear.y + " z: " + "%.05f" % vel.twist.linear.z + " yaw: " + "%.05f" % vel.twist.angular.z)
 
