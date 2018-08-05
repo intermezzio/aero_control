@@ -9,7 +9,7 @@ from copy import deepcopy
 from aero_control.msg import Line
 import sys
 
-DEBUG = False
+DEBUG = True
 
 class LineDetector:
     def __init__(self):
