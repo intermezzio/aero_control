@@ -27,7 +27,6 @@ class Listener():
         '''TODO-START: FILL IN CODE HERE 
         * print out the message received to the terminal
         '''
->>>>>>> 77543efb4ff62a326b3b162aad36bc72473ddff6
 
 if __name__ == '__main__':
     '''
