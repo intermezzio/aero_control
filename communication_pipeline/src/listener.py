@@ -21,16 +21,7 @@ class Listener():
     def chatter_callback(self, msg):
         ''' Function to be run everytime a message is received on chatter topic
         '''
-<<<<<<< HEAD
-        msg = "Hi! I am listening to the talker node!"
-        print(msg)
-        '''TODO-START: FILL IN CODE HERE 
-        * print out the message received to the terminal
-        '''
-        # raise Exception("CODE INCOMPLETE! Delete this exception and replace with your own code")
-        '''TODO-END '''
-=======
-	msg =  "this is a listern"
+	msg =  "this is a listener"
 	print(msg)
 
         '''TODO-START: FILL IN CODE HERE 
